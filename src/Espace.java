@@ -16,6 +16,6 @@ public class Espace
 
    public class Planet extends Body
    {
-
+	  String name;
    }
 }
