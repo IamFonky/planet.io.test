@@ -9,5 +9,7 @@ public class Jeu
       Espace monUnivers = new Espace();
 
       monUnivers.addNewPlanet(5.9736E24,6371.008);
+     int m = 3;
    }
 }
+	
