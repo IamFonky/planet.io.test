@@ -3,7 +3,7 @@
  */
 public enum Constantes
 {
-   GRAVITATION(6.67E-11,"N⋅m2⋅kg-2");
+   GRAVITATION(6.66E-15,"N⋅m2⋅kg-2");
 
    Constantes(Double valeur, String unite)
    {
