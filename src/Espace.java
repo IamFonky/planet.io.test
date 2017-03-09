@@ -1,6 +1,3 @@
-import com.sun.corba.se.impl.protocol.giopmsgheaders.KeyAddr;
-import com.sun.javafx.geom.Vec2d;
-
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
