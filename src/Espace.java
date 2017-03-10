@@ -208,14 +208,15 @@ public class Espace extends Frame
             {
                Body surrounding = allThings.get(j);
 
+               //On calcule les distances x et y et la distance au carré
                double dX = surrounding.position.x - body.position.x;
-               boolean xUp = (dX > 0.0);
                double dY = surrounding.position.y - body.position.y;
-               boolean yUp = (dY > 0.0);
                double sqDistance = dX * dX + dY * dY;
 
+               //On calcule la distance réelle (Ground to ground)
                double gTgDistance = Math.sqrt(sqDistance) - body.radius/2 - surrounding.radius/2;
-               if(gTgDistance < 0)
+
+               if(gTgDistance < 0) //Collision!
                {
                   if(body.mass > surrounding.mass)
                   {
@@ -226,22 +227,35 @@ public class Espace extends Frame
                      surrounding.eat(body);
                   }
                }
-               else
+               else //Gravitation et physique
                {
-                  double vX = dX / Math.sqrt(sqDistance);
-                  double vY = dY / Math.sqrt(sqDistance);
+                  //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
+                  double rDX = dX / Math.sqrt(sqDistance);
+                  double rDY = dY / Math.sqrt(sqDistance);
 
+                  //Loi de gravité : F [N] = G [N*m2*kg-2] * mA [kg] * mB [kg] / d2 [m2]
+                  //un Newton = 1 [kg*m*s-2]. Plus simplement [kg*a] ou a est l'accélération
+                  //donc G [kg*m*s-2*m2*kg-2] ==> G [m3*s-2*kg-1]
+                  //On peut donc calculer simplement l'accélération aN sur chaque corps avec :
+                  //aA [m*s-2] = G [m3*s-2*kg-1] * mB [kg] / d2 [m2]
                   double bodyA = Constantes.GRAVITATION.valeur * surrounding.mass / sqDistance;
-                  double bodyAX = bodyA * vX;
-                  double bodyAY = bodyA * vY;
-                  double surrA = Constantes.GRAVITATION.valeur * body.mass / sqDistance;
-                  double surrAX = surrA * vX;
-                  double surrAY = surrA * vY;
+                  //A cette étape nous avons un vecteur d'accélération mais pas de direction
+                  //Il décomposer en deux composantes x et y
+                  double bodyAX = bodyA * rDX;
+                  double bodyAY = bodyA * rDY;
 
-                  body.speed.x += (xUp ? 1 : -1) * bodyAX;
-                  body.speed.y += (yUp ? 1 : -1) * bodyAY;
-                  surrounding.speed.x += (xUp ? -1 : 1) * surrAX;
-                  surrounding.speed.y += (yUp ? -1 : 1) * surrAY;
+                  //Même chose pour les deuxième corps
+                  double surrA = Constantes.GRAVITATION.valeur * body.mass / sqDistance;
+                  double surrAX = surrA * -rDX;
+                  double surrAY = surrA * -rDY;
+
+                  //Il faut maintenant appliquer accélérations x et y aux vitesses x et y
+                  //Pour le moment la cadence du processeur règle la vitesse du programme
+                  body.speed.x += bodyAX;
+                  body.speed.y += bodyAY;
+                  surrounding.speed.x += surrAX;
+                  surrounding.speed.y += surrAY;
+
                }
             }
             body.position.x += body.speed.x;
