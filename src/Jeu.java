@@ -18,7 +18,7 @@ public class Jeu
       new Espace();
       Espace monUnivers = new Espace();
 
-      Espace.Planet terre = monUnivers.addNewPlanet("Terre", 0, 0, 5.9736E24, 6371, Color.green);
+//      Espace.Planet terre = monUnivers.addNewPlanet("Terre", 0, 0, 5.9736E24, 6371, Color.green);
    }
 }
 	

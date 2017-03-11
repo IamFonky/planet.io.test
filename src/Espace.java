@@ -1,8 +1,5 @@
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -158,8 +155,23 @@ public class Espace extends Frame
 
       public void eat(Body meal)
       {
-         this.mass += meal.mass;
-         this.radius = Math.sqrt((meal.radius * meal.radius * Math.PI + this.radius *  this.radius * Math.PI)/Math.PI);
+         double newMass = mass + meal.mass;
+         //Pour le nouveau rayon on additionne les aires puis on retrouve le rayon
+         double newRadius = Math.sqrt((meal.radius * meal.radius * Math.PI + this.radius *  this.radius * Math.PI)/Math.PI);
+
+         //Pour la nouvelle vitesse il faut prendre en compte l'inértie.
+         //Donc un ratio mass/mass pour chaque vitesse
+         double mTot = mass + meal.mass;
+         double vXrThis = speed.getX() * mass / mTot;
+         double vYrThis = speed.getY() * mass / mTot;
+         double vXrMeal = meal.speed.getX() * meal.mass / mTot;
+         double vYrMeal = meal.speed.getY() * meal.mass / mTot;
+         double newVX = vXrThis + vXrMeal;
+         double newVY = vYrThis + vYrMeal;
+
+         setmass(newMass);
+         setRadius(newRadius);
+         setSpeed(new Speed(newVX,newVY));
          allThings.remove(meal);
       }
 
@@ -273,6 +285,15 @@ public class Espace extends Frame
    {
       super("Mon univers");
 
+      addMouseListener(new MouseAdapter() {
+         @Override
+         public void mouseClicked(MouseEvent e)
+         {
+//            generateOnePlanet(e.getX() / 2 * zoom,((e.getY() / 2) - getHeight()) *zoom);
+            generateOnePlanet(e.getX() * zoom / 2,e.getY() * zoom / 2);
+         }
+      });
+
       addKeyListener(new KeyAdapter() {
          @Override
          public void keyTyped(KeyEvent e)
@@ -338,13 +359,25 @@ public class Espace extends Frame
       repaint();
    }
 
+   public void generateOnePlanet(double x, double y)
+   {
+      Random rand = new Random();
+      addNewPlanet("Click planet",x,y,rand.nextDouble()*1E+22 + 1E+21,  rand.nextDouble()*1000 + 4000, new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+   }
    public void generateShit()
    {
       for(int i = 0; i < 25; ++i)
       {
          Random rand = new Random();
-         Espace.Planet lune = this.addNewPlanet("Lune" + i, rand.nextDouble()*100000 + -50000, rand.nextDouble()*100000 + -50000,  rand.nextDouble()*1E+22 + 1E+21,  rand.nextDouble()*1000 + 4000, Color.darkGray);
-//         lune.speed.setX(i*10);
+         Espace.Planet lune = this.addNewPlanet(
+                 "Lune" + i,
+                 rand.nextDouble()*400000 + -200000,
+                 rand.nextDouble()*400000 + -200000,
+                 rand.nextDouble()*1E+22 + 1E+21,
+                 rand.nextDouble()*1000 + 4000,
+                 new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+         lune.speed.setX(rand.nextDouble() * 1000 - 500);
+         lune.speed.setY(rand.nextDouble() * 1000 - 500);
       }
 
    }
