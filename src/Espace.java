@@ -5,6 +5,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static java.lang.Math.*;
+
 /**
  * Created by Fonky on 20.02.2017.
  */
@@ -12,6 +14,11 @@ public class Espace extends Frame
 {
    public static class Speed
    {
+      public double getSpeed()
+      {
+         return sqrt(x*x+y*y);
+      }
+      
       public double getX()
       {
          return x;
@@ -151,54 +158,140 @@ public class Espace extends Frame
       Body orbiting;
       String name;
       Color couleur;
+      double fragmentationRatio;
       Speed speed = new Speed(0,0);
 
       public void eat(Body meal)
       {
-         double newMass = mass + meal.mass;
-         //Pour le nouveau rayon on additionne les aires puis on retrouve le rayon
-         double newRadius = Math.sqrt((meal.radius * meal.radius * Math.PI + this.radius *  this.radius * Math.PI)/Math.PI);
 
-         //Pour la nouvelle vitesse il faut prendre en compte l'inértie.
-         //Donc un ratio mass/mass pour chaque vitesse
-         double mTot = mass + meal.mass;
-         double vXrThis = speed.getX() * mass / mTot;
-         double vYrThis = speed.getY() * mass / mTot;
-         double vXrMeal = meal.speed.getX() * meal.mass / mTot;
-         double vYrMeal = meal.speed.getY() * meal.mass / mTot;
-         double newVX = vXrThis + vXrMeal;
-         double newVY = vYrThis + vYrMeal;
+         if(Fragment.class.isInstance(meal) || abs(mass - meal.mass) > mass * fragmentationRatio)
+         {
+            double newMass = mass + meal.mass;
+            //Pour le nouveau rayon on additionne les aires puis on retrouve le rayon
+            double newRadius = sqrt((meal.radius * meal.radius * PI + this.radius * this.radius * PI) / PI);
 
-         setmass(newMass);
-         setRadius(newRadius);
-         setSpeed(new Speed(newVX,newVY));
-         allThings.remove(meal);
+            //Pour la nouvelle vitesse il faut prendre en compte l'inértie.
+            //Donc un ratio mass/mass pour chaque vitesse
+            double mTot = mass + meal.mass;
+            double vXrThis = speed.getX() * mass / mTot;
+            double vYrThis = speed.getY() * mass / mTot;
+            double vXrMeal = meal.speed.getX() * meal.mass / mTot;
+            double vYrMeal = meal.speed.getY() * meal.mass / mTot;
+            double newVX = vXrThis + vXrMeal;
+            double newVY = vYrThis + vYrMeal;
+
+            setmass(newMass);
+            setRadius(newRadius);
+            setSpeed(new Speed(newVX, newVY));
+            allThings.remove(meal);
+         }
+         else
+         {
+            if(Planet.class.isInstance(this))
+            {
+               ((Planet)this).explode();
+               ((Planet)meal).explode();
+            }
+         }
       }
 
-
-      public Body(String name, Position position, double mass, double radius, Color couleur)
+      private void init(String name, Position position, double mass, double radius, Color couleur)
       {
          this.name = name;
          this.position = position;
          this.mass = mass;
          this.radius = radius;
          this.couleur = couleur;
+         this.fragmentationRatio = 0;
+      }
+
+      public Body(String name, Position position, double mass, double radius, Color couleur)
+      {
+         init(name,position,mass,radius,couleur);
+      }
+
+      public Body(String name, double mass, double radius)
+      {
+
+         init(name, new Position(0,0),mass,radius,Color.BLACK);
+      }
+
+      public Body(String name, double mass, double radius, Color couleur)
+      {
+         init(name, new Position(0,0),mass,radius,couleur);
       }
    }
 
    public class Planet extends Body
    {
-      public Planet(String name, double mass, double radius)
-      {
-         super(name, new Position(0,0),mass,radius,Color.BLACK);
-      }
-
-      public Planet(String name, double mass, double radius, Color couleur)
-      {
-         super(name, new Position(0,0),mass,radius,couleur);
-      }
-
       public Planet(String name, Position position, double mass, double radius, Color couleur)
+      {
+         super(name, position,mass,radius,couleur);
+         this.fragmentationRatio = 0.1;
+      }
+
+      public void explode()
+      {
+         Random rand = new Random();
+         double dThis = mass/(radius*radius*PI);
+         double oldMass = mass;
+
+
+         while(mass > 0)
+         {
+
+            double fragMass = oldMass * rand.nextDouble() / 2;
+            double fragRadius = sqrt(oldMass/(dThis*PI));
+            Planet frag =  addNewPlanet(
+                    "FRAG" + name,
+                    this.position.getX() + rand.nextDouble()*radius*10 - 5,
+                    this.position.getY() + rand.nextDouble()*radius*10 - 5,
+                    fragMass,
+                    fragRadius,
+                    Color.RED
+            );
+
+            double newDirection = rand.nextDouble() * 2 * PI;
+            double newVX = cos(newDirection) * speed.getSpeed();
+            double newVY = sin(newDirection) * speed.getSpeed();
+
+            frag.setSpeed(new Speed(newVX,newVY));
+
+            if(mass - fragMass < 0)
+            {
+               mass = 0;
+            }
+            else
+            {
+               mass -= fragMass;
+            }
+//            if(radius - fragRadius < 0)
+//            {
+//               radius = 0;
+//            }
+//            else
+//            {
+//               radius -= fragRadius;
+//            }
+         }
+
+         allThings.remove(this);
+      }
+   }
+
+   public class Fragment extends Body
+   {
+//      public Fragment(String name, double mass, double radius)
+//      {
+//         super(name, new Position(0,0),mass,radius,Color.BLACK);
+//      }
+//
+//      public Fragment(String name, double mass, double radius, Color couleur)
+//      {
+//         super(name, new Position(0,0),mass,radius,couleur);
+//      }
+
+      public Fragment(String name, Position position, double mass, double radius, Color couleur)
       {
          super(name, position,mass,radius,couleur);
       }
@@ -226,7 +319,7 @@ public class Espace extends Frame
                double sqDistance = dX * dX + dY * dY;
 
                //On calcule la distance réelle (Ground to ground)
-               double gTgDistance = Math.sqrt(sqDistance) - body.radius/2 - surrounding.radius/2;
+               double gTgDistance = sqrt(sqDistance) - body.radius/2 - surrounding.radius/2;
 
                if(gTgDistance < 0) //Collision!
                {
@@ -242,8 +335,8 @@ public class Espace extends Frame
                else //Gravitation et physique
                {
                   //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
-                  double rDX = dX / Math.sqrt(sqDistance);
-                  double rDY = dY / Math.sqrt(sqDistance);
+                  double rDX = dX / sqrt(sqDistance);
+                  double rDY = dY / sqrt(sqDistance);
 
                   //Loi de gravité : F [N] = G [N*m2*kg-2] * mA [kg] * mB [kg] / d2 [m2]
                   //un Newton = 1 [kg*m*s-2]. Plus simplement [kg*a] ou a est l'accélération
@@ -307,7 +400,14 @@ public class Espace extends Frame
                   zoom -= zoom * 0.1;
                   break;
                case ' ':
-                  generateShit();
+                  if(e.isShiftDown())
+                  {
+                     generateExactSameShit();
+                  }
+                  else
+                  {
+                     generateRandomShit();
+                  }
                   break;
             }
             System.out.println(e.getKeyChar());
@@ -335,8 +435,17 @@ public class Espace extends Frame
          int radius = (int)(body.radius/zoom);
          int x = (getWidth()/2) + ((int)((body.position.x - (body.radius/2))/zoom));
          int y = (getHeight()/2) + ((int)((body.position.y - (body.radius/2))/zoom));
+
          g.setColor(body.couleur);
-         g.drawOval(x,y,radius,radius);
+         if(Planet.class.isInstance(body))
+         {
+            g.drawOval(x,y,radius,radius);
+//            g.drawString(String.format("%6.3e",body.mass),x,y);
+         }
+         else if(Fragment.class.isInstance(body))
+         {
+            g.drawRect(x,y,radius,radius);
+         }
       }
    }
 
@@ -352,6 +461,14 @@ public class Espace extends Frame
       return newP;
    }
 
+   public Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur)
+   {
+      Fragment newP = new Fragment(name,new Position(x,y),mass,radius,couleur);
+      allThings.add(newP);
+      return newP;
+   }
+
+
    public void res()
    {
       invalidate();
@@ -364,7 +481,25 @@ public class Espace extends Frame
       Random rand = new Random();
       addNewPlanet("Click planet",x,y,rand.nextDouble()*1E+22 + 1E+21,  rand.nextDouble()*1000 + 4000, new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
    }
-   public void generateShit()
+
+   public void generateExactSameShit()
+   {
+      for(int i = 0; i < 25; ++i)
+      {
+         Random rand = new Random();
+         Espace.Planet lune = this.addNewPlanet(
+                 "Lune" + i,
+                 rand.nextDouble()*400000 + -200000,
+                 rand.nextDouble()*400000 + -200000,
+                 2E+21,
+                 3000,
+                 new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+//         lune.speed.setX(rand.nextDouble() * 1000 - 500);
+//         lune.speed.setY(rand.nextDouble() * 1000 - 500);
+      }
+   }
+
+   public void generateRandomShit()
    {
       for(int i = 0; i < 25; ++i)
       {
