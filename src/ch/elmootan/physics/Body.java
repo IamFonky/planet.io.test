@@ -1,7 +1,6 @@
 package ch.elmootan.physics;
 
 import java.awt.*;
-import java.util.Random;
 
 import static java.lang.Math.*;
 
@@ -20,7 +19,7 @@ public abstract class Body
 
     private Speed speed = new Speed(0, 0);
 
-    double fragmentationRatio;
+    private double fragmentationRatio;
 
     public Body(String name, Position position, double mass, double radius, Color couleur, double fragmentationRatio)
     {

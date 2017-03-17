@@ -10,8 +10,6 @@ public class Game {
     public static void main(String... args) {
         new Universe();
         Universe monUnivers = new Universe();
-
-        Planet terre = monUnivers.addNewPlanet("Terre", 0, 0, 5.9736E23         , 6371, Color.green);
     }
 
 }
