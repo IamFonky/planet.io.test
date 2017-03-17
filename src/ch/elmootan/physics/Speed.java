@@ -1,5 +1,7 @@
 package ch.elmootan.physics;
 
+import static java.lang.Math.sqrt;
+
 /**
  * @brief Permet de modéliser la vitesse d'un corps.
  */
@@ -29,5 +31,10 @@ public class Speed {
 
     public void setY(double y) {
         this.y = y;
+    }
+
+    public double getSpeed()
+    {
+        return sqrt(x*x+y*y);
     }
 }
