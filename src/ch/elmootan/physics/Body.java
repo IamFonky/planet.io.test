@@ -1,8 +1,12 @@
 package ch.elmootan.physics;
 
 import java.awt.*;
+import java.util.Random;
 
-public abstract class Body {
+import static java.lang.Math.*;
+
+public abstract class Body
+{
     private Position position;
 
     private double mass;
@@ -16,73 +20,115 @@ public abstract class Body {
 
     private Speed speed = new Speed(0, 0);
 
-    public Body(String name, Position position, double mass, double radius, Color couleur) {
+    double fragmentationRatio;
+
+    public Body(String name, Position position, double mass, double radius, Color couleur, double fragmentationRatio)
+    {
         this.name = name;
         this.position = position;
         this.mass = mass;
         this.radius = radius;
         this.couleur = couleur;
+        this.fragmentationRatio = fragmentationRatio;
     }
 
-    public double getMass() {
+    public double getMass()
+    {
         return mass;
     }
 
-    public Position getPosition() {
+    public Position getPosition()
+    {
         return position;
     }
 
-    public double getRadius() {
+    public double getRadius()
+    {
         return radius;
     }
 
-    public void setMass(double mass) {
+    public void setMass(double mass)
+    {
         this.mass = mass;
     }
 
-    public void setPosition(Position position) {
+    public void setPosition(Position position)
+    {
         this.position = position;
     }
 
-    public void setRadius(double radius) {
+    public void setRadius(double radius)
+    {
         this.radius = radius;
     }
 
-    public Body getOrbiting() {
+    public Body getOrbiting()
+    {
         return orbiting;
     }
 
-    public void setOrbiting(Body orbiting) {
+    public void setOrbiting(Body orbiting)
+    {
         this.orbiting = orbiting;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public Color getCouleur() {
+    public Color getCouleur()
+    {
         return couleur;
     }
 
-    public void setCouleur(Color couleur) {
+    public void setCouleur(Color couleur)
+    {
         this.couleur = couleur;
     }
 
-    public Speed getSpeed() {
+    public Speed getSpeed()
+    {
         return speed;
     }
 
-    public void setSpeed(Speed speed) {
+    public void setSpeed(Speed speed)
+    {
         this.speed = speed;
     }
 
-    public void eat(Body meal) {
-        this.mass += meal.mass;
-        this.radius = Math.sqrt((meal.radius * meal.radius * Math.PI + this.radius * this.radius * Math.PI) / Math.PI);
-        //allThings.remove(meal);
+    public BodyState eat(Body meal)
+    {
+        boolean explode = (abs(mass - meal.mass) < mass * fragmentationRatio);
+
+        double newMass = mass + meal.mass;
+        //Pour le nouveau rayon on additionne les aires puis on retrouve le rayon
+        double newRadius = Math.sqrt((meal.radius * meal.radius * Math.PI + this.radius * this.radius * Math.PI) / Math.PI);
+
+        double mTot = mass + meal.mass;
+        double vXrThis = speed.getX() * mass / mTot;
+        double vYrThis = speed.getY() * mass / mTot;
+        double vXrMeal = meal.speed.getX() * meal.mass / mTot;
+        double vYrMeal = meal.speed.getY() * meal.mass / mTot;
+        double newVX = vXrThis + vXrMeal;
+        double newVY = vYrThis + vYrMeal;
+
+        setMass(newMass);
+        setRadius(newRadius);
+        setSpeed(new Speed(newVX, newVY));
+
+        if (!explode)
+        {
+            return BodyState.EAT_MEAL;
+        }
+        else //Too much to eat, the planet with explode!
+        {
+            return BodyState.EXPLODE;
+        }
     }
 }

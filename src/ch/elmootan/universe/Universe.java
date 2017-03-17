@@ -1,29 +1,51 @@
 package ch.elmootan.universe;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import ch.elmootan.physics.*;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
-public class Universe extends Frame {
+import static java.lang.Math.*;
+
+public class Universe extends Frame
+{
 
     public ArrayList<Body> allThings = new ArrayList<>();
     public double zoom = 500.0;
 
-    public Universe() {
+    private boolean tadaam = false;
+
+    public Universe()
+    {
         super("Mon univers");
 
-        addKeyListener(new KeyAdapter() {
+        addMouseListener(new MouseAdapter()
+        {
             @Override
-            public void keyTyped(KeyEvent e) {
-                switch (e.getKeyChar()) {
+            public void mouseClicked(MouseEvent e)
+            {
+                generatePlanetFromClick(e.getX(),e.getY());
+            }
+        });
+
+        addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+                switch (e.getKeyChar())
+                {
+                    case 's':
+                        hollySong("starwars",0.025);
+                        break;
                     case 'a':
                         zoom += zoom * 0.1;
                         break;
@@ -31,8 +53,14 @@ public class Universe extends Frame {
                         zoom -= zoom * 0.1;
                         break;
                     case ' ':
-                        generateShit();
-                        break;
+                        if(e.isShiftDown())
+                        {
+                            generateExactSameShit();
+                        }
+                        else
+                        {
+                            generateRandomShit();
+                        }
                 }
                 System.out.println(e.getKeyChar());
             }
@@ -40,8 +68,10 @@ public class Universe extends Frame {
 
         setSize(1000, 1000);
         setVisible(true);
-        addWindowListener(new WindowAdapter() {
-                              public void windowClosing(WindowEvent e) {
+        addWindowListener(new WindowAdapter()
+                          {
+                              public void windowClosing(WindowEvent e)
+                              {
                                   dispose();
                                   System.exit(0);
                               }
@@ -50,13 +80,17 @@ public class Universe extends Frame {
 
         Timer myTime = new Timer("myTime");
 
-        myTime.schedule(new TimerTask() {
+        myTime.schedule(new TimerTask()
+        {
 
             @Override
-            public void run() {
-                for (int i = 0; i < allThings.size(); ++i) {
+            public void run()
+            {
+                for (int i = 0; i < allThings.size(); ++i)
+                {
                     Body body = allThings.get(i);
-                    for (int j = i + 1; j < allThings.size(); ++j) {
+                    for (int j = i + 1; j < allThings.size(); ++j)
+                    {
                         Body surrounding = allThings.get(j);
 
                         //On calcule les distances x et y et la distance au carré
@@ -69,14 +103,31 @@ public class Universe extends Frame {
 
                         if (gTgDistance < 0) //Collision!
                         {
-                            if (body.getMass() > surrounding.getMass()) {
-                                body.eat(surrounding);
-                                allThings.remove(surrounding);
-                            } else {
-                                surrounding.eat(body);
-                                allThings.remove(body);
+                            BodyState eatState;
+                            synchronized (allThings)
+                            {
+                                if (body.getMass() > surrounding.getMass())
+                                {
+                                    eatState = body.eat(surrounding);
+                                    allThings.remove(surrounding);
+                                }
+                                else
+                                {
+                                    eatState = surrounding.eat(body);
+                                    allThings.remove(body);
+                                }
+                                
+                                switch (eatState)
+                                {
+                                    case EXPLODE:
+                                        explode(body);
+                                        allThings.remove(body);
+                                        break;
+                                    //On peut imaginer ici un case SUN ou BLACKHOLE
+                                }
                             }
-                        } else //Gravitation et physique
+                        }
+                        else //Gravitation et physique
                         {
                             //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
                             double rDX = dX / Math.sqrt(sqDistance);
@@ -123,39 +174,153 @@ public class Universe extends Frame {
         }, 0, 33);
     }
 
-    public void paint(Graphics g) {
+    public void explode(Body body)
+    {
+        Random rand = new Random();
+        double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
+        double oldMass = body.getMass();
 
-        for (Body body : allThings) {
+
+        while (body.getMass() > 0)
+        {
+
+            double fragMass = oldMass * rand.nextDouble() / 2;
+            double fragRadius = sqrt(fragMass / (dThis * PI));
+            Body frag = addNewFragment(
+                    "FRAG" + body.getName(),
+                    body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
+                    body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
+                    fragMass,
+                    fragRadius,
+                    Color.RED
+            );
+
+            double newDirection = rand.nextDouble() * 2 * PI;
+            double newVX = cos(newDirection) * body.getSpeed().getSpeed();
+            double newVY = sin(newDirection) * body.getSpeed().getSpeed();
+
+            frag.setSpeed(new Speed(newVX, newVY));
+
+            if (body.getMass() - fragMass < 0)
+            {
+                body.setMass(0);
+            }
+            else
+            {
+                body.setMass(body.getMass() - fragMass);
+            }
+        }
+//        hollySong("boom",0.001);
+    }
+
+    public void paint(Graphics g)
+    {
+
+        for (Body body : allThings)
+        {
             int radius = (int) (body.getRadius() / zoom);
             int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
             int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
             g.setColor(body.getCouleur());
-            g.drawOval(x, y, radius, radius);
+
+            if(Planet.class.isInstance(body))
+            {
+                g.drawOval(x,y,radius,radius);
+            }
+            else if(Fragment.class.isInstance(body))
+            {
+                g.drawRect(x,y,radius,radius);
+            }
         }
     }
 
-    public Planet addNewPlanet(String name, double mass, double radius) {
+    public void generatePlanetFromClick(double x, double y)
+    {
+        Random rand = new Random();
+        double bodyRadius = rand.nextDouble() * 1000 + 4000;
+        double bodyX = ((x - (getWidth() / 2)) * zoom);
+        double bodyY = ((y - (getHeight() / 2)) * zoom);
+        addNewPlanet("Click planet", bodyX, bodyY, rand.nextDouble() * 1E+22 + 1E+21, bodyRadius , new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+    }
+
+
+    public Planet addNewPlanet(String name, double mass, double radius)
+    {
         return addNewPlanet(name, 0, 0, mass, radius, Color.BLACK);
     }
 
-    public Planet addNewPlanet(String name, double x, double y, double mass, double radius, Color couleur) {
+    public Planet addNewPlanet(String name, double x, double y, double mass, double radius, Color couleur)
+    {
         Planet newP = new Planet(name, new Position(x, y), mass, radius, couleur);
         allThings.add(newP);
         return newP;
     }
 
-    public void res() {
+    public Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur)
+    {
+        Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
+        allThings.add(newP);
+        return newP;
+    }
+
+
+    public void res()
+    {
         invalidate();
         validate();
         repaint();
     }
 
-    public void generateShit() {
-        for (int i = 0; i < 25; ++i) {
+
+    public void generateExactSameShit()
+    {
+        for(int i = 0; i < 25; ++i)
+        {
             Random rand = new Random();
-            Planet lune = this.addNewPlanet("Lune" + i, rand.nextDouble() * 100000 + -50000, rand.nextDouble() * 100000 + -50000, rand.nextDouble() * 1E+22 + 1E+21, rand.nextDouble() * 1000 + 4000, Color.darkGray);
-//          lune.speed.setX(i*10);
+            Planet lune = this.addNewPlanet(
+                    "Lune" + i,
+                    rand.nextDouble()*400000 + -200000,
+                    rand.nextDouble()*400000 + -200000,
+                    2E+21,
+                    3000,
+                    new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+            lune.setSpeed(new Speed(rand.nextDouble() * 1500 - 750,
+                    rand.nextDouble() * 1500 - 750));
+
         }
+
+    }
+
+    public void generateRandomShit()
+    {
+        for(int i = 0; i < 25; ++i)
+        {
+            Random rand = new Random();
+            Planet lune = this.addNewPlanet(
+                    "Lune" + i,
+                    rand.nextDouble()*400000 + -200000,
+                    rand.nextDouble()*400000 + -200000,
+                    rand.nextDouble()*1E+22 + 1E+21,
+                    rand.nextDouble()*1000 + 4000,
+                    new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+            lune.setSpeed(new Speed(rand.nextDouble() * 1000 - 500,
+                    rand.nextDouble() * 1000 - 500));
+        }
+
+    }
+
+    public void hollySong(String sound, double volume)
+    {
+        ((Runnable) () ->
+        {
+            new JFXPanel();
+            System.out.println(System.getProperty("user.dir"));
+            String bip = sound + ".mp3";
+            Media hit = new Media(new File(bip).toURI().toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(hit);
+            mediaPlayer.setVolume(volume);
+            mediaPlayer.play();
+        }).run();
 
     }
 }

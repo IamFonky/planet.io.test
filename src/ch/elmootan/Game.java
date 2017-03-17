@@ -11,7 +11,7 @@ public class Game {
         new Universe();
         Universe monUnivers = new Universe();
 
-        Planet terre = monUnivers.addNewPlanet("Terre", 0, 0, 5.9736E24, 6371, Color.green);
+        Planet terre = monUnivers.addNewPlanet("Terre", 0, 0, 5.9736E23         , 6371, Color.green);
     }
 
 }
