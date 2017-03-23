@@ -92,83 +92,88 @@ public class Universe extends Frame
             for (int i = 0; i < allThings.size(); ++i)
             {
                Body body = allThings.get(i);
-               for (int j = i + 1; j < allThings.size(); ++j)
+               if(body != null)
                {
-                  Body surrounding = allThings.get(j);
-                  double gTgDistance = 0;
-                  double sqDistance = 0;
-                  double dX = 0;
-                  double dY = 0;
-                  //On calcule les distances x et y et la distance au carré
-                  synchronized (body)
+                  for (int j = i + 1; j < allThings.size(); ++j)
                   {
-
-                     dX = surrounding.getPosition().getX() - body.getPosition().getX();
-                     dY = surrounding.getPosition().getY() - body.getPosition().getY();
-                     sqDistance = dX * dX + dY * dY;
-
-                     //On calcule la distance réelle (Ground to ground)
-                     gTgDistance = Math.sqrt(sqDistance) - body.getRadius() / 2 - surrounding.getRadius() / 2;
-                  }
-
-                  if (gTgDistance < 0) //Collision!
-                  {
-                     BodyState eatState;
-                     synchronized (allThings)
+                     Body surrounding = allThings.get(j);
+                     if (surrounding != null)
                      {
-                        if (body.getMass() > surrounding.getMass())
+                        double gTgDistance = 0;
+                        double sqDistance = 0;
+                        double dX = 0;
+                        double dY = 0;
+                        //On calcule les distances x et y et la distance au carré
+                        synchronized (body)
                         {
-                           eatState = body.eat(surrounding);
-                           allThings.remove(surrounding);
-                        }
-                        else
-                        {
-                           eatState = surrounding.eat(body);
-                           allThings.remove(body);
+                           dX = surrounding.getPosition().getX() - body.getPosition().getX();
+                           dY = surrounding.getPosition().getY() - body.getPosition().getY();
+                           sqDistance = dX * dX + dY * dY;
+
+                           //On calcule la distance réelle (Ground to ground)
+                           gTgDistance = Math.sqrt(sqDistance) - body.getRadius() / 2 - surrounding.getRadius() / 2;
                         }
 
-                        switch (eatState)
+                        if (gTgDistance < 0) //Collision!
                         {
-                           case EXPLODE:
-                              explode(body);
-                              break;
-                           //On peut imaginer ici un case SUN ou BLACKHOLE
+                           BodyState eatState;
+                           synchronized (allThings)
+                           {
+                              if (body.getMass() > surrounding.getMass())
+                              {
+                                 eatState = body.eat(surrounding);
+                                 allThings.remove(surrounding);
+                              }
+                              else
+                              {
+                                 eatState = surrounding.eat(body);
+                                 allThings.remove(body);
+                              }
+
+                              switch (eatState)
+                              {
+                                 case EXPLODE:
+                                    explode(body);
+                                    break;
+                                 //On peut imaginer ici un case SUN ou BLACKHOLE
+                              }
+                           }
+                        }
+                        else //Gravitation et physique
+                        {
+                           //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
+                           double rDX = dX / Math.sqrt(sqDistance);
+                           double rDY = dY / Math.sqrt(sqDistance);
+
+                           //Loi de gravité : F [N] = G [N*m2*kg-2] * mA [kg] * mB [kg] / d2 [m2]
+                           //un Newton = 1 [kg*m*s-2]. Plus simplement [kg*a] ou a est l'accélération
+                           //donc G [kg*m*s-2*m2*kg-2] ==> G [m3*s-2*kg-1]
+                           //On peut donc calculer simplement l'accélération aN sur chaque corps avec :
+                           //aA [m*s-2] = G [m3*s-2*kg-1] * mB [kg] / d2 [m2]
+                           double bodyA = Constants.GRAVITATION.valeur * surrounding.getMass() / sqDistance;
+                           //A cette étape nous avons un vecteur d'accélération mais pas de direction
+                           //Il décomposer en deux composantes x et y
+                           double bodyAX = bodyA * rDX;
+                           double bodyAY = bodyA * rDY;
+
+                           //Même chose pour les deuxième corps
+                           double surrA = Constants.GRAVITATION.valeur * body.getMass() / sqDistance;
+                           double surrAX = surrA * -rDX;
+                           double surrAY = surrA * -rDY;
+
+                           //Il faut maintenant appliquer accélérations x et y aux vitesses x et y
+                           //Pour le moment la cadence du processeur règle la vitesse du programme
+                           synchronized (body)
+                           {
+                              body.getSpeed().setX(body.getSpeed().getX() + bodyAX);
+                              body.getSpeed().setY(body.getSpeed().getY() + bodyAY);
+
+                              surrounding.getSpeed().setX(surrounding.getSpeed().getX() + surrAX);
+                              surrounding.getSpeed().setY(surrounding.getSpeed().getY() + surrAY);
+                           }
+
                         }
                      }
-                  }
-                  else //Gravitation et physique
-                  {
-                     //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
-                     double rDX = dX / Math.sqrt(sqDistance);
-                     double rDY = dY / Math.sqrt(sqDistance);
-
-                     //Loi de gravité : F [N] = G [N*m2*kg-2] * mA [kg] * mB [kg] / d2 [m2]
-                     //un Newton = 1 [kg*m*s-2]. Plus simplement [kg*a] ou a est l'accélération
-                     //donc G [kg*m*s-2*m2*kg-2] ==> G [m3*s-2*kg-1]
-                     //On peut donc calculer simplement l'accélération aN sur chaque corps avec :
-                     //aA [m*s-2] = G [m3*s-2*kg-1] * mB [kg] / d2 [m2]
-                     double bodyA = Constants.GRAVITATION.valeur * surrounding.getMass() / sqDistance;
-                     //A cette étape nous avons un vecteur d'accélération mais pas de direction
-                     //Il décomposer en deux composantes x et y
-                     double bodyAX = bodyA * rDX;
-                     double bodyAY = bodyA * rDY;
-
-                     //Même chose pour les deuxième corps
-                     double surrA = Constants.GRAVITATION.valeur * body.getMass() / sqDistance;
-                     double surrAX = surrA * -rDX;
-                     double surrAY = surrA * -rDY;
-
-                     //Il faut maintenant appliquer accélérations x et y aux vitesses x et y
-                     //Pour le moment la cadence du processeur règle la vitesse du programme
-                     synchronized (body)
-                     {
-                        body.getSpeed().setX(body.getSpeed().getX() + bodyAX);
-                        body.getSpeed().setY(body.getSpeed().getY() + bodyAY);
-
-                        surrounding.getSpeed().setX(surrounding.getSpeed().getX() + surrAX);
-                        surrounding.getSpeed().setY(surrounding.getSpeed().getY() + surrAY);
-                     }
-
                   }
                }
 
