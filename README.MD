@@ -59,4 +59,32 @@ En plus des planètes, des bonus se baladent dans l'univers. Ceux-ci octroient d
     - Variation de la densité en fonction de la composition et de la force G appliquée à sois même. Une planète de masse m sera logiquement toujours moins dense qu'une planète de masse m+1 car la masse va augmenter la force de gravité et donc la "compression" de la planète sur elle-même.
     - Vie sur les planètes (en fonction de la chaleur et du taux de radiations --> zones de vie autour des soleils).
     - Nouveau corps : Nuages de gaz, comètes, spécialisation des planètes (gazeuse, rocheuse, océanique, magmatique, plasmatique, etc... )
+    - Management du serveur depuis telnet.
+
+----
+
+## Contraintes
+
+### Flux réseau
+Dans un cadre d'application client-serveur, la contrainte principale est le flux réseau. Nous allons donc partir du principe que le minimum de données doivent transiter sur le réseau. seules les informations relatives aux position et attributs des planettes seront envoyés depuis le serveur. Seul les données relative à la position de la "caméra" et la souris du client seront envoyées au serveur. Pour aller plus loin, il faudrait envoyer les données concernant uniquement les éléments à être affichés par le client (et ignorer les élément périphériques)  
+
+### Contraintes client
+Le client quand à lui doit pouvoir démarrer sans serveur actif, indiquer à l'utilisateur qu'aucun serveur n'est connecté. Après démarrage du serveur le programme doit détecter automatiquement que le serveur est UP et se connecter. Lors d'une première connexion, l'utilisateur doit pouvoir s'enregistrer au près du serveur.
+
+### Contraintes serveur
+Le serveur doit être administrable. Lors de la première utilisation, l'admin doit pouvoir définir un nom et un mot de passe.
+
+### Valeurs limites 
+Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont importantes. En effet, pour un modèle d'univers, les grandeurs sont astronomiques (c'est le cass de le dire!). Il faudra donc faire très attention aux chiffres significatifs de chaque grandeur phyasique afin que les calculs dépassent pas les plages de valeurs des variables.
+
+----
+
+## Priorités de développement
+
+1. Définir une interface graphique ergonomique et agréable.
+2. Etablir une connexion stable (sans interruption) entre le serveur et les clients.
+3. Implémenter les interractions entre les différents élément du système dans un souci de fluidité.
+4. Rendre un produit fonctionnel, répondant aux fonctionnalités (obligatoire) définies au préalable.
+5. Tojours développer dans un souci d'évolutivité afin de pouvoir facilement rajouter des fonctionnalités
+
 
