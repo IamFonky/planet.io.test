@@ -5,7 +5,7 @@
 L'application se présente sous la forme de plusieurs clients et d'un serveur. Chaque client se connecte au serveur, renseigne un pseudonyme et commence à jouer.
 
 Un client contrôle une planète. Celle-ci peut se déplacer dans l'univers. Chaque planète génère une force gravitationnelle qui attire les corps célestes environnants vers elle.
-Lorsqu'il y a collision entre deux corps, il y a plusieurs cas de figure : 
+Lorsqu'il y a collision entre deux corps, il y a plusieurs cas de figure :
 
   - le corps le plus imposant *mange* l'autre et grossit (ce qui amplifie son attraction).
   - les deux corps on une masse trop proche, le plus gros mange le plus petit et finalement explose en fragments.
@@ -61,7 +61,12 @@ En plus des planètes, des bonus se baladent dans l'univers. Ceux-ci octroient d
     - Nouveau corps : Nuages de gaz, comètes, spécialisation des planètes (gazeuse, rocheuse, océanique, magmatique, plasmatique, etc... )
     - Management du serveur depuis telnet.
 
-----
+## Règles du jeu
+
+* Pas de victoire
+* Système de classement selon des points
+* Si deux planètes se touchent, celles-ci explosent ou alors une mange l'autre (dépend de la densité des planètes)
+* ?
 
 ## Contraintes
 
@@ -74,10 +79,8 @@ Le client quand à lui doit pouvoir démarrer sans serveur actif, indiquer à l'
 ### Contraintes serveur
 Le serveur doit être administrable. Lors de la première utilisation, l'admin doit pouvoir définir un nom et un mot de passe.
 
-### Valeurs limites 
+### Valeurs limites
 Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont importantes. En effet, pour un modèle d'univers, les grandeurs sont astronomiques (c'est le cass de le dire!). Il faudra donc faire très attention aux chiffres significatifs de chaque grandeur phyasique afin que les calculs dépassent pas les plages de valeurs des variables.
-
-----
 
 ## Priorités de développement
 
@@ -86,5 +89,3 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 3. Implémenter les interractions entre les différents élément du système dans un souci de fluidité.
 4. Rendre un produit fonctionnel, répondant aux fonctionnalités (obligatoire) définies au préalable.
 5. Tojours développer dans un souci d'évolutivité afin de pouvoir facilement rajouter des fonctionnalités
-
-
