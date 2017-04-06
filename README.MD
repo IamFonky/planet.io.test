@@ -1,4 +1,5 @@
 # planet.io
+Lucas ELISEI, Pierre-Benjamin MONACO, Gaëtan OTHENIN-GIRARD & David TRUAN
 
 ## Description
 
