@@ -95,3 +95,6 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 3. Implémenter les interactions entre les différents éléments du système dans un souci de fluidité.
 4. Rendre un produit fonctionnel, répondant aux fonctionnalités (obligatoire) définies au préalable.
 5. Toujours développer dans un souci d'évolutivité afin de pouvoir facilement rajouter des fonctionnalités.
+
+## Schéma des cas d'utilisation
+![Cas d'utilisation de planet.io](Schemas/UseCasesPlanet.io.png)
