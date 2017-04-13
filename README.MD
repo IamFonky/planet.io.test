@@ -98,3 +98,11 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 
 ## Schéma des cas d'utilisation
 ![Cas d'utilisation de planet.io](Documents/Schemas/UseCasesPlanet.io.png)
+
+## Plan des itérations
+
+| n° Iteration  | Objectif      | Temps escompté  | Rôles          | Effort escompté |
+| ------------- | ------------- | --------------- | -------------- | --------------- |
+| 1             | Colonne       | Colonne         |      Colonne   | Colonne         |
+| 2             | Alignée à     |   Alignée au    |     Alignée à  | Alignée à       |
+| Gauche        | Gauche        |      Centre     |      Droite    | Gauche          |
