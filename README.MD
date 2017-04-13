@@ -105,6 +105,21 @@ La base de données va principalement nous servir à stocker les comptes utilisa
 Chaque joueur possédera une compte composé d’un pseudo et d’un mot de passe. Son meilleur score sera aussi associé à son compte. Il aura la possibilité de voir toutes les parties auquelles il a participé et son score à chacune d’elle.
 Un deuxième type de compte sera le compte « modérateur ». Les modérateurs seront des arbitres ayant des droits administrateurs sur la partie. Ils auront un compte comme les utilisateurs mais ne posséderont pas de meilleur score. Un historique des parties modérées sera aussi mis à leur disposition.
 
+## Protocole d'échange entre le client et le serveur
+
+Chaque donnée envoyée ou reçue sera sous la forme JSON.
+
+Commande | Description
+:-----------------: | ----------------------------------------
+`PLANET_IO_SUCCESS:<data_nullable>` | Demande acceptée avec possibilité de retourner des données
+`PLANET_IO_FAILURE:<error>` | Demande refusée avec description de l'erreur
+`PLANET_IO_HELLO` | Demande de connexion au serveur
+`PLANET_IO_LOGIN:<credentials>` | Demande de connexion à un compte
+`PLANET_IO_REGISTER:<credentials>` | Demande de création de compte
+`PLANET_IO_GET_SCORES` | Demande de récupération des scores
+`PLANET_IO_GET_UNIVERSE` | Demande des données relatives à l'univers
+`PLANET_IO_SEND_POSITION:<position_data>` | Envoi de la position de la planète au serveur
+
 ## Schéma conceptuel de la BDD
 ![Cas d'utilisation de planet.io](Documents/Schemas/BDD_ModelConceptuel.jpg)
 
@@ -126,7 +141,7 @@ Système de jeu fonctionnel en standalone :
 #### Temps escompté
 
  - une semaine (plus les vacances de pâques)
- 
+
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures / Resposable des tests (P-B. Monaco) : Test unitaires et revue de code, 4h.
@@ -175,7 +190,7 @@ Management du serveur :
 #### Temps escompté
 
  - une semaine
- 
+
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des scores dans l'application, 3h.
@@ -196,14 +211,14 @@ Management du serveur :
 #### Temps escompté
 
  - une semaine
- 
+
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des fonctions d'administration, 3h.
  - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
  - Représentant des utilisateurs / Programmeur (David Truan) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
  - Responsable de la configuration / Responsable des tests (Gaétan Othenin-Girard) : Test unitaires, vérification et validation du fonctionnement et revue de code, 2h.
- 
+
 ### Itération 6
 
 #### Objectifs
