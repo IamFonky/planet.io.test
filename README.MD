@@ -98,6 +98,14 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 
 ## Schéma des cas d'utilisation
 ![Cas d'utilisation de planet.io](Documents/Schemas/UseCasesPlanet.io.png)
+## Base de données
+La base de données va principalement nous servir à stocker les comptes utilisateurs et les différentes parties jouées. Chaque partie sera sauvegardée et comprendra un classement.
+Chaque joueur possédera une compte composé d’un pseudo et d’un mot de passe. Son meilleur score sera aussi associé à son compte. Il aura la possibilité de voir toutes les parties auquelles il a participé et son score à chacune d’elle.
+Un deuxième type de compte sera le compte « modérateur ». Les modérateurs seront des arbitres ayant des droits administrateurs sur la partie. Ils auront un compte comme les utilisateurs mais ne posséderont pas de meilleur score. Un historique des parties modérées sera aussi mis à leur disposition.
+
+## Schéma conceptuel de la BDD
+![Cas d'utilisation de planet.io](Documents/Schemas/BDD_ModelConceptuel.jpg)
+
 ## Plan d'itérations
 
 ### Itération 1
