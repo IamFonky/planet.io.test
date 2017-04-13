@@ -169,7 +169,7 @@ Système de jeu fonctionnel en standalone :
 #### Temps escompté
 
  - une semaine
- 
+
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures / Resposable des tests (P-B. Monaco) : Test unitaires et revue de code, 4h.
@@ -218,7 +218,7 @@ Management du serveur :
 #### Temps escompté
 
  - une semaine
- 
+
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des scores dans l'application, 3h.
@@ -239,14 +239,14 @@ Management du serveur :
 #### Temps escompté
 
  - une semaine
- 
+
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des fonctions d'administration, 3h.
  - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
  - Représentant des utilisateurs / Programmeur (David Truan) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
  - Responsable de la configuration / Responsable des tests (Gaétan Othenin-Girard) : Test unitaires, vérification et validation du fonctionnement et revue de code, 2h.
- 
+
 ### Itération 7
 
 #### Objectifs
@@ -266,17 +266,16 @@ Implémentation des modifications administrateurs en pleine partie avec l'ajout 
 - Représentant des utilisateurs (David Truan) : Interraction directe avec la planète du joueur (déplacement et explosion), 3h.
 - Responsable de configuration (Gaëtan Othenin-Girard) : Interface de sélection de la liste des joueurs et ajout de bonus sur le joueur sélectionné, 3h.
 
-
 ### Itération 8
 
 #### Objectifs
-
+- Finalisation du projet, récupération du retard.
 
 #### Temps escompté
 - Une semaine.
 
 #### Rôles et efforts escomptés
-- Responsable de projet (P-B. Monaco): Apparition d'objets aux endroits sélectionnés et tests unitaires, 3h.
-- Architecte, concepteur en chef (Lucas Elisey) : Implémentation du compte spécial "modérateur" sur la base de données et en jeu, 3h.
-- Représentant des utilisateurs (David Truan) : Interraction directe avec la planète du joueur (déplacement et explosion), 3h.
-- Responsable de configuration (Gaëtan Othenin-Girard) : Interface de sélection de la liste des joueurs et ajout de bonus sur le joueur sélectionné, 3h.
+- Responsable de projet (P-B. Monaco): Finalisation, revue de code en profondeur, 2h.
+- Architecte, concepteur en chef (Lucas Elisey) : Finalisation, revue de code en profondeur, 2h.
+- Représentant des utilisateurs (David Truan) : Finalisation, revue de code en profondeur, 2h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Finalisation, revue de code en profondeur, 2h.
