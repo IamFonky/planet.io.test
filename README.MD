@@ -1,4 +1,5 @@
 # planet.io
+Lucas ELISEI, Pierre-Benjamin MONACO, Gaëtan OTHENIN-GIRARD & David TRUAN
 
 ## Description
 
@@ -94,3 +95,125 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 3. Implémenter les interactions entre les différents éléments du système dans un souci de fluidité.
 4. Rendre un produit fonctionnel, répondant aux fonctionnalités (obligatoire) définies au préalable.
 5. Toujours développer dans un souci d'évolutivité afin de pouvoir facilement rajouter des fonctionnalités.
+
+## Schéma des cas d'utilisation
+![Cas d'utilisation de planet.io](Documents/Schemas/UseCasesPlanet.io.png)
+## Base de données
+La base de données va principalement nous servir à stocker les comptes utilisateurs et les différentes parties jouées. Chaque partie sera sauvegardée et comprendra un classement.
+Chaque joueur possédera une compte composé d’un pseudo et d’un mot de passe. Son meilleur score sera aussi associé à son compte. Il aura la possibilité de voir toutes les parties auquelles il a participé et son score à chacune d’elle.
+Un deuxième type de compte sera le compte « modérateur ». Les modérateurs seront des arbitres ayant des droits administrateurs sur la partie. Ils auront un compte comme les utilisateurs mais ne posséderont pas de meilleur score. Un historique des parties modérées sera aussi mis à leur disposition.
+
+## Schéma conceptuel de la BDD
+![Cas d'utilisation de planet.io](Documents/Schemas/BDD_ModelConceptuel.jpg)
+
+## Plan d'itérations
+
+### Itération 1
+
+#### Objectifs
+
+Système de jeu fonctionnel en standalone :
+ - création partie
+ - contrôle d'une planete
+ - gestion des événements (collisions, changements d'états)
+ - design graphique (simple)
+
+#### Temps escompté
+
+ - une semaine (plus les vacances de pâques)
+ 
+#### Rôles et effort escompté
+
+ - Chef de projet / Responsable des normes et procédures / Resposable des tests (P-B. Monaco) : Test unitaires et revue de code, 4h.
+ - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Gestion des propriétés physiques, 6h.
+ - Représentant des utilisateurs / Programmeur (David Truan) : Design graphique, validation du design auprès d'utilisateurs Alpha, 5h.
+ - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Gestion événementielle, 6h.
+
+### Itération 2
+
+#### Objectifs
+L'objectif de cette itération est l'amélioration de l'application crée lors de la première itération mais en fonctionnant de manière client/serveur. Sur cette version, le serveur contiendra les informations concernant les objets du jeu qu'il enverra au client. Le client va uniquement afficher les objets aux coordonnées reçues.
+
+#### Temps escompté
+Une semaine.
+
+#### Rôles et efforts escomptés
+- Responsable de projet (P-B. Monaco): Tests unitaires et revue de code, 2h.
+- Architecte, concepteur en chef (Lucas Elisey) : Conception et implémentation de l'API, 3h.
+- Représentant des utilisateurs (David Truan) : Interface client générale (différentes zones du GUI), 3h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Création et gestion de la connexion au serveur, 3h.
+
+### Itération 3
+
+#### Objectifs
+Implémentation du concept de joueurs avec la création de comptes stockés dans la base de données et connexion au serveur via l'interface du client.
+
+#### Temps escompté
+- Une semaine.
+
+#### Rôles et efforts escomptés
+- Responsable de projet (P-B. Monaco): Création de la base de données et ajout de la partie compte utilisateur, 3h.
+- Architecte, concepteur en chef (Lucas Elisey) : Connexion à la base de données et affichage du pseudo sur la planète. 3h.
+- Représentant des utilisateurs (David Truan) : Analyse et recherche des besoins au niveau sécuritaire et tests unitaires, 2h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Interface de connexion au compte utilisateur sur le client, 4h.
+
+### Itération 4
+
+#### Objectifs
+
+Management du serveur :
+ - Implémentation du système de de score.
+ - Etude des échanges entre client et serveur (adaptation de la taille et du type de données partagées).
+ - Etude des flux entre les threads du serveur et optimisation.
+ - Tests unitiares de l'interraction client/serveur.
+
+#### Temps escompté
+
+ - une semaine
+ 
+#### Rôles et effort escompté
+
+ - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des scores dans l'application, 3h.
+ - Achitecte, concepteur en chef / Responsable des tests (Lucas Elisei) : Tests unitaires, test de fonctionnnement et revue de code, 4h.
+ - Représentant des utilisateurs / Programmeur (David Truan) : Etude et optimisation des flux entre client et serveur, validation auprès des utilisateurs alpha.
+ - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Implémentation du système de score dans la base de donnée, 3h.
+
+
+### Itération 5
+
+#### Objectifs
+
+Management du serveur :
+ - Implémentation des fonctions de contrôle des joueur (ban kick, allow, etc..:).
+ - Essais d'attaques depuis le client, vérification qu'il n'est pas possible de contrer un bannisement.
+ - Etudes des différentes techniques de triches qui pourraient être utilisée (glitches et exploit).
+
+#### Temps escompté
+
+ - une semaine
+ 
+#### Rôles et effort escompté
+
+ - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des fonctions d'administration, 3h.
+ - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
+ - Représentant des utilisateurs / Programmeur (David Truan) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
+ - Responsable de la configuration / Responsable des tests (Gaétan Othenin-Girard) : Test unitaires, vérification et validation du fonctionnement et revue de code, 2h.
+ 
+### Itération 6
+
+#### Objectifs
+Implémentation des modifications administrateurs en pleine partie avec l'ajout de compte "modérateur". Par exemple :
+- Ajout de bonus à un endroit.
+- Explosion d'une planète sélectionnée.
+- Application instantanée d'un bonus sur un joueur.
+- Déplacement d'un joueur en drag and drop.
+- Mettre la partie en pause.
+
+#### Temps escompté
+- Une semaine.
+
+#### Rôles et efforts escomptés
+- Responsable de projet (P-B. Monaco): Apparition d'objets aux endroits sélectionnés et tests unitaires, 3h.
+- Architecte, concepteur en chef (Lucas Elisey) : Implémentation du compte spécial "modérateur" sur la base de données et en jeu, 3h.
+- Représentant des utilisateurs (David Truan) : Interraction directe avec la planète du joueur (déplacement et explosion), 3h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Interface de sélection de la liste des joueurs et ajout de bonus sur le joueur sélectionné, 3h.
