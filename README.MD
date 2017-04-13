@@ -106,6 +106,9 @@ Un deuxième type de compte sera le compte « modérateur ». Les modérateurs
 ## Schéma conceptuel de la BDD
 ![Cas d'utilisation de planet.io](Documents/Schemas/BDD_ModelConceptuel.jpg)
 
+## Schéma de domaine
+![Schéma de domaine](Documents/Schemas/domaine/domaine_client.png)
+
 ## Plan d'itérations
 
 ### Itération 1
