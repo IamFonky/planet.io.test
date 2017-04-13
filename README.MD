@@ -138,7 +138,8 @@ Commande | Description
 
 #### Objectifs
 
-Modelisation des schémas UML du client et serveur et prototype :
+Modelisation des schémas UML du client et serveur et prototype :  
+
  - Schéma UML du client.
  - Schéma UML du serveur.
  - Schéma UML des modules externes.
@@ -160,7 +161,8 @@ Modelisation des schémas UML du client et serveur et prototype :
 
 #### Objectifs
 
-Système de jeu fonctionnel en standalone :
+Système de jeu fonctionnel en standalone :  
+
  - création partie.
  - contrôle d'une planete.
  - gestion des événements (collisions, changements d'états).
