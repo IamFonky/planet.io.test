@@ -139,32 +139,32 @@ Commande | Description
 #### Objectifs
 
 Modelisation des schémas UML du client et serveur et prototype :
- - Schéma UML du client
- - Schéma UML du serveur
- - Schéma UML des modules externes
- - Création d'un prototype simple de client
+ - Schéma UML du client.
+ - Schéma UML du serveur.
+ - Schéma UML des modules externes.
+ - Création d'un prototype simple de client.
  
 #### Temps escompté
 
- - une semaine (plus les vacances de pâques)
+ - une semaine (plus les vacances de pâques).
  
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures / Resposable des tests (P-B. Monaco) : Mise en place de JUnit et implémentation des test du prototype, 2h.
- - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Développement du schéma UML du server,2h
+ - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Développement du schéma UML du server,2h.
  - Représentant des utilisateurs / Programmeur (David Truan) : Développement du schéma UML du client, 2h.
  - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Mise en place du projet Maven, du système de contrôle de version et mise en place du système d'intégration continue, 2h.
- - Tout le monde : Développement du prototype (travail collaboratif : bonne technique pour être opérationnel avec git le moment venu)
+ - Tout le monde : Développement du prototype (travail collaboratif : bonne technique pour être opérationnel avec git le moment venu).
 
 ### Itération 2
 
 #### Objectifs
 
 Système de jeu fonctionnel en standalone :
- - création partie
- - contrôle d'une planete
- - gestion des événements (collisions, changements d'états)
- - design graphique (simple)
+ - création partie.
+ - contrôle d'une planete.
+ - gestion des événements (collisions, changements d'états).
+ - design graphique (simple).
 
 #### Temps escompté
 
@@ -256,6 +256,21 @@ Implémentation des modifications administrateurs en pleine partie avec l'ajout 
 - Application instantanée d'un bonus sur un joueur.
 - Déplacement d'un joueur en drag and drop.
 - Mettre la partie en pause.
+
+#### Temps escompté
+- Une semaine.
+
+#### Rôles et efforts escomptés
+- Responsable de projet (P-B. Monaco): Apparition d'objets aux endroits sélectionnés et tests unitaires, 3h.
+- Architecte, concepteur en chef (Lucas Elisey) : Implémentation du compte spécial "modérateur" sur la base de données et en jeu, 3h.
+- Représentant des utilisateurs (David Truan) : Interraction directe avec la planète du joueur (déplacement et explosion), 3h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Interface de sélection de la liste des joueurs et ajout de bonus sur le joueur sélectionné, 3h.
+
+
+### Itération 8
+
+#### Objectifs
+
 
 #### Temps escompté
 - Une semaine.
