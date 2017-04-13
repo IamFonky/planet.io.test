@@ -1,5 +1,7 @@
 # planet.io
-Lucas ELISEI, Pierre-Benjamin MONACO, Gaëtan OTHENIN-GIRARD & David TRUAN
+Etudiants : Lucas ELISEI, Pierre-Benjamin MONACO, Gaëtan OTHENIN-GIRARD & David TRUAN  
+Professeur : Eric Lefrançois  
+Assistant : Christophe Greppin  
 
 ## Description
 
