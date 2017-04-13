@@ -100,10 +100,14 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 
 ## Schéma des cas d'utilisation
 ![Cas d'utilisation de planet.io](Documents/Schemas/UseCasesPlanet.io.png)
+
 ## Base de données
 La base de données va principalement nous servir à stocker les comptes utilisateurs et les différentes parties jouées. Chaque partie sera sauvegardée et comprendra un classement.
 Chaque joueur possédera une compte composé d’un pseudo et d’un mot de passe. Son meilleur score sera aussi associé à son compte. Il aura la possibilité de voir toutes les parties auquelles il a participé et son score à chacune d’elle.
 Un deuxième type de compte sera le compte « modérateur ». Les modérateurs seront des arbitres ayant des droits administrateurs sur la partie. Ils auront un compte comme les utilisateurs mais ne posséderont pas de meilleur score. Un historique des parties modérées sera aussi mis à leur disposition.
+
+## Schéma conceptuel de la BDD
+![Cas d'utilisation de planet.io](Documents/Schemas/BDD_ModelConceptuel.jpg)
 
 ## Protocole d'échange entre le client et le serveur
 
@@ -120,15 +124,39 @@ Commande | Description
 `PLANET_IO_GET_UNIVERSE` | Demande des données relatives à l'univers
 `PLANET_IO_SEND_POSITION:<position_data>` | Envoi de la position de la planète au serveur
 
-## Schéma conceptuel de la BDD
-![Cas d'utilisation de planet.io](Documents/Schemas/BDD_ModelConceptuel.jpg)
+## Schéma de domaine  
 
-## Schéma de domaine
-![Schéma de domaine](Documents/Schemas/domaine/domaine_client.png)
+### Client
+![Schéma de domaine du client](Documents/Schemas/domaine/domaine_client.png)  
+
+### Server
+![Schéma de domaine du serveur](Documents/Schemas/domaine/domaine_serveur.png)  
 
 ## Plan d'itérations
 
 ### Itération 1
+
+#### Objectifs
+
+Modelisation des schémas UML du client et serveur et prototype :
+ - Schéma UML du client
+ - Schéma UML du serveur
+ - Schéma UML des modules externes
+ - Création d'un prototype simple de client
+ 
+#### Temps escompté
+
+ - une semaine (plus les vacances de pâques)
+ 
+#### Rôles et effort escompté
+
+ - Chef de projet / Responsable des normes et procédures / Resposable des tests (P-B. Monaco) : Mise en place de JUnit et implémentation des test du prototype, 2h.
+ - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Développement du schéma UML du server,2h
+ - Représentant des utilisateurs / Programmeur (David Truan) : Développement du schéma UML du client, 2h.
+ - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Mise en place du projet Maven, du système de contrôle de version et mise en place du système d'intégration continue, 2h.
+ - Tout le monde : Développement du prototype (travail collaboratif : bonne technique pour être opérationnel avec git le moment venu)
+
+### Itération 2
 
 #### Objectifs
 
@@ -140,8 +168,8 @@ Système de jeu fonctionnel en standalone :
 
 #### Temps escompté
 
- - une semaine (plus les vacances de pâques)
-
+ - une semaine
+ 
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures / Resposable des tests (P-B. Monaco) : Test unitaires et revue de code, 4h.
@@ -149,7 +177,7 @@ Système de jeu fonctionnel en standalone :
  - Représentant des utilisateurs / Programmeur (David Truan) : Design graphique, validation du design auprès d'utilisateurs Alpha, 5h.
  - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Gestion événementielle, 6h.
 
-### Itération 2
+### Itération 3
 
 #### Objectifs
 L'objectif de cette itération est l'amélioration de l'application crée lors de la première itération mais en fonctionnant de manière client/serveur. Sur cette version, le serveur contiendra les informations concernant les objets du jeu qu'il enverra au client. Le client va uniquement afficher les objets aux coordonnées reçues.
@@ -163,7 +191,7 @@ Une semaine.
 - Représentant des utilisateurs (David Truan) : Interface client générale (différentes zones du GUI), 3h.
 - Responsable de configuration (Gaëtan Othenin-Girard) : Création et gestion de la connexion au serveur, 3h.
 
-### Itération 3
+### Itération 4
 
 #### Objectifs
 Implémentation du concept de joueurs avec la création de comptes stockés dans la base de données et connexion au serveur via l'interface du client.
@@ -177,7 +205,7 @@ Implémentation du concept de joueurs avec la création de comptes stockés dans
 - Représentant des utilisateurs (David Truan) : Analyse et recherche des besoins au niveau sécuritaire et tests unitaires, 2h.
 - Responsable de configuration (Gaëtan Othenin-Girard) : Interface de connexion au compte utilisateur sur le client, 4h.
 
-### Itération 4
+### Itération 5
 
 #### Objectifs
 
@@ -190,7 +218,7 @@ Management du serveur :
 #### Temps escompté
 
  - une semaine
-
+ 
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des scores dans l'application, 3h.
@@ -199,7 +227,7 @@ Management du serveur :
  - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Implémentation du système de score dans la base de donnée, 3h.
 
 
-### Itération 5
+### Itération 6
 
 #### Objectifs
 
@@ -211,15 +239,15 @@ Management du serveur :
 #### Temps escompté
 
  - une semaine
-
+ 
 #### Rôles et effort escompté
 
  - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des fonctions d'administration, 3h.
  - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
  - Représentant des utilisateurs / Programmeur (David Truan) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
  - Responsable de la configuration / Responsable des tests (Gaétan Othenin-Girard) : Test unitaires, vérification et validation du fonctionnement et revue de code, 2h.
-
-### Itération 6
+ 
+### Itération 7
 
 #### Objectifs
 Implémentation des modifications administrateurs en pleine partie avec l'ajout de compte "modérateur". Par exemple :
