@@ -101,8 +101,28 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 
 ## Plan des itérations
 
-| n° Iteration  | Objectif      | Temps escompté  | Rôles          | Effort escompté |
-| ------------- | ------------- | --------------- | -------------- | --------------- |
-| 1             | Colonne       | Colonne         |      Colonne   | Colonne         |
-| 2             | Alignée à     |   Alignée au    |     Alignée à  | Alignée à       |
-| Gauche        | Gauche        |      Centre     |      Droite    | Gauche          |
+### Itération 1
+
+#### Objectifs
+
+Système de jeu fonctionnel en standalone :
+ - création partie
+ - contrôle d'une planete
+ - gestion des événements (collisions, changements d'états)
+ - design graphique (simple)
+
+#### Temps escompté
+
+ - une semaine (plus les vacances de pâques)
+ 
+#### Rôles et effort escompté
+
+ - Chef de projet / Responsable des normes et procédures (P-B. Monaco) : Test unitaires et revue de code, 4h.
+ - Achictecte, concepteur en chef / Programmeur (Lucas Elisei) : Gestion des propriétés physiques, 6h.
+ - Représentant des utilisateurs / Programmeur (David Truan) : Design graphique, validation du design auprès d'utilisateurs Alpha, 5h.
+ - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Gestion événementielle, 6h.
+
+
+ 
+ 
+
