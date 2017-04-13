@@ -203,7 +203,6 @@ public class Universe extends Frame
 
       while (body.getMass() > 0)
       {
-
          double fragMass = oldMass * rand.nextDouble() / 2;
          double fragRadius = sqrt(fragMass / (dThis * PI));
          Body frag = addNewFragment(
