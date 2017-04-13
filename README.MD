@@ -149,7 +149,7 @@ Une semaine.
 Implémentation du concept de joueurs avec la création de comptes stockés dans la base de données et connexion au serveur via l'interface du client.
 
 #### Temps escompté
-Une semaine.
+- Une semaine.
 
 #### Rôles et efforts escomptés
 - Responsable de projet (P-B. Monaco): Création de la base de données et ajout de la partie compte utilisateur, 3h.
@@ -210,7 +210,7 @@ Implémentation des modifications administrateurs en pleine partie avec l'ajout 
 - Mettre la partie en pause.
 
 #### Temps escompté
-Une semaine.
+- Une semaine.
 
 #### Rôles et efforts escomptés
 - Responsable de projet (P-B. Monaco): Apparition d'objets aux endroits sélectionnés et tests unitaires, 3h.
