@@ -97,4 +97,4 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 5. Toujours développer dans un souci d'évolutivité afin de pouvoir facilement rajouter des fonctionnalités.
 
 ## Schéma des cas d'utilisation
-![Cas d'utilisation de planet.io](Schemas/UseCasesPlanet.io.png)
+![Cas d'utilisation de planet.io](Documents/Schemas/UseCasesPlanet.io.png)
