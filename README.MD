@@ -101,8 +101,49 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 
 ## Plan des itérations
 
-| n° Iteration  | Objectif      | Temps escompté  | Rôles          | Effort escompté |
-| ------------- | ------------- | --------------- | -------------- | --------------- |
-| 1             | Colonne       | Colonne         |      Colonne   | Colonne         |
-| 2             | Alignée à     |   Alignée au    |     Alignée à  | Alignée à       |
-| Gauche        | Gauche        |      Centre     |      Droite    | Gauche          |
+### Itération 2
+
+#### Objectifs
+L'objectif de cette itération est l'amélioration de l'application crée lors de la première itération mais en fonctionnant de manière client/serveur. Sur cette version, le serveur contiendra les informations concernant les objets du jeu qu'il enverra au client. Le client va uniquement afficher les objets aux coordonnées reçues.
+
+#### Temps escompté
+Une semaine.
+
+#### Rôles et efforts escomptés
+- Responsable de projet (P-B. Monaco): Tests unitaires et revue de code, 2h.
+- Architecte, concepteur en chef (Lucas Elisey) : Conception et implémentation de l'API, 3h.
+- Représentant des utilisateurs (David Truan) : Interface client générale (différentes zones du GUI), 3h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Création et gestion de la connexion au serveur, 3h.
+
+### Itération 3
+
+#### Objectifs
+Implémentation du concept de joueurs avec la création de comptes stockés dans la base de données et connexion au serveur via l'interface du client.
+
+#### Temps escompté
+Une semaine.
+
+#### Rôles et efforts escomptés
+- Responsable de projet (P-B. Monaco): Création de la base de données et ajout de la partie compte utilisateur, 3h.
+- Architecte, concepteur en chef (Lucas Elisey) : Connexion à la base de données et affichage du pseudo sur la planète. 3h.
+- Représentant des utilisateurs (David Truan) : Analyse et recherche des besoins au niveau sécuritaire et tests unitaires, 2h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Interface de connexion au compte utilisateur sur le client, 4h.
+
+### Itération 6
+
+#### Objectifs
+Implémentation des modifications administrateurs en pleine partie avec l'ajout de compte "modérateur". Par exemple :
+- Ajout de bonus à un endroit.
+- Explosion d'une planète sélectionnée.
+- Application instantanée d'un bonus sur un joueur.
+- Déplacement d'un joueur en drag and drop.
+- Mettre la partie en pause.
+
+#### Temps escompté
+Une semaine.
+
+#### Rôles et efforts escomptés
+- Responsable de projet (P-B. Monaco): Apparition d'objets aux endroits sélectionnés et tests unitaires, 3h.
+- Architecte, concepteur en chef (Lucas Elisey) : Implémentation du compte spécial "modérateur" sur la base de données et en jeu, 3h.
+- Représentant des utilisateurs (David Truan) : Interraction directe avec la planète du joueur (déplacement et explosion), 3h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Interface de sélection de la liste des joueurs et ajout de bonus sur le joueur sélectionné, 3h.
