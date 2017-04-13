@@ -117,12 +117,58 @@ Système de jeu fonctionnel en standalone :
  
 #### Rôles et effort escompté
 
- - Chef de projet / Responsable des normes et procédures (P-B. Monaco) : Test unitaires et revue de code, 4h.
- - Achictecte, concepteur en chef / Programmeur (Lucas Elisei) : Gestion des propriétés physiques, 6h.
+ - Chef de projet / Responsable des normes et procédures / Resposable des tests (P-B. Monaco) : Test unitaires et revue de code, 4h.
+ - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Gestion des propriétés physiques, 6h.
  - Représentant des utilisateurs / Programmeur (David Truan) : Design graphique, validation du design auprès d'utilisateurs Alpha, 5h.
  - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Gestion événementielle, 6h.
 
 
+
+
+
+### Itération 4
+
+#### Objectifs
+
+Management du serveur :
+ - Implémentation du système de de score.
+ - Etude des échanges entre client et serveur (adaptation de la taille et du type de données partagées).
+ - Etude des flux entre les threads du serveur et optimisation.
+ - Tests unitiares de l'interraction client/serveur.
+
+#### Temps escompté
+
+ - une semaine
+ 
+#### Rôles et effort escompté
+
+ - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des scores dans l'application, 3h.
+ - Achitecte, concepteur en chef / Responsable des tests (Lucas Elisei) : Tests unitaires, test de fonctionnnement et revue de code, 4h.
+ - Représentant des utilisateurs / Programmeur (David Truan) : Etude et optimisation des flux entre client et serveur, validation auprès des utilisateurs alpha.
+ - Resposable de la configuration / Programmeur (Gaétan Othenin-Girard) : Implémentation du système de score dans la base de donnée, 3h.
+
+
+### Itération 5
+
+#### Objectifs
+
+Management du serveur :
+ - Implémentation des fonctions de contrôle des joueur (ban kick, allow, etc..:).
+ - Essais d'attaques depuis le client, vérification qu'il n'est pas possible de contrer un bannisement.
+ - Etudes des différentes techniques de triches qui pourraient être utilisée (glitches et exploit).
+
+#### Temps escompté
+
+ - une semaine
+ 
+#### Rôles et effort escompté
+
+ - Chef de projet / Responsable des normes et procédures (P-B. Monaco) / Programmeur : Implémentation des fonctions d'administration, 3h.
+ - Achitecte, concepteur en chef / Programmeur (Lucas Elisei) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
+ - Représentant des utilisateurs / Programmeur (David Truan) : Etude des problèmees/risques de sécurité. Ecriture d'un rapport de sécurité, 3h.
+ - Responsable de la configuration / Responsable des tests (Gaétan Othenin-Girard) : Test unitaires, vérification et validation du fonctionnement et revue de code, 2h.
  
  
+
+
 
