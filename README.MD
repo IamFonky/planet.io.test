@@ -105,6 +105,21 @@ La base de données va principalement nous servir à stocker les comptes utilisa
 Chaque joueur possédera une compte composé d’un pseudo et d’un mot de passe. Son meilleur score sera aussi associé à son compte. Il aura la possibilité de voir toutes les parties auquelles il a participé et son score à chacune d’elle.
 Un deuxième type de compte sera le compte « modérateur ». Les modérateurs seront des arbitres ayant des droits administrateurs sur la partie. Ils auront un compte comme les utilisateurs mais ne posséderont pas de meilleur score. Un historique des parties modérées sera aussi mis à leur disposition.
 
+## Protocole d'échange entre le client et le serveur
+
+Chaque donnée envoyée ou reçue sera sous la forme JSON.
+
+Commande | Description
+:-----------------: | ----------------------------------------
+`PLANET_IO_SUCCESS:<data_nullable>` | Demande acceptée avec possibilité de retourner des données
+`PLANET_IO_FAILURE:<error>` | Demande refusée avec description de l'erreur
+`PLANET_IO_HELLO` | Demande de connexion au serveur
+`PLANET_IO_LOGIN:<credentials>` | Demande de connexion à un compte
+`PLANET_IO_REGISTER:<credentials>` | Demande de création de compte
+`PLANET_IO_GET_SCORES` | Demande de récupération des scores
+`PLANET_IO_GET_UNIVERSE` | Demande des données relatives à l'univers
+`PLANET_IO_SEND_POSITION:<position_data>` | Envoi de la position de la planète au serveur
+
 ## Schéma conceptuel de la BDD
 ![Cas d'utilisation de planet.io](Documents/Schemas/BDD_ModelConceptuel.jpg)
 
