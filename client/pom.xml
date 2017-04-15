@@ -5,19 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>elmootan</groupId>
-    <artifactId>planet.io</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>client</artifactId>
     <version>0.1</version>
-    <modules>
-        <module>server</module>
-        <module>client</module>
-        <module>core</module>
-        <module>documents</module>
-    </modules>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
 
 </project>
