@@ -326,20 +326,27 @@ public class Universe extends Frame
 
    }
 
-   private void hollySong(String sound, double volume)
+   private void hollySong(String soundFile, double intiVolume)
    {
-      ((Runnable) () ->
+      final String sound = soundFile;
+      final double volume = intiVolume;
+
+      (new Runnable()
       {
-         new JFXPanel();
-         System.out.println(System.getProperty("user.dir"));
-         String bip = "sounds/" + sound + ".mp3";
+         @Override
+         public void run()
+         {
+            new JFXPanel();
+            System.out.println(System.getProperty("user.dir"));
+            String bip = "sounds/" + sound + ".mp3";
 
 //         File file = new File(bip);
 
-         Media hit = new Media(Game.class.getResource(bip).toString());
-         MediaPlayer mediaPlayer = new MediaPlayer(hit);
-         mediaPlayer.setVolume(volume);
-         mediaPlayer.play();
+            Media hit = new Media(Game.class.getResource(bip).toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(hit);
+            mediaPlayer.setVolume(volume);
+            mediaPlayer.play();
+         }
       }).run();
 
    }

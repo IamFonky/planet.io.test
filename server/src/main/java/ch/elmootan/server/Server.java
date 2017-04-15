@@ -93,26 +93,30 @@ public class Server
          }
       }
 
-      Thread serverThread = new Thread(() ->
+      Thread serverThread = new Thread(new Runnable()
       {
-         shouldRun = true;
-         while (shouldRun)
+         @Override
+         public void run()
          {
-            try
+            shouldRun = true;
+            while (shouldRun)
             {
-               LOG.log(Level.INFO, "Listening for client connection on {0}", serverSocket.getLocalSocketAddress());
-               Socket clientSocket = serverSocket.accept();
-               LOG.info("New client has arrived...");
-               ClientWorker worker = new ClientWorker(clientSocket, Server.this);
-               clientWorkers.add(worker);
-               LOG.info("Delegating work to client worker...");
-               Thread clientThread = new Thread(worker);
-               clientThread.start();
-            }
-            catch (IOException ex)
-            {
-               LOG.log(Level.SEVERE, "IOException in main server thread, exit: {0}", ex.getMessage());
-               shouldRun = false;
+               try
+               {
+                  LOG.log(Level.INFO, "Listening for client connection on {0}", serverSocket.getLocalSocketAddress());
+                  Socket clientSocket = serverSocket.accept();
+                  LOG.info("New client has arrived...");
+                  ClientWorker worker = new ClientWorker(clientSocket, Server.this);
+                  clientWorkers.add(worker);
+                  LOG.info("Delegating work to client worker...");
+                  Thread clientThread = new Thread(worker);
+                  clientThread.start();
+               }
+               catch (IOException ex)
+               {
+                  LOG.log(Level.SEVERE, "IOException in main server thread, exit: {0}", ex.getMessage());
+                  shouldRun = false;
+               }
             }
          }
       });
