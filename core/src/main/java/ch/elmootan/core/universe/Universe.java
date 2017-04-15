@@ -2,7 +2,6 @@ package ch.elmootan.core.universe;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -10,6 +9,7 @@ import java.util.TimerTask;
 
 import ch.elmootan.core.Game;
 import ch.elmootan.core.physics.*;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
