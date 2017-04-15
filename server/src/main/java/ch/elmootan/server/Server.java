@@ -10,23 +10,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * This class implements the main logic of the Server. It starts a loop
- * to accept incoming connections on a TCP port. When a new connection request
- * is made by a client, the server spawns a new thread. It instantiates a client
- * handler, to which it delegates the processing of the session (the client
- * handler executes on the thread).
- * <p>
- * It is possible to either create an instance of the Server by
- * specifying an explicit TCP port (typically, the default port defined in the
- * protocol specification), or to let the OS allocate an ephemeral port. While
- * this is not a common approach for TCP servers (because clients generally want
- * to have a well-known port to establish the communication), it is useful in
- * the context of automated tests (which may execute in parallel and therefore
- * need "isolated" servers).
- *
- * @author Olivier Liechti
- */
 public class Server
 {
 

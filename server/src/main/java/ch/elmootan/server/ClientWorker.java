@@ -7,20 +7,6 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Instances of this class are created whenever a client has arrived and a
- * connection has been established (the instances are created by the TCPServer
- * class). The class is responsible for setting up and cleaning up the
- * communication streams, but delegates the hard work (i.e. the implementation
- * of our own application protocol) to a class that implements the
- * IClientHandler interface.
- *
- * This means that we could reuse this class, develop a new class that
- * implements the IClientHandler interface and implement another application
- * protocol.
- *
- * @author Olivier Liechti
- */
 public class ClientWorker implements Runnable {
 
    static final Logger LOG = Logger.getLogger(ClientWorker.class.getName());
