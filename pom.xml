@@ -12,7 +12,6 @@
         <module>server</module>
         <module>client</module>
         <module>core</module>
-        <module>documents</module>
     </modules>
 
     <properties>
