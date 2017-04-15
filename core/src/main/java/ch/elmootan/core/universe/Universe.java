@@ -1,4 +1,4 @@
-package ch.elmootan.universe;
+package ch.elmootan.core.universe;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -8,7 +8,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ch.elmootan.physics.*;
+import ch.elmootan.core.Game;
+import ch.elmootan.core.physics.*;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -331,8 +332,11 @@ public class Universe extends Frame
       {
          new JFXPanel();
          System.out.println(System.getProperty("user.dir"));
-         String bip = sound + ".mp3";
-         Media hit = new Media(new File(bip).toURI().toString());
+         String bip = "sounds/" + sound + ".mp3";
+
+//         File file = new File(bip);
+
+         Media hit = new Media(Game.class.getResource(bip).toString());
          MediaPlayer mediaPlayer = new MediaPlayer(hit);
          mediaPlayer.setVolume(volume);
          mediaPlayer.play();

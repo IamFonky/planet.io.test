@@ -1,4 +1,4 @@
-package ch.elmootan.physics;
+package ch.elmootan.core.physics;
 
 import java.awt.*;
 
