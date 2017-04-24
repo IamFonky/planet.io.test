@@ -1,9 +1,6 @@
-package ch.elmootan;
+package ch.elmootan.core;
 
-import ch.elmootan.universe.Planet;
-import ch.elmootan.universe.Universe;
-
-import java.awt.*;
+import ch.elmootan.core.universe.Universe;
 
 public class Game {
 

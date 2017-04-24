@@ -1,10 +1,12 @@
-package ch.elmootan.universe;
+package ch.elmootan.core.universe;
 
-import ch.elmootan.physics.*;
+import ch.elmootan.core.physics.Body;
+import ch.elmootan.core.physics.Position;
 
 import java.awt.*;
 
-public class Planet extends Body {
+public class Planet extends Body
+{
     public Planet(String name, double mass, double radius) {
         super(name, new Position(0, 0), mass, radius, Color.BLACK,0.1);
     }

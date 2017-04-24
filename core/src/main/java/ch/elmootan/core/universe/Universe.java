@@ -1,17 +1,21 @@
-package ch.elmootan.universe;
+package ch.elmootan.core.universe;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ch.elmootan.physics.*;
+import ch.elmootan.core.Game;
+import ch.elmootan.core.physics.*;
+
+//import com.zenjava.javafx.maven.plugin.*;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+
 
 import static java.lang.Math.*;
 
@@ -203,7 +207,6 @@ public class Universe extends Frame
 
       while (body.getMass() > 0)
       {
-
          double fragMass = oldMass * rand.nextDouble() / 2;
          double fragRadius = sqrt(fragMass / (dThis * PI));
          Body frag = addNewFragment(
@@ -326,17 +329,27 @@ public class Universe extends Frame
 
    }
 
-   private void hollySong(String sound, double volume)
+   private void hollySong(String soundFile, double intiVolume)
    {
-      ((Runnable) () ->
+      final String sound = soundFile;
+      final double volume = intiVolume;
+
+      (new Runnable()
       {
-         new JFXPanel();
-         System.out.println(System.getProperty("user.dir"));
-         String bip = sound + ".mp3";
-         Media hit = new Media(new File(bip).toURI().toString());
-         MediaPlayer mediaPlayer = new MediaPlayer(hit);
-         mediaPlayer.setVolume(volume);
-         mediaPlayer.play();
+         @Override
+         public void run()
+         {
+            new JFXPanel();
+            System.out.println(System.getProperty("user.dir"));
+            String bip = "sounds/" + sound + ".mp3";
+
+//         File file = new File(bip);
+
+            Media hit = new Media(Game.class.getResource(bip).toString());
+            MediaPlayer mediaPlayer = new MediaPlayer(hit);
+            mediaPlayer.setVolume(volume);
+            mediaPlayer.play();
+         }
       }).run();
 
    }

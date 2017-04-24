@@ -1,6 +1,7 @@
-package ch.elmootan.universe;
+package ch.elmootan.core.universe;
 
-import ch.elmootan.physics.*;
+import ch.elmootan.core.physics.Body;
+import ch.elmootan.core.physics.Position;
 
 import java.awt.*;
 
