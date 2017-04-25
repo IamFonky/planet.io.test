@@ -1,7 +1,7 @@
 # planet.io
-Etudiants : Lucas ELISEI, Pierre-Benjamin MONACO, Gaëtan OTHENIN-GIRARD & David TRUAN  
-Professeur : Eric Lefrançois  
-Assistant : Christophe Greppin  
+Etudiants : Lucas ELISEI, Pierre-Benjamin MONACO, Gaëtan OTHENIN-GIRARD & David TRUAN
+Professeur : Eric Lefrançois
+Assistant : Christophe Greppin
 
 ## Description
 
@@ -79,7 +79,7 @@ Dans un cadre d'application client-serveur, la contrainte principale est le flux
 Le client quant à lui doit pouvoir démarrer sans serveur actif, indiquer à l'utilisateur qu'aucun serveur n'est connecté. Après démarrage du serveur le programme doit détecter automatiquement que le serveur est UP et se connecter. Lors d'une première connexion, l'utilisateur doit pouvoir s'enregistrer au près du serveur.
 
 ### Contraintes serveur
-Le serveur doit être administrable. Lors de la première utilisation, l'admin doit pouvoir définir un nom et un mot de passe.  
+Le serveur doit être administrable. Lors de la première utilisation, l'admin doit pouvoir définir un nom et un mot de passe.
 Des données persistantes seront aussi stockées sur le serveur. Celles-ci sont composées de:
 
 * Score des joueurs
@@ -98,6 +98,58 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
 
 ## Schéma des cas d'utilisation
 ![Cas d'utilisation de planet.io](Documents/Schemas/UseCasesPlanet.io.png)
+
+## Cas d'utilisation
+
+### Administrateur et joueur normal
+
+#### Se connecter
+ 1. Le joueur rentre ses données (pseudonyme + mot-de-passe).
+ 2.  
+  a. Les identifiants sont corrects et le joueur accède au lobby.  
+  b. Les identifiants sont incorrects et un message d'erreur est affiché. Retour à l'étape **1**.
+
+#### S'enregistrer
+ 1. Le joueur clique sur un bouton **S'enregistrer** et accède au menu pour s'enregistrer.
+ 2. Il rentre un pseudonyme et un mot-de-passe.  
+ 3.  
+  a. Le pseudonyme est libre et le compte est créé.  
+  b. Le pseudonyme est déjà pris et le joueur est informé par un message d'erreur. Retour à l'étape **2**.
+ 4. Le joueur peut se connecter avec son compte.
+
+#### Jouer
+ 1. Le joueur choisi la partie à laquelle il veut participer dans le lobby.
+ 2.  
+  a. La partie est pleine ou terminée (pas mise à jour) donc impossible de se connecter. Retour à l'étape **1**.  
+  b. Le joueur peut se connecter.
+ 3. Le joueur rentre dans la partie.
+ 4. Il commande sa planète en *générant* de la gravité à l'aide de clicks plus ou moins rapide de la souris.
+ 5. Il absorbe les fragments contenu par l'univers de la partie et les planètes plus petites que lui.
+ 6. Il peut absorber des bonus/malus qui lui donnent des pouvoir ou font des actions spécifique à leur type (accélération, augmentation de la force de gravité momentanée, etc...).
+ 7. Sa partie se termine lorsque sa planète se fait absorber par une autre entité (planète adverse, trou noir, pluie de météorite).
+
+#### Créer une partie dans le lobby
+ 1. Dans le lobby le joueur appuie sur le bouton **Créer une partie**.
+ 2.
+  a. Il reste de la place pour une partie dans le lobby, le joueur peut passer à l'étape **3**.  
+  b. Plus de place pour une partie donc impossible de créer la partie. Un message d'erreur est affiché.
+ 3. Choisir un nom pour sa partie et un nombre de joueur max.
+ 4. Choisir les bonus disponibles lors de la partie et si elle a des propriétés spéciales (garvité extra, nombre de *fragments*, etc...).
+
+### Administrateur seulement
+
+#### Supprimer une partie
+ 1. Depuis le lobby l'admin peut supprimer une partie.
+ 2. Les joueurs sont informés que la partie est supprimée et celle-ci se supprime après 10s.
+
+#### Setter les propriétés du lobby
+ 1. L'admin peut, depuis le lobby, parametrer ses différentes propriétés comme le nombre de parties max., le nombre de joueur max., le type de parties proposées, etc...
+
+#### Action sur une partie
+ 1. Ajout de bonus *en live*.
+ 2. Accès à la liste des joueurs avec leurs informations: pseudo, masse actuelle.
+ 3. Bannissement d'un joueur en cliquant sur sa ligne dans la liste et en appuyant sur le bouton **BAN DAT BOI**.
+
 
 ## Base de données
 La base de données va principalement nous servir à stocker les comptes utilisateurs et les différentes parties jouées. Chaque partie sera sauvegardée et comprendra un classement.
@@ -122,13 +174,13 @@ Commande | Description
 `PLANET_IO_GET_UNIVERSE` | Demande des données relatives à l'univers
 `PLANET_IO_SEND_POSITION:<position_data>` | Envoi de la position de la planète au serveur
 
-## Schéma de domaine  
+## Schéma de domaine
 
 ### Client
-![Schéma de domaine du client](Documents/Schemas/domaine/domaine_client.png)  
+![Schéma de domaine du client](Documents/Schemas/domaine/domaine_client.png)
 
 ### Server
-![Schéma de domaine du serveur](Documents/Schemas/domaine/domaine_serveur.png)  
+![Schéma de domaine du serveur](Documents/Schemas/domaine/domaine_serveur.png)
 
 ## Plan d'itérations
 
@@ -136,7 +188,7 @@ Commande | Description
 
 #### Objectifs
 
-Modelisation des schémas UML du client et serveur et prototype :  
+Modelisation des schémas UML du client et serveur et prototype :
 
  - Schéma UML du client.
  - Schéma UML du serveur.
@@ -159,7 +211,7 @@ Modelisation des schémas UML du client et serveur et prototype :
 
 #### Objectifs
 
-Système de jeu fonctionnel en standalone :  
+Système de jeu fonctionnel en standalone :
 
  - création partie.
  - contrôle d'une planete.
