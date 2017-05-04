@@ -2,6 +2,8 @@ package ch.elmootan.core.universe;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -17,6 +19,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import static java.lang.Math.*;
