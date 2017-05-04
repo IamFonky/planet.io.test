@@ -1,7 +1,7 @@
 # planet.io
-Etudiants : Lucas ELISEI, Pierre-Benjamin MONACO, Gaëtan OTHENIN-GIRARD & David TRUAN  
-Professeur : Eric Lefrançois  
-Assistant : Christophe Greppin  
+Etudiants : Lucas ELISEI, Pierre-Benjamin MONACO, Gaëtan OTHENIN-GIRARD & David TRUAN
+Professeur : Eric Lefrançois
+Assistant : Christophe Greppin
 
 ## Description
 
@@ -79,7 +79,7 @@ Dans un cadre d'application client-serveur, la contrainte principale est le flux
 Le client quant à lui doit pouvoir démarrer sans serveur actif, indiquer à l'utilisateur qu'aucun serveur n'est connecté. Après démarrage du serveur le programme doit détecter automatiquement que le serveur est UP et se connecter. Lors d'une première connexion, l'utilisateur doit pouvoir s'enregistrer au près du serveur.
 
 ### Contraintes serveur
-Le serveur doit être administrable. Lors de la première utilisation, l'admin doit pouvoir définir un nom et un mot de passe.  
+Le serveur doit être administrable. Lors de la première utilisation, l'admin doit pouvoir définir un nom et un mot de passe.
 Des données persistantes seront aussi stockées sur le serveur. Celles-ci sont composées de:
 
 * Score des joueurs
@@ -150,6 +150,7 @@ Dans le cadre d'une simulation d'un modèle physique, les valeurs limites sont i
  2. Accès à la liste des joueurs avec leurs informations: pseudo, masse actuelle.
  3. Bannissement d'un joueur en cliquant sur sa ligne dans la liste et en appuyant sur le bouton **BAN DAT BOI**.
 
+
 ## Base de données
 La base de données va principalement nous servir à stocker les comptes utilisateurs et les différentes parties jouées. Chaque partie sera sauvegardée et comprendra un classement.
 Chaque joueur possédera une compte composé d’un pseudo et d’un mot de passe. Son meilleur score sera aussi associé à son compte. Il aura la possibilité de voir toutes les parties auquelles il a participé et son score à chacune d’elle.
@@ -173,13 +174,13 @@ Commande | Description
 `PLANET_IO_GET_UNIVERSE` | Demande des données relatives à l'univers
 `PLANET_IO_SEND_POSITION:<position_data>` | Envoi de la position de la planète au serveur
 
-## Schéma de domaine  
+## Schéma de domaine
 
 ### Client
-![Schéma de domaine du client](Documents/Schemas/domaine/domaine_client.png)  
+![Schéma de domaine du client](Documents/Schemas/domaine/domaine_client.png)
 
 ### Server
-![Schéma de domaine du serveur](Documents/Schemas/domaine/domaine_serveur.png)  
+![Schéma de domaine du serveur](Documents/Schemas/domaine/domaine_serveur.png)
 
 ## Plan d'itérations
 
@@ -187,7 +188,7 @@ Commande | Description
 
 #### Objectifs
 
-Modelisation des schémas UML du client et serveur et prototype :  
+Modelisation des schémas UML du client et serveur et prototype :
 
  - Schéma UML du client.
  - Schéma UML du serveur.
@@ -210,7 +211,7 @@ Modelisation des schémas UML du client et serveur et prototype :
 
 #### Objectifs
 
-Système de jeu fonctionnel en standalone :  
+Système de jeu fonctionnel en standalone :
 
  - création partie.
  - contrôle d'une planete.
