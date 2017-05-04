@@ -198,7 +198,7 @@ public class Universe extends Frame
       }, 0, 33);
    }
 
-   private void explode(Body body)
+   public void explode(Body body)
    {
       Random rand = new Random();
       double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
@@ -269,7 +269,7 @@ public class Universe extends Frame
       addNewPlanet("Click planet", bodyX, bodyY, rand.nextDouble() * 1E+22 + 1E+21, bodyRadius, new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
    }
 
-   private Planet addNewPlanet(String name, double x, double y, double mass, double radius, Color couleur)
+   public Planet addNewPlanet(String name, double x, double y, double mass, double radius, Color couleur)
    {
       Planet newP = new Planet(name, new Position(x, y), mass, radius, couleur);
       allThings.add(newP);
@@ -352,5 +352,9 @@ public class Universe extends Frame
          }
       }).run();
 
+   }
+
+   public ArrayList<Body> getAllThings() {
+      return allThings;
    }
 }
