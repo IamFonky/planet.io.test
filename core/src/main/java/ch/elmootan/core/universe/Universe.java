@@ -2,6 +2,8 @@ package ch.elmootan.core.universe;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +34,9 @@ public class Universe extends JFrame
 
    private JPanel rootPane;
 
+   private Planet clickedPlanet;
+   private boolean mousePressed = false;
+
 //   private boolean tadaam = false;
 
    public Universe()
@@ -41,9 +46,16 @@ public class Universe extends JFrame
       addMouseListener(new MouseAdapter()
       {
          @Override
-         public void mouseClicked(MouseEvent e)
+         public void mousePressed(MouseEvent e)
          {
-            generatePlanetFromClick(e.getX(), e.getY());
+            if (!mousePressed) {
+               generatePlanetFromClick(e.getX(), e.getY());
+               mousePressed = true;
+            }
+         }
+         public void mouseReleased(MouseEvent e) {
+            removePlanet(clickedPlanet);
+            mousePressed = false;
          }
       });
 
@@ -104,6 +116,7 @@ public class Universe extends JFrame
          protected void paintComponent(Graphics g)
          {
             super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D)g;
             synchronized (allThings)
             {
                for (Body body : allThings)
@@ -113,9 +126,19 @@ public class Universe extends JFrame
                   int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
                   g.setColor(body.getCouleur());
 
-                  if (Planet.class.isInstance(body))
+                  if (InvisiblePlanet.class.isInstance(body)) {
+                     Point mouseCoord = MouseInfo.getPointerInfo().getLocation();
+                     g.drawOval(mouseCoord.x - radius, mouseCoord.y - radius, radius, radius);
+                     g.setColor(Color.WHITE);
+                  }
+                  else if (Planet.class.isInstance(body))
                   {
-                     g.drawOval(x, y, radius, radius);
+                     Ellipse2D.Double circle = new Ellipse2D.Double(x, y, radius, radius);
+//                     g2d.setClip(circle);
+//                     Rectangle rekt = new Rectangle(x,y,radius,radius);
+//                     g2d.setPaint(new TexturePaint(toBufferedImage(((Planet)body).getImage(), rekt));
+                     g2d.setColor(body.getCouleur());
+                     g2d.fill(circle);
                   }
                   else if (Fragment.class.isInstance(body))
                   {
@@ -133,6 +156,25 @@ public class Universe extends JFrame
 
       add(rootPane);
    }
+
+//   public static BufferedImage toBufferedImage(Image img)
+//   {
+//      if (img instanceof BufferedImage)
+//      {
+//         return (BufferedImage) img;
+//      }
+//
+//      // Create a buffered image with transparency
+//      BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+//
+//      // Draw the image on to the buffered image
+//      Graphics2D bGr = bimage.createGraphics();
+//      bGr.drawImage(img, 0, 0, null);
+//      bGr.dispose();
+//
+//      // Return the buffered image
+//      return bimage;
+//   }
 
    private void drawBodies() {
       for (int i = 0; i < allThings.size(); ++i)
@@ -274,37 +316,16 @@ public class Universe extends JFrame
 //        hollySong("boom",0.001);
    }
 
-   public void paint(Graphics g)
-   {
-      super.paint(g);
-      synchronized (allThings)
-      {
-         for (Body body : allThings)
-         {
-            int radius = (int) (body.getRadius() / zoom);
-            int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
-            int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
-            g.setColor(body.getCouleur());
 
-            if (Planet.class.isInstance(body))
-            {
-               g.drawOval(x, y, radius, radius);
-            }
-            else if (Fragment.class.isInstance(body))
-            {
-               g.drawRect(x, y, radius, radius);
-            }
-         }
-      }
-   }
 
    private void generatePlanetFromClick(double x, double y)
    {
       Random rand = new Random();
-      double bodyRadius = rand.nextDouble() * 1000 + 4000;
+      double bodyRadius = 30000;
       double bodyX = ((x - (getWidth() / 2)) * zoom);
       double bodyY = ((y - (getHeight() / 2)) * zoom);
-      addNewPlanet("Click planet", bodyX, bodyY, rand.nextDouble() * 1E+22 + 1E+21, bodyRadius, new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+      InvisiblePlanet p = new InvisiblePlanet("Invisible", new Position(bodyX, bodyY), rand.nextDouble() * 1E+24 + 1E+23, bodyRadius, Color.WHITE);
+      clickedPlanet = addNewPlanet(p);
    }
 
    public Planet addNewPlanet(String name, double x, double y, double mass, double radius, Color couleur)
@@ -312,6 +333,16 @@ public class Universe extends JFrame
       Planet newP = new Planet(name, new Position(x, y), mass, radius, couleur);
       allThings.add(newP);
       return newP;
+   }
+
+   public InvisiblePlanet addNewPlanet(InvisiblePlanet newP)
+   {
+      allThings.add(newP);
+      return newP;
+   }
+
+   public void removePlanet(Planet planet) {
+      allThings.remove(planet);
    }
 
    private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur)
@@ -342,7 +373,7 @@ public class Universe extends JFrame
 
    private void generateRandomShit()
    {
-      for (int i = 0; i < 25; ++i)
+      for (int i = 0; i < 1; ++i)
       {
          Random rand = new Random();
          Planet lune = this.addNewPlanet(
@@ -352,8 +383,8 @@ public class Universe extends JFrame
                  rand.nextDouble() * 1E+22 + 1E+21,
                  rand.nextDouble() * 1000 + 4000,
                  new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
-         lune.setSpeed(new Speed(rand.nextDouble() * 1000 - 500,
-                 rand.nextDouble() * 1000 - 500));
+         lune.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
+                 rand.nextDouble() * 100 - 50));
       }
 
    }
