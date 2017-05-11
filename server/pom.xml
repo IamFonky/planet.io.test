@@ -28,6 +28,11 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.4.4</version>
         </dependency>
+        <dependency>
+            <groupId>ch.elmootan</groupId>
+            <artifactId>core</artifactId>
+            <version>0.1</version>
+        </dependency>
     </dependencies>
 
 </project>
