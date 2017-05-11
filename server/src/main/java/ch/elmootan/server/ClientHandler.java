@@ -1,13 +1,9 @@
 package ch.elmootan.server;
 
-import ch.elmootan.protocol.Credentials;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.elmootan.protocol.Protocol;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 
 import java.io.*;
 import java.util.List;
@@ -16,7 +12,6 @@ import java.util.logging.Logger;
 
 public class ClientHandler {
 
-   final static Logger LOG = Logger.getLogger(ClientHandler.class.getName());
    final static ObjectMapper jsonMapper = new ObjectMapper();
     private final static Logger LOG = Logger.getLogger(ClientHandler.class.getName());
 
@@ -35,13 +30,6 @@ public class ClientHandler {
       writer.println("Hello. Online HELP is available. Will you find it?");
       writer.flush();
 
-      String command;
-      boolean done = false;
-      while (!done && ((command = reader.readLine()) != null)) {
-         LOG.log(Level.INFO, "COMMAND: {0}", command);
-         switch (command.toUpperCase()) {
-            case Protocol.PLANET_IO_LOGIN:
-               Credentials creds = jsonMapper.readValue(reader.readLine(),Credentials.class);
         String command;
         boolean done = false;
         while (!done && ((command = reader.readLine()) != null)) {
@@ -50,17 +38,14 @@ public class ClientHandler {
             index = index != -1 ? index : command.length();
             switch (command.toUpperCase().substring(0,  index)) {
 
-               //TODO : TEST CREDENTIALS HERE
-
-               writer.println(Protocol.PLANET_IO_SUCCESS);
                 // Client wants to create a game.
                 case Protocol.CMD_CREATE_GAME: {
                     if (index != command.length()) {
                         String data = command.substring(index + 1);
                         gamesManager.addGame(data);
-                        writer.println(Protocol.CMD_SUCCESS);
+                        writer.println(Protocol.PLANET_IO_SUCCESS);
                     } else {
-                        writer.println(Protocol.CMD_FAILURE);
+                        writer.println(Protocol.PLANET_IO_FAILURE);
                     }
 
                     break;
@@ -69,16 +54,16 @@ public class ClientHandler {
                 // Client wants to disconnect.
                 case Protocol.CMD_DISCONNECT: {
                     done = true;
-                    writer.println(Protocol.CMD_SUCCESS);
+                    writer.println(Protocol.PLANET_IO_SUCCESS);
 
                     break;
                 }
 
                 // Client wants to connect.
-                case Protocol.CMD_HELLO: {
+                case Protocol.PLANET_IO_HELLO: {
                     String serializedData = mapper.writeValueAsString(gamesManager.getGamesList());
 
-                    writer.println(Protocol.CMD_SUCCESS + ":" + serializedData);
+                    writer.println(Protocol.PLANET_IO_SUCCESS + ":" + serializedData);
 
                     break;
                 }
