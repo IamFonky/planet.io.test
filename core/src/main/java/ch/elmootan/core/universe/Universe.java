@@ -2,6 +2,10 @@ package ch.elmootan.core.universe;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -17,13 +21,21 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+
 import static java.lang.Math.*;
 
-public class Universe extends Frame
+public class Universe extends JFrame
 {
 
    private final ArrayList<Body> allThings = new ArrayList<>();
    private double zoom = 500.0;
+
+   private JPanel rootPane;
+
+   private Planet clickedPlanet;
+   private boolean mousePressed = false;
 
 //   private boolean tadaam = false;
 
@@ -34,9 +46,16 @@ public class Universe extends Frame
       addMouseListener(new MouseAdapter()
       {
          @Override
-         public void mouseClicked(MouseEvent e)
+         public void mousePressed(MouseEvent e)
          {
-            generatePlanetFromClick(e.getX(), e.getY());
+            if (!mousePressed) {
+               generatePlanetFromClick(e.getX(), e.getY());
+               mousePressed = true;
+            }
+         }
+         public void mouseReleased(MouseEvent e) {
+            removePlanet(clickedPlanet);
+            mousePressed = false;
          }
       });
 
@@ -85,117 +104,177 @@ public class Universe extends Frame
                         }
       );
 
-      Timer myTime = new Timer("myTime");
+      ActionListener repaintLol = new ActionListener() {
+         public void actionPerformed(ActionEvent evt) {
+            drawBodies();
+            rootPane.repaint();
+         }
+      };
 
-      myTime.schedule(new TimerTask()
-      {
-
+      rootPane = new JPanel() {
          @Override
-         public void run()
+         protected void paintComponent(Graphics g)
          {
-            for (int i = 0; i < allThings.size(); ++i)
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D)g;
+            synchronized (allThings)
             {
-               Body body = allThings.get(i);
-               if(body != null)
+               for (Body body : allThings)
                {
-                  for (int j = i + 1; j < allThings.size(); ++j)
+                  int radius = (int) (body.getRadius() / zoom);
+                  int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
+                  int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
+                  g.setColor(body.getCouleur());
+
+                  if (InvisiblePlanet.class.isInstance(body)) {
+                     Point mouseCoord = MouseInfo.getPointerInfo().getLocation();
+                     g.drawOval(mouseCoord.x - radius, mouseCoord.y - radius, radius, radius);
+                     g.setColor(Color.WHITE);
+                  }
+                  else if (Planet.class.isInstance(body))
                   {
-                     Body surrounding = allThings.get(j);
-                     if (surrounding != null)
+                     Ellipse2D.Double circle = new Ellipse2D.Double(x, y, radius, radius);
+//                     g2d.setClip(circle);
+//                     Rectangle rekt = new Rectangle(x,y,radius,radius);
+//                     g2d.setPaint(new TexturePaint(toBufferedImage(((Planet)body).getImage(), rekt));
+                     g2d.setColor(body.getCouleur());
+                     g2d.fill(circle);
+                  }
+                  else if (Fragment.class.isInstance(body))
+                  {
+                     g.drawRect(x, y, radius, radius);
+                  }
+               }
+            }
+         }
+      };
+
+      javax.swing.Timer displayTimer = new javax.swing.Timer(10,repaintLol);
+      displayTimer.start();
+
+      rootPane.setBackground(Color.BLACK);
+
+      add(rootPane);
+   }
+
+//   public static BufferedImage toBufferedImage(Image img)
+//   {
+//      if (img instanceof BufferedImage)
+//      {
+//         return (BufferedImage) img;
+//      }
+//
+//      // Create a buffered image with transparency
+//      BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+//
+//      // Draw the image on to the buffered image
+//      Graphics2D bGr = bimage.createGraphics();
+//      bGr.drawImage(img, 0, 0, null);
+//      bGr.dispose();
+//
+//      // Return the buffered image
+//      return bimage;
+//   }
+
+   private void drawBodies() {
+      for (int i = 0; i < allThings.size(); ++i)
+      {
+         Body body = allThings.get(i);
+         if(body != null)
+         {
+            for (int j = i + 1; j < allThings.size(); ++j)
+            {
+               Body surrounding = allThings.get(j);
+               if (surrounding != null)
+               {
+                  double gTgDistance = 0;
+                  double sqDistance = 0;
+                  double dX = 0;
+                  double dY = 0;
+                  //On calcule les distances x et y et la distance au carré
+                  synchronized (body)
+                  {
+                     dX = surrounding.getPosition().getX() - body.getPosition().getX();
+                     dY = surrounding.getPosition().getY() - body.getPosition().getY();
+                     sqDistance = dX * dX + dY * dY;
+
+                     //On calcule la distance réelle (Ground to ground)
+                     gTgDistance = Math.sqrt(sqDistance) - body.getRadius() / 2 - surrounding.getRadius() / 2;
+                  }
+
+                  if (gTgDistance < 0) //Collision!
+                  {
+                     BodyState eatState;
+                     synchronized (allThings)
                      {
-                        double gTgDistance = 0;
-                        double sqDistance = 0;
-                        double dX = 0;
-                        double dY = 0;
-                        //On calcule les distances x et y et la distance au carré
-                        synchronized (body)
+                        if (body.getMass() > surrounding.getMass())
                         {
-                           dX = surrounding.getPosition().getX() - body.getPosition().getX();
-                           dY = surrounding.getPosition().getY() - body.getPosition().getY();
-                           sqDistance = dX * dX + dY * dY;
-
-                           //On calcule la distance réelle (Ground to ground)
-                           gTgDistance = Math.sqrt(sqDistance) - body.getRadius() / 2 - surrounding.getRadius() / 2;
+                           eatState = body.eat(surrounding);
+                           allThings.remove(surrounding);
+                        }
+                        else
+                        {
+                           eatState = surrounding.eat(body);
+                           allThings.remove(body);
                         }
 
-                        if (gTgDistance < 0) //Collision!
+                        switch (eatState)
                         {
-                           BodyState eatState;
-                           synchronized (allThings)
-                           {
-                              if (body.getMass() > surrounding.getMass())
-                              {
-                                 eatState = body.eat(surrounding);
-                                 allThings.remove(surrounding);
-                              }
-                              else
-                              {
-                                 eatState = surrounding.eat(body);
-                                 allThings.remove(body);
-                              }
-
-                              switch (eatState)
-                              {
-                                 case EXPLODE:
-                                    explode(body);
-                                    break;
-                                 //On peut imaginer ici un case SUN ou BLACKHOLE
-                              }
-                           }
-                        }
-                        else //Gravitation et physique
-                        {
-                           //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
-                           double rDX = dX / Math.sqrt(sqDistance);
-                           double rDY = dY / Math.sqrt(sqDistance);
-
-                           //Loi de gravité : F [N] = G [N*m2*kg-2] * mA [kg] * mB [kg] / d2 [m2]
-                           //un Newton = 1 [kg*m*s-2]. Plus simplement [kg*a] ou a est l'accélération
-                           //donc G [kg*m*s-2*m2*kg-2] ==> G [m3*s-2*kg-1]
-                           //On peut donc calculer simplement l'accélération aN sur chaque corps avec :
-                           //aA [m*s-2] = G [m3*s-2*kg-1] * mB [kg] / d2 [m2]
-                           double bodyA = Constants.GRAVITATION.valeur * surrounding.getMass() / sqDistance;
-                           //A cette étape nous avons un vecteur d'accélération mais pas de direction
-                           //Il décomposer en deux composantes x et y
-                           double bodyAX = bodyA * rDX;
-                           double bodyAY = bodyA * rDY;
-
-                           //Même chose pour les deuxième corps
-                           double surrA = Constants.GRAVITATION.valeur * body.getMass() / sqDistance;
-                           double surrAX = surrA * -rDX;
-                           double surrAY = surrA * -rDY;
-
-                           //Il faut maintenant appliquer accélérations x et y aux vitesses x et y
-                           //Pour le moment la cadence du processeur règle la vitesse du programme
-                           synchronized (body)
-                           {
-                              body.getSpeed().setX(body.getSpeed().getX() + bodyAX);
-                              body.getSpeed().setY(body.getSpeed().getY() + bodyAY);
-
-                              surrounding.getSpeed().setX(surrounding.getSpeed().getX() + surrAX);
-                              surrounding.getSpeed().setY(surrounding.getSpeed().getY() + surrAY);
-                           }
-
+                           case EXPLODE:
+                              explode(body);
+                              break;
+                           //On peut imaginer ici un case SUN ou BLACKHOLE
                         }
                      }
                   }
-               }
+                  else //Gravitation et physique
+                  {
+                     //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
+                     double rDX = dX / Math.sqrt(sqDistance);
+                     double rDY = dY / Math.sqrt(sqDistance);
 
-               synchronized (body)
-               {
-                  body.getPosition().setX(body.getPosition().getX() + body.getSpeed().getX());
-                  body.getPosition().setY(body.getPosition().getY() + body.getSpeed().getY());
-               }
+                     //Loi de gravité : F [N] = G [N*m2*kg-2] * mA [kg] * mB [kg] / d2 [m2]
+                     //un Newton = 1 [kg*m*s-2]. Plus simplement [kg*a] ou a est l'accélération
+                     //donc G [kg*m*s-2*m2*kg-2] ==> G [m3*s-2*kg-1]
+                     //On peut donc calculer simplement l'accélération aN sur chaque corps avec :
+                     //aA [m*s-2] = G [m3*s-2*kg-1] * mB [kg] / d2 [m2]
+                     double bodyA = Constants.GRAVITATION.valeur * surrounding.getMass() / sqDistance;
+                     //A cette étape nous avons un vecteur d'accélération mais pas de direction
+                     //Il décomposer en deux composantes x et y
+                     double bodyAX = bodyA * rDX;
+                     double bodyAY = bodyA * rDY;
 
-               // Freinage des corps
-               // body.speed.x -= 0.005 * body.speed.x;
-               // body.speed.y -= 0.005 * body.speed.y;
+                     //Même chose pour les deuxième corps
+                     double surrA = Constants.GRAVITATION.valeur * body.getMass() / sqDistance;
+                     double surrAX = surrA * -rDX;
+                     double surrAY = surrA * -rDY;
+
+                     //Il faut maintenant appliquer accélérations x et y aux vitesses x et y
+                     //Pour le moment la cadence du processeur règle la vitesse du programme
+                     synchronized (body)
+                     {
+                        body.getSpeed().setX(body.getSpeed().getX() + bodyAX);
+                        body.getSpeed().setY(body.getSpeed().getY() + bodyAY);
+
+                        surrounding.getSpeed().setX(surrounding.getSpeed().getX() + surrAX);
+                        surrounding.getSpeed().setY(surrounding.getSpeed().getY() + surrAY);
+                     }
+
+                  }
+               }
             }
-
-            res();
          }
 
-      }, 0, 33);
+         synchronized (body)
+         {
+            body.getPosition().setX(body.getPosition().getX() + body.getSpeed().getX());
+            body.getPosition().setY(body.getPosition().getY() + body.getSpeed().getY());
+         }
+
+         // Freinage des corps
+         // body.speed.x -= 0.005 * body.speed.x;
+         // body.speed.y -= 0.005 * body.speed.y;
+      }
    }
 
    public void explode(Body body)
@@ -237,36 +316,16 @@ public class Universe extends Frame
 //        hollySong("boom",0.001);
    }
 
-   public void paint(Graphics g)
-   {
-      synchronized (allThings)
-      {
-         for (Body body : allThings)
-         {
-            int radius = (int) (body.getRadius() / zoom);
-            int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
-            int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
-            g.setColor(body.getCouleur());
 
-            if (Planet.class.isInstance(body))
-            {
-               g.drawOval(x, y, radius, radius);
-            }
-            else if (Fragment.class.isInstance(body))
-            {
-               g.drawRect(x, y, radius, radius);
-            }
-         }
-      }
-   }
 
    private void generatePlanetFromClick(double x, double y)
    {
       Random rand = new Random();
-      double bodyRadius = rand.nextDouble() * 1000 + 4000;
+      double bodyRadius = 30000;
       double bodyX = ((x - (getWidth() / 2)) * zoom);
       double bodyY = ((y - (getHeight() / 2)) * zoom);
-      addNewPlanet("Click planet", bodyX, bodyY, rand.nextDouble() * 1E+22 + 1E+21, bodyRadius, new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+      InvisiblePlanet p = new InvisiblePlanet("Invisible", new Position(bodyX, bodyY), rand.nextDouble() * 1E+24 + 1E+23, bodyRadius, Color.WHITE);
+      clickedPlanet = addNewPlanet(p);
    }
 
    public Planet addNewPlanet(String name, double x, double y, double mass, double radius, Color couleur)
@@ -276,21 +335,22 @@ public class Universe extends Frame
       return newP;
    }
 
+   public InvisiblePlanet addNewPlanet(InvisiblePlanet newP)
+   {
+      allThings.add(newP);
+      return newP;
+   }
+
+   public void removePlanet(Planet planet) {
+      allThings.remove(planet);
+   }
+
    private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur)
    {
       Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
       allThings.add(newP);
       return newP;
    }
-
-
-   private void res()
-   {
-      invalidate();
-      validate();
-      repaint();
-   }
-
 
    private void generateExactSameShit()
    {
@@ -313,7 +373,7 @@ public class Universe extends Frame
 
    private void generateRandomShit()
    {
-      for (int i = 0; i < 25; ++i)
+      for (int i = 0; i < 1; ++i)
       {
          Random rand = new Random();
          Planet lune = this.addNewPlanet(
@@ -323,8 +383,8 @@ public class Universe extends Frame
                  rand.nextDouble() * 1E+22 + 1E+21,
                  rand.nextDouble() * 1000 + 4000,
                  new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
-         lune.setSpeed(new Speed(rand.nextDouble() * 1000 - 500,
-                 rand.nextDouble() * 1000 - 500));
+         lune.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
+                 rand.nextDouble() * 100 - 50));
       }
 
    }

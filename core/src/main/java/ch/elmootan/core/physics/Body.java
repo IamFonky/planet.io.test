@@ -1,5 +1,7 @@
 package ch.elmootan.core.physics;
 
+import ch.elmootan.core.universe.Fragment;
+
 import java.awt.*;
 
 import static java.lang.Math.*;
@@ -103,6 +105,8 @@ public abstract class Body
 
     public BodyState eat(Body meal)
     {
+        if (this instanceof Fragment)
+            return BodyState.DEFAULT;
         boolean explode = (abs(mass - meal.mass) < mass * fragmentationRatio);
 
         double newMass = mass + meal.mass;
