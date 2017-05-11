@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ch.elmootan.core.Game;
+import ch.elmootan.core.PlanetIO;
 import ch.elmootan.core.physics.*;
 
 //import com.zenjava.javafx.maven.plugin.*;
@@ -345,7 +345,7 @@ public class Universe extends Frame
 
 //         File file = new File(bip);
 
-            Media hit = new Media(Game.class.getResource(bip).toString());
+            Media hit = new Media(PlanetIO.class.getResource(bip).toString());
             MediaPlayer mediaPlayer = new MediaPlayer(hit);
             mediaPlayer.setVolume(volume);
             mediaPlayer.play();
