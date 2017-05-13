@@ -3,13 +3,8 @@ package ch.elmootan.core.universe;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import ch.elmootan.core.PlanetIO;
 import ch.elmootan.core.physics.*;
@@ -21,7 +16,6 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import static java.lang.Math.*;
