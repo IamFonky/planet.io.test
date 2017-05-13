@@ -35,13 +35,24 @@ public class Universe extends JFrame
    private JPanel rootPane;
 
    private Planet clickedPlanet;
+   private Planet myPlanet;
+   private double nbClicks;
    private boolean mousePressed = false;
+
+   private ArrayList<BufferedImage> planets = new ArrayList<>();
 
 //   private boolean tadaam = false;
 
    public Universe()
    {
       super("Mon univers");
+
+      try {
+         for (int i=1; i<=8; i++)
+            planets.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/planets/planet"+i+"_64x64.png")));
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
 
       addMouseListener(new MouseAdapter()
       {
@@ -50,13 +61,20 @@ public class Universe extends JFrame
          {
             if (!mousePressed) {
                generatePlanetFromClick(e.getX(), e.getY());
+               clickedPlanet.setMass(clickedPlanet.getMass()*nbClicks);
+               //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
                mousePressed = true;
             }
+            nbClicks = e.getClickCount();
          }
          public void mouseReleased(MouseEvent e) {
             removePlanet(clickedPlanet);
             mousePressed = false;
          }
+//         public void mouseMoved(MouseEvent e) {
+//            if (mousePressed)
+//               clickedPlanet.setPosition(new Position(e.getX(), e.getY()));
+//         }
       });
 
       addKeyListener(new KeyAdapter()
@@ -87,6 +105,10 @@ public class Universe extends JFrame
                   {
                      generateRandomShit();
                   }
+                  break;
+               case 'q':
+                  generateMyPlanet();
+                  break;
             }
             System.out.println(e.getKeyChar());
          }
@@ -128,17 +150,16 @@ public class Universe extends JFrame
 
                   if (InvisiblePlanet.class.isInstance(body)) {
                      Point mouseCoord = MouseInfo.getPointerInfo().getLocation();
-                     g.drawOval(mouseCoord.x - radius, mouseCoord.y - radius, radius, radius);
-                     g.setColor(Color.WHITE);
+//                     g.drawOval(x, y, radius, radius);
+//                     g.setColor(Color.WHITE);
+                     g2d.drawImage(planets.get(0).getScaledInstance(radius, radius, 0),x,y,this);
                   }
                   else if (Planet.class.isInstance(body))
                   {
-                     Ellipse2D.Double circle = new Ellipse2D.Double(x, y, radius, radius);
-//                     g2d.setClip(circle);
-//                     Rectangle rekt = new Rectangle(x,y,radius,radius);
-//                     g2d.setPaint(new TexturePaint(toBufferedImage(((Planet)body).getImage(), rekt));
-                     g2d.setColor(body.getCouleur());
-                     g2d.fill(circle);
+                     g2d.drawImage(planets.get(1).getScaledInstance(radius, radius, 0),x,y,this);
+//                     Ellipse2D.Double circle = new Ellipse2D.Double(x, y, radius, radius);
+//                     g2d.setColor(body.getCouleur());
+//                     g2d.fill(circle);
                   }
                   else if (Fragment.class.isInstance(body))
                   {
@@ -204,30 +225,31 @@ public class Universe extends JFrame
 
                   if (gTgDistance < 0) //Collision!
                   {
-                     BodyState eatState;
-                     synchronized (allThings)
-                     {
-                        if (body.getMass() > surrounding.getMass())
-                        {
-                           eatState = body.eat(surrounding);
-                           allThings.remove(surrounding);
-                        }
-                        else
-                        {
-                           eatState = surrounding.eat(body);
-                           allThings.remove(body);
-                        }
+                     if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
+                        removePlanet(clickedPlanet);
+                     } else {
+                        BodyState eatState;
+                        synchronized (allThings) {
+                           if (body.getMass() > surrounding.getMass()) {
+                              eatState = body.eat(surrounding);
+                              allThings.remove(surrounding);
+                           } else {
+                              eatState = surrounding.eat(body);
+                              allThings.remove(body);
+                           }
 
-                        switch (eatState)
-                        {
-                           case EXPLODE:
-                              explode(body);
-                              break;
-                           //On peut imaginer ici un case SUN ou BLACKHOLE
+                           switch (eatState) {
+                              case EXPLODE:
+                                 explode(body);
+                                 break;
+                              //On peut imaginer ici un case SUN ou BLACKHOLE
+                           }
                         }
                      }
                   }
-                  else //Gravitation et physique
+                  else if ((body != clickedPlanet && surrounding != clickedPlanet)||
+                           (body == clickedPlanet && surrounding == myPlanet)||
+                           (body == myPlanet && surrounding == clickedPlanet))//Gravitation et physique
                   {
                      //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
                      double rDX = dX / Math.sqrt(sqDistance);
@@ -324,7 +346,7 @@ public class Universe extends JFrame
       double bodyRadius = 30000;
       double bodyX = ((x - (getWidth() / 2)) * zoom);
       double bodyY = ((y - (getHeight() / 2)) * zoom);
-      InvisiblePlanet p = new InvisiblePlanet("Invisible", new Position(bodyX, bodyY), rand.nextDouble() * 1E+24 + 1E+23, bodyRadius, Color.WHITE);
+      InvisiblePlanet p = new InvisiblePlanet("Invisible", new Position(bodyX, bodyY), 1E+24, bodyRadius, Color.WHITE);
       clickedPlanet = addNewPlanet(p);
    }
 
@@ -343,6 +365,7 @@ public class Universe extends JFrame
 
    public void removePlanet(Planet planet) {
       allThings.remove(planet);
+      planet = null;
    }
 
    private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur)
@@ -387,6 +410,20 @@ public class Universe extends JFrame
                  rand.nextDouble() * 100 - 50));
       }
 
+   }
+
+   private void generateMyPlanet()
+   {
+      Random rand = new Random();
+      myPlanet = this.addNewPlanet(
+              "MYPLANET",
+              rand.nextDouble() * 400000 + -200000,
+              rand.nextDouble() * 400000 + -200000,
+              rand.nextDouble() * 1E+22 + 1E+21,
+              rand.nextDouble() * 1000 + 4000,
+              new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
+      myPlanet.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
+              rand.nextDouble() * 100 - 50));
    }
 
    private void hollySong(String soundFile, double intiVolume)
