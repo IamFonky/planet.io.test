@@ -36,6 +36,7 @@ public class Universe extends JFrame
 
    private Planet clickedPlanet;
    private Planet myPlanet;
+   private double myPlanetInitMass;
    private double nbClicks;
    private boolean mousePressed = false;
 
@@ -48,27 +49,44 @@ public class Universe extends JFrame
    {
       super("Mon univers");
 
-      try {
-         for (int i=1; i<=8; i++)
-            planets.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet"+i+"_32x32.png")));
+      try
+      {
+         for (int i = 1; i <= 8; i++)
+            planets.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet" + i + "_32x32.png")));
          invisible = ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/invisible_64x64.png"));
-      } catch (IOException e) {
+      }
+      catch (IOException e)
+      {
          e.printStackTrace();
       }
+
+      addMouseMotionListener(new MouseMotionAdapter() {
+
+         @Override
+         public void mouseDragged(MouseEvent e)
+         {
+            if(clickedPlanet != null && mousePressed)
+            {
+               clickedPlanet.setMass(myPlanetInitMass*getControlForce(e));
+               clickedPlanet.setPosition(convertXYToPosition(e.getX(),e.getY()));
+            }
+         }
+      });
 
       addMouseListener(new MouseAdapter()
       {
          @Override
          public void mousePressed(MouseEvent e)
          {
-            if (!mousePressed) {
+            if (clickedPlanet == null || !mousePressed) {
                generatePlanetFromClick(e.getX(), e.getY());
-               clickedPlanet.setMass(clickedPlanet.getMass()*nbClicks);
+               myPlanetInitMass = clickedPlanet.getMass();
+               clickedPlanet.setMass(myPlanetInitMass);
                //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
                mousePressed = true;
             }
-            nbClicks = e.getClickCount();
          }
+
          @Override
          public void mouseReleased(MouseEvent e) {
             removePlanet(clickedPlanet);
@@ -320,15 +338,38 @@ public class Universe extends JFrame
 //        hollySong("boom",0.001);
    }
 
+   private int getControlForce(MouseEvent e)
+   {
+      if (e.isShiftDown() && e.isControlDown())
+      {
+         return 10;
+      }
+      else if (e.isShiftDown())
+      {
+         return 2;
+      }
+      else if (e.isControlDown())
+      {
+         return 3;
+      }
+      else
+      {
+         return 1;
+      }
+   }
 
+   private Position convertXYToPosition(double x, double y)
+   {
+      double bodyX = ((x - (getWidth() / 2)) * zoom);
+      double bodyY = ((y - (getHeight() / 2)) * zoom);
+      return new Position(bodyX,bodyY);
+   }
 
    private void generatePlanetFromClick(double x, double y)
    {
-      Random rand = new Random();
       double bodyRadius = 30000;
-      double bodyX = ((x - (getWidth() / 2)) * zoom);
-      double bodyY = ((y - (getHeight() / 2)) * zoom);
-      InvisiblePlanet p = new InvisiblePlanet("Invisible", new Position(bodyX, bodyY), 1E+24, bodyRadius, 1);
+      InvisiblePlanet p = new InvisiblePlanet("Invisible", convertXYToPosition(x,y), 1E+24, bodyRadius, 1);
+
       clickedPlanet = addNewPlanet(p);
    }
 
