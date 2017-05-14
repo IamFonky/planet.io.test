@@ -1,5 +1,6 @@
 package ch.elmootan.core.sharedObjects;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -8,6 +9,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -78,11 +82,12 @@ public class Lobby extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == addGameButton) {
             new GameCreator();
-
-
         } else {
             int indexGame = table.getSelectedRow();
             if(indexGame!= -1) {
+                // Choix du skin quand on rejoint la partie.
+                SkinChooser skinChooser = new SkinChooser();
+                //while (!skinChooser.skinChoosed());
                 gamesList.get(indexGame).join();
             }
         }
@@ -157,13 +162,80 @@ public class Lobby extends JFrame implements ActionListener {
                 Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
                 addGame(newGame);
                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+                // Choix du skin après avoir créé la partie.
+                new SkinChooser();
             }
+        }
+    }
+
+    private class SkinChooser extends JFrame implements ActionListener {
+        private JButton btnNext = new JButton(">");
+        private JButton btnPrev = new JButton("<");
+
+        private JButton btnChoose = new JButton("GO!");
+
+        private ArrayList<BufferedImage> skins = new ArrayList<>();
+        private JLabel imgSkin;
+        private int idSkin = 0;
+
+        private boolean chooseStatus = false;
+
+        public SkinChooser() {
+            JPanel imgPanel = new JPanel(new FlowLayout());
+            JPanel goPanel = new JPanel();
+
+            try {
+                for (int i=1; i<=8; i++)
+                    skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet"+i+"_64x64.png")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            imgSkin = new JLabel(new ImageIcon(skins.get(idSkin)));
+            imgPanel.add(btnPrev);
+            btnPrev.addActionListener(this);
+            imgPanel.add(imgSkin);
+            btnNext.addActionListener(this);
+            imgPanel.add(btnNext);
+
+            goPanel.add(btnChoose);
+            btnChoose.addActionListener(this);
+
+            getContentPane().add(imgPanel, BorderLayout.CENTER);
+            getContentPane().add(goPanel, BorderLayout.PAGE_END);
+            setTitle("Choix du skin");
+            setResizable(false);
+            setSize(200,150);
+            setVisible(true);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == btnChoose) {
+                System.out.println(idSkin);
+                chooseStatus = true;
+                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+            }
+
+            if (e.getSource() == btnNext) {
+                idSkin = idSkin+1 > 7 ? 0 : ++idSkin;
+            }
+            if (e.getSource() == btnPrev) {
+                idSkin = idSkin-1 < 0 ? 7 : --idSkin;
+            }
+
+            imgSkin.setIcon(new ImageIcon(skins.get(idSkin)));
+            revalidate();
+            repaint();
+        }
+
+        public boolean skinChoosed() {
+            return chooseStatus;
         }
     }
 
     public static void main(String... args) {
         new Lobby();
-
     }
 
 }

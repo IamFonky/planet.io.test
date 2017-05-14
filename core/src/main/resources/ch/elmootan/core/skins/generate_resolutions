@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ $1 = -1 ]; then
+	exit
+fi
+
+for i in {1..8}
+do
+	convert "planet"$i".png" -resize $1"x"$1 "planet"$i"_"$1"x"$1".png"
+done;
+
+echo "Les images on été générées !"

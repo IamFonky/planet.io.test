@@ -18,7 +18,7 @@ public class CoreTest extends Universe {
     @Test
     public void itShouldBePossibleToAddAPlanetToTheUniverse() {
         Universe universe = new Universe();
-        Planet jupiter = universe.addNewPlanet("Jupiter", 666, 666, 1.8986e27, 71492, new Color(202, 174, 133));
+        Planet jupiter = universe.addNewPlanet("Jupiter", 666, 666, 1.8986e27, 71492, 2, 1);
         assertNotNull(jupiter);
     }
 
@@ -27,10 +27,10 @@ public class CoreTest extends Universe {
         Universe universe = new Universe();
 
         double jupiterMass = 1.8986e27;
-        Planet jupiter = universe.addNewPlanet("Jupiter", 666, 666, jupiterMass, 71492, new Color(202, 174, 133));
+        Planet jupiter = universe.addNewPlanet("Jupiter", 666, 666, jupiterMass, 71492, 2, 1);
 
         double marsMass = 641.85e21;
-        Planet mars = universe.addNewPlanet("Mars", 666, 666, marsMass, 3396, new Color(215, 96, 45));
+        Planet mars = universe.addNewPlanet("Mars", 666, 666, marsMass, 3396, 5, 2);
 
         try {
             Thread.sleep(1000);
@@ -45,7 +45,7 @@ public class CoreTest extends Universe {
     @Test
     public void itShouldBePossibleToExplodeAPlanet() {
         Universe universe = new Universe();
-        Planet jupiter = universe.addNewPlanet("Jupiter", 666, 666, 1.8986e27, 71492, new Color(202, 174, 133));
+        Planet jupiter = universe.addNewPlanet("Jupiter", 666, 666, 1.8986e27, 71492, 2, 1);
 
         universe.explode(jupiter);
 

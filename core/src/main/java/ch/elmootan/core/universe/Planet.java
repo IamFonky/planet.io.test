@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class Planet extends Body
 {
-    //private final Image image = new ImageIcon(getClass().getClassLoader().getResource("ch/elmootan/core/textures/planet1.jpg").getPath()).getImage();
+    private int idSkin = 1;
 
     public Planet(String name, double mass, double radius) {
         super(name, new Position(0, 0), mass, radius, Color.BLACK,0.1);
@@ -22,8 +22,13 @@ public class Planet extends Body
         super(name, position, mass, radius, couleur,0.1);
     }
 
-//    public Image getImage() {
-//        image.getScaledInstance((int)getRadius(), (int)getRadius(),Image.SCALE_FAST);
-//        return image;
-//    }
+    public Planet(String name, Position position, double mass, double radius, int skin, int id) {
+        super(name, position, mass, radius, Color.BLACK,0.1);
+        idSkin = skin;
+        setId(id);
+    }
+
+    public int getIdSkin() {
+        return idSkin;
+    }
 }
