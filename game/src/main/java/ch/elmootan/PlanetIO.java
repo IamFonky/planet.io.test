@@ -61,7 +61,7 @@ public class PlanetIO {
             Object id = e.getSource();
             if (id == client) {
                 new CredentialsPrompt();
-                setVisible(false);
+                this.dispose();
                 //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             } else if (id == server) {
                 Server server = new ch.elmootan.server.Server();
