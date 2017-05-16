@@ -39,10 +39,11 @@ public class Server {
      * TCP port
      */
     public Server() {
-
+        System.out.println("New server created!");
     }
 
     public void startServer() throws IOException {
+        System.out.println("Server starting!");
         serverSocket = new ServerSocket();
         serverSocket.setReuseAddress(true);
         serverSocket.bind(new InetSocketAddress(LISTENING_PORT));
