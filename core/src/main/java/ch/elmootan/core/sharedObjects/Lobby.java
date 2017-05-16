@@ -82,9 +82,9 @@ public class Lobby extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == addGameButton) {
             new GameCreator();
-        } else {
+        } else if (e.getSource() == joinGameButton){
             int indexGame = table.getSelectedRow();
-            if(indexGame!= -1) {
+            if(indexGame != -1) {
                 // Choix du skin quand on rejoint la partie.
                 SkinChooser skinChooser = new SkinChooser();
                 //while (!skinChooser.skinChoosed());
@@ -162,8 +162,6 @@ public class Lobby extends JFrame implements ActionListener {
                 Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
                 addGame(newGame);
                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-                // Choix du skin après avoir créé la partie.
-                new SkinChooser();
             }
         }
     }
