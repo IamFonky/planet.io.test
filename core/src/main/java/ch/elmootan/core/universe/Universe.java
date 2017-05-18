@@ -159,13 +159,19 @@ public class Universe extends JFrame
                   int radius = (int) (body.getRadius() / zoom);
                   int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
                   int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
-                  g.setColor(body.getCouleur());
+                  g.setColor(Color.WHITE);
+                  String pseudo;
 
                   if (InvisiblePlanet.class.isInstance(body)) {
                      g2d.drawImage(invisible.getScaledInstance(radius, radius, 0),x,y,this);
                   }
                   else if (Planet.class.isInstance(body))
                   {
+                     if (body == myPlanet)
+                        pseudo = "GatiGato";
+                     else
+                        pseudo = "ImFonky";
+                     g2d.drawString(pseudo, x-(pseudo.length()/2)*5+radius/2, y-10);
                      g2d.drawImage(planets.get(((Planet)body).getIdSkin()-1).getScaledInstance(radius, radius, 0),x,y,this);
                   }
                   else if (Fragment.class.isInstance(body))
