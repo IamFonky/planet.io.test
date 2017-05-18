@@ -23,6 +23,8 @@ public abstract class Body
 
     private double fragmentationRatio;
 
+    private int id;
+
     public Body(String name, Position position, double mass, double radius, Color couleur, double fragmentationRatio)
     {
         this.name = name;
@@ -101,6 +103,14 @@ public abstract class Body
     public void setSpeed(Speed speed)
     {
         this.speed = speed;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public BodyState eat(Body meal)

@@ -17,11 +17,11 @@ public class Client {
     BufferedReader in;
 
 
-    protected String serverRead() throws IOException {
+    public String serverRead() throws IOException {
         return in.readLine();
     }
 
-    protected void serverWrite(String toWrite) {
+    public void serverWrite(String toWrite) {
         out.println(toWrite);
         out.flush();
     }

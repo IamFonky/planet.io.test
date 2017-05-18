@@ -8,8 +8,8 @@ import ch.elmootan.core.physics.Position;
 import java.awt.*;
 
 public class InvisiblePlanet extends Planet {
-    public InvisiblePlanet(String name, Position position, double mass, double radius, Color couleur)  {
-        super(name, position, mass, radius, couleur);
+    public InvisiblePlanet(String name, Position position, double mass, double radius, int id)  {
+        super(name, position, mass, radius, 1, id);
     }
 
     public BodyState eat(Body meal)

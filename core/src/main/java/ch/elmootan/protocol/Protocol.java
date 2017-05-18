@@ -17,5 +17,5 @@ public final class Protocol {
     public static final String CMD_DISCONNECT = "DISCONECT";
 
 
-    public static final int PORT = 666;
+    public static final int PORT = 6666;
 }

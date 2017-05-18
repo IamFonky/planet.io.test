@@ -6,7 +6,6 @@ public class PlanetIO {
 
     public static void main(String... args) {
         new Universe();
-        Universe monUnivers = new Universe();
     }
 
 }
