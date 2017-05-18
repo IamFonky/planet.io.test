@@ -15,5 +15,10 @@
             <artifactId>server</artifactId>
             <version>0.1</version>
         </dependency>
+        <dependency>
+            <groupId>ch.elmootan</groupId>
+            <artifactId>client</artifactId>
+            <version>0.1</version>
+        </dependency>
     </dependencies>
 </project>

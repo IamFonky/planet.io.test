@@ -8,7 +8,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 
+import ch.elmootan.core.sharedObjects.Lobby;
+import ch.elmootan.core.sharedObjects.Player;
 import ch.elmootan.server.Server;
+import ch.elmootan.client.Client;
+import com.sun.deploy.util.SessionState;
 
 public class PlanetIO {
 
@@ -64,7 +68,10 @@ public class PlanetIO {
                 this.dispose();
                 //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             } else if (id == server) {
-                Server server = new ch.elmootan.server.Server();
+                Server server = new Server();
+
+                Lobby.getSharedInstance().addServerObserver(server);
+
                 try {
                     server.startServer();
                 } catch (IOException e1) {
@@ -76,29 +83,38 @@ public class PlanetIO {
 
     private static class CredentialsPrompt extends JFrame implements ActionListener {
 
-
         private JTextField pseudo;
         private JButton done;
 
         public CredentialsPrompt() {
-            setLayout(new FlowLayout());
+            //setLayout(new FlowLayout());
 
             done = new JButton("Done");
+            done.addActionListener(this);
 
-            pseudo = new JTextField("Enter your pseudo");
+            JPanel pseudoPanel = new JPanel(new FlowLayout());
 
-            add(pseudo);
-            add(done);
+            pseudo = new JTextField(17);
+
+            pseudoPanel.add(new JLabel("Pseudo"));
+            pseudoPanel.add(pseudo);
+
+            getContentPane().add(pseudoPanel, BorderLayout.CENTER);
+            getContentPane().add(done, BorderLayout.SOUTH);
 
 
             setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            setSize(267, 150);
+            setSize(300, 150);
 
             setVisible(true);
         }
 
         public void actionPerformed(ActionEvent e) {
-
+            if (e.getSource() == done && pseudo.getText() != "") {
+                // TODO check if in DB
+                Client client = new Client(new Player(pseudo.getText()));
+                this.dispose();
+            }
         }
     }
 

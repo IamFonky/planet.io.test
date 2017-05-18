@@ -1,5 +1,7 @@
 package ch.elmootan.server;
 
+import ch.elmootan.core.sharedObjects.Game;
+import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.protocol.Protocol;
 
 import java.io.IOException;
@@ -7,11 +9,13 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Server {
+public class Server implements Observer {
 
     //! Logger.
     final static Logger LOG = Logger.getLogger(Server.class.getName());
@@ -21,6 +25,7 @@ public class Server {
 
     //! Server socket.
     private ServerSocket serverSocket;
+
 
     /*
      * The server maintains a list of client workers, so that they can be notified
@@ -44,6 +49,9 @@ public class Server {
 
     public void startServer() throws IOException {
         System.out.println("Server starting!");
+
+        Lobby.getSharedInstance().setNbGamesMax(7);
+
         serverSocket = new ServerSocket();
         serverSocket.setReuseAddress(true);
         serverSocket.bind(new InetSocketAddress(LISTENING_PORT));
@@ -116,4 +124,11 @@ public class Server {
         clientWorkers.remove(worker);
     }
 
+
+    public void update(Observable o, Object obj)  {
+        Game newGame = (Game) obj;
+        for (ClientWorker clientWorker : clientWorkers) {
+            clientWorker.sendLobbyUpdate(newGame);
+        }
+    }
 }

@@ -1,8 +1,11 @@
 package ch.elmootan.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import ch.elmootan.core.sharedObjects.Game;
+import ch.elmootan.protocol.Protocol;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.*;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,4 +80,19 @@ public class ClientWorker implements Runnable {
         }
     }
 
+    public void sendLobbyUpdate(Game game) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(os));
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            String gameJson = mapper.writeValueAsString(game);
+            writer.println(Protocol.LOBBY_UPDATED);
+            writer.println(gameJson);
+            writer.flush();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
 }

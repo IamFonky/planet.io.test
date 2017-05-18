@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Vector;
 
 /**
@@ -17,15 +19,31 @@ import java.util.Vector;
  */
 public class Lobby extends JFrame implements ActionListener {
 
-    private ArrayList<Game> gamesList = new ArrayList<>();
-    private JList<Game> games;
+    protected ArrayList<Game> gamesList = new ArrayList<>();
+    protected JTable table;
 
-    private JTable table;
+    protected JButton addGameButton;
+    protected JButton joinGameButton;
 
-    private JButton addGameButton;
-    private JButton joinGameButton;
+    protected int nbGamesMax;
 
-    public Lobby() {
+    private Observable lobbyChanged = new Observable() {
+        public void notifyObservers(Object obj) {
+            super.setChanged();
+            super.notifyObservers(obj);
+        }
+    };
+
+    private static Lobby sharedLobby = null;
+
+    public static Lobby getSharedInstance() {
+        if (sharedLobby == null) {
+            sharedLobby = new Lobby();
+        }
+        return sharedLobby;
+    }
+
+    protected Lobby() {
         super("Best lobby. Ever.");
 
         Object[] tableTitles = {"Name", "Players"};
@@ -51,8 +69,8 @@ public class Lobby extends JFrame implements ActionListener {
         Game gameTest1 = new Game("Test1", null, 12);
         Game gameTest2 = new Game("Test2", null, 39);
 
-        addGame(gameTest1);
-        addGame(gameTest2);
+        //addGame(gameTest1);
+        //addGame(gameTest2);
 
         JScrollPane js = new JScrollPane(table);
 
@@ -69,17 +87,19 @@ public class Lobby extends JFrame implements ActionListener {
 
 
         setSize(500, 500);
-        setVisible(true);
+
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+    }
+
+    public void showUI() {
+        setVisible(true);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == addGameButton) {
-            new GameCreator();
-
-
+            //new GameCreator();
         } else {
             int indexGame = table.getSelectedRow();
             if(indexGame!= -1) {
@@ -92,78 +112,39 @@ public class Lobby extends JFrame implements ActionListener {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.addRow(new Object[] {game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
+        lobbyChanged.notifyObservers(game);
+    }
+
+    public void addGameList(ArrayList<Game> gameList) {
+        for (Game game : gameList) {
+            addGame(game);
+        }
+    }
+
+    public ArrayList<Game> getGamesList() {
+        return gamesList;
     }
 
 
-    private class GameCreator extends JFrame implements ActionListener {
-
-        JTextField gameName;
-        JFormattedTextField playerMax;
-
-        JButton createGame;
-
-        public GameCreator() {
-            JPanel topPanel = new JPanel(new GridLayout(1, 2));
-
-            JPanel namePanel = new JPanel(new FlowLayout());
-            namePanel.setPreferredSize(new Dimension(100, 20));
-            JPanel numberOfPlayerPanel = new JPanel(new FlowLayout());
-            numberOfPlayerPanel.setPreferredSize(new Dimension(30, 20));
-
-            playerMax = new JFormattedTextField(NumberFormat.getIntegerInstance());
-            playerMax.setColumns(10);
-            playerMax.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent arg0) {
-                    createGame.doClick();
-                }
-            });
-
-            gameName = new JTextField(17);
-
-            namePanel.add(new JLabel("Game name"));
-            namePanel.add(gameName);
-
-            numberOfPlayerPanel.add(new JLabel("Number of player max"));
-            numberOfPlayerPanel.add(playerMax);
-
-            topPanel.add(namePanel);
-            topPanel.add(numberOfPlayerPanel);
-
-            createGame = new JButton("Create Game!");
-            createGame.addActionListener(this);
-
-
-            JPanel bottomPanel = new JPanel();
-            bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-
-            bottomPanel.add(createGame);
-
-            this.getContentPane().add(topPanel, BorderLayout.CENTER);
-            this.getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
-
-            getRootPane().setDefaultButton(createGame);
-
-            pack();
-
-            this.setResizable(false);
-            this.setSize(450, 150);
-            this.setVisible(true);
-
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if(e.getSource() == createGame) {
-                Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
-                addGame(newGame);
-                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-            }
-        }
+    public void setNbGamesMax(int nbGamesMax) {
+        this.nbGamesMax = nbGamesMax;
     }
+
+    public int getNbGamesMax() {
+        return nbGamesMax;
+    }
+
 
     public static void main(String... args) {
         new Lobby();
 
+    }
+
+
+    public void addServerObserver(Observer server) {
+        if (server != null) {
+            lobbyChanged.addObserver(server);
+        }
     }
 
 }

@@ -6,6 +6,8 @@ public final class Protocol {
     public static final String PLANET_IO_SUCCESS = "GREATSUCCESS";
     public static final String PLANET_IO_FAILURE = "AH!AH!";
 
+    public static final String LOBBY_UPDATED = "OHBOITHELOBBYISUPDATED!";
+
     // Commandes envoyées par le client.
     public static final String PLANET_IO_HELLO = "HELLOPELO";
     public static final String PLANET_IO_LOGIN = "LOGIN";
@@ -17,5 +19,5 @@ public final class Protocol {
     public static final String CMD_DISCONNECT = "DISCONECT";
 
 
-    public static final int PORT = 666;
+    public static final int PORT = 8585;
 }
