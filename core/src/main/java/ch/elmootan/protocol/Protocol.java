@@ -18,6 +18,12 @@ public final class Protocol {
     public static final String CMD_CREATE_GAME = "CREATEGAME";
     public static final String CMD_DISCONNECT = "DISCONECT";
 
+    public static final String END_OF_COMMAND = "COMMAND_DONE_MA_BOI";
+
 
     public static final int PORT = 8585;
+
+    public static final int PORT_UDP = 9898;
+
+    public static final String IP_MULTICAST = "239.192.0.2";
 }

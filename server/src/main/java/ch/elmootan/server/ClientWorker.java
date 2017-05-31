@@ -79,20 +79,4 @@ public class ClientWorker implements Runnable {
             LOG.log(Level.INFO, "Exception while closing socket on the server: {0}", ex.getMessage());
         }
     }
-
-    public void sendLobbyUpdate(Game game) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(os));
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        try {
-            String gameJson = mapper.writeValueAsString(game);
-            writer.println(Protocol.LOBBY_UPDATED);
-            writer.println(gameJson);
-            writer.flush();
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-    }
 }

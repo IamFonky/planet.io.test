@@ -15,7 +15,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -31,7 +33,9 @@ public class Client implements Runnable{
     BufferedReader in;
     Player player;
 
-    LobbyClient lobbyClient = new LobbyClient();
+    static LobbyClient lobbyClient = null;
+
+    private ClientMulticast clientMulticast;
 
 
 
@@ -45,8 +49,16 @@ public class Client implements Runnable{
     }
 
     public Client(Player player) {
+        try {
+            clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
+
+            new Thread(clientMulticast).start();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         this.player = player;
         socket = new Socket();
+        lobbyClient = new LobbyClient();
         lobbyClient.showUI();
         try {
             connect("localhost", Protocol.PORT);
@@ -120,6 +132,10 @@ public class Client implements Runnable{
         return socket.isConnected() && !socket.isClosed();
     }
 
+    public static void addGameToLobby(Game game) {
+        lobbyClient.addGame(game);
+    }
+
     private class LobbyClient extends Lobby {
 
         @Override
@@ -164,5 +180,4 @@ public class Client implements Runnable{
             }
         }
     }
-
 }
