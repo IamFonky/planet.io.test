@@ -11,6 +11,7 @@
     <modules>
         <module>server</module>
         <module>client</module>
+        <module>game</module>
         <module>core</module>
         <module>documents</module>
     </modules>

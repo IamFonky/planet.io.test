@@ -1,6 +1,7 @@
 package ch.elmootan.core.sharedObjects;
 
 import ch.elmootan.core.universe.Bonus;
+import ch.elmootan.core.universe.Universe;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -20,6 +21,14 @@ public class Game implements Serializable {
     //!
     private int nbPlayersMax;
 
+    //!
+    private int gameId;
+
+    //Je déconseille sérieusement de mettre un Univers dans la Game
+    //Déja simplement parce qu'on lance une fenetre des qu'on l'appelle donc
+    //chaque fois que tu fais new Game() tu lance une GUI du jeu, donc tu attend pas de join
+//    private final Universe universe = new Universe();
+
     public Game(String name, HashSet<Bonus> bonuses, int nbPlayersMax) {
         this.name = name;
         this.availableBonuses = bonuses;
@@ -28,7 +37,6 @@ public class Game implements Serializable {
 
     //! Dumme constructor needed for deserialization
     public Game() {
-
     }
 
     public String getName() {
@@ -55,9 +63,10 @@ public class Game implements Serializable {
         this.nbPlayersMax = nbPlayersMax;
     }
 
-    public void join() {
-        System.out.println("Game " + name + " joined!");
-    }
+//    public void join(String playerName, int skin) {
+//        universe.showUI();
+//        universe.generateMyPlanet(playerName, skin);
+//    }
 
     public int getNbPlaylersCurrent() {
         return nbPlaylersCurrent;
@@ -65,5 +74,14 @@ public class Game implements Serializable {
 
     public void setNbPlaylersCurrent(int nbPlaylersCurrent) {
         this.nbPlaylersCurrent = nbPlaylersCurrent;
+    }
+
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 }

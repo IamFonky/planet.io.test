@@ -12,6 +12,8 @@ public class Speed {
     // Vitesse verticale.
     double y;
 
+    public Speed(){}
+
     public Speed(double x, double y) {
         this.x = x;
         this.y = y;
@@ -36,5 +38,11 @@ public class Speed {
     public double getSpeed()
     {
         return sqrt(x*x+y*y);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Speed : (" + x + ";" + y + ")";
     }
 }

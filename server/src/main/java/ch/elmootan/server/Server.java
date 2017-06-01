@@ -47,7 +47,6 @@ public class Server implements Observer {
     public Server() {
         try {
             serverMulticast = new ServerMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
-
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -57,6 +56,7 @@ public class Server implements Observer {
     public void startServer() throws IOException {
         System.out.println("Server starting!");
 
+//        GamesManager.getSharedManager(serverMulticast);
         Lobby.getSharedInstance().setNbGamesMax(7);
 
         serverSocket = new ServerSocket();
@@ -145,5 +145,6 @@ public class Server implements Observer {
                 gameJson + "\n" +
                 Protocol.END_OF_COMMAND;
         serverMulticast.send(command);
+
     }
 }
