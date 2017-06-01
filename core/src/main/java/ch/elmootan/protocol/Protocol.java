@@ -17,6 +17,10 @@ public final class Protocol {
     public static final String PLANET_IO_SEND_POSITION = "IAMHERE";
     public static final String CMD_CREATE_GAME = "CREATEGAME";
     public static final String CMD_DISCONNECT = "DISCONECT";
+    public static final String CMD_SEPARATOR = ":";
+    public static final String CMD_BLABLA = "blablabla";
+
+
 
     public static final String END_OF_COMMAND = "COMMAND_DONE_MA_BOI";
 

@@ -11,11 +11,11 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ch.elmootan.core.PlanetIO;
 import ch.elmootan.core.physics.*;
 
 //import com.zenjava.javafx.maven.plugin.*;
 
+import ch.elmootan.core.sharedObjects.GameCreator;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -52,8 +52,8 @@ public class Universe extends JFrame
       try
       {
          for (int i = 1; i <= 8; i++)
-            planets.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet" + i + "_32x32.png")));
-         invisible = ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/invisible_64x64.png"));
+            planets.add(ImageIO.read(Universe.class.getResource("../skins/planet" + i + "_32x32.png")));
+         invisible = ImageIO.read(Universe.class.getResource("../skins/invisible_64x64.png"));
       }
       catch (IOException e)
       {
@@ -477,7 +477,7 @@ public class Universe extends JFrame
 
 //         File file = new File(bip);
 
-            Media hit = new Media(PlanetIO.class.getResource(bip).toString());
+            Media hit = new Media(GameCreator.class.getResource(bip).toString());
             MediaPlayer mediaPlayer = new MediaPlayer(hit);
             mediaPlayer.setVolume(volume);
             mediaPlayer.play();
