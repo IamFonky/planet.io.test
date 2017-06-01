@@ -134,6 +134,9 @@ public class Lobby extends JFrame implements ActionListener {
     public ArrayList<Game> getGamesList() {
         return gamesList;
     }
+    public ArrayList<Engine> getEngineList() {
+        return engineList;
+    }
 
 
     public void setNbGamesMax(int nbGamesMax) {

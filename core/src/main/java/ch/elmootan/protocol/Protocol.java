@@ -16,11 +16,15 @@ public final class Protocol {
     public static final String PLANET_IO_GET_SCORES = "GIVEMEMYSCORESPLZ";
     public static final String PLANET_IO_GET_UNIVERSE = "SHREKISLIFE";
     public static final String PLANET_IO_SEND_POSITION = "IAMHERE";
+
+    // Commande de controle
     public static final String PLANET_IO_CREATE_PLANET = "CREATEPLANET";
     public static final String PLANET_IO_SET_PLANET = "SETPLANET";
     public static final String PLANET_IO_KILL_PLANET = "KILLPLANET";
 
+    //Commandes du client au serveur
     public static final String CMD_CREATE_GAME = "CREATEGAME";
+    public static final String CMD_JOIN_GAME = "JOINGAME";
     public static final String CMD_DISCONNECT = "DISCONECT";
     public static final String CMD_SEPARATOR = ":";
     public static final String CMD_BLABLA = "blablabla";

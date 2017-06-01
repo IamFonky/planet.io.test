@@ -2,6 +2,7 @@ package ch.elmootan.server;
 
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.core.sharedObjects.Lobby;
+import ch.elmootan.core.universe.Planet;
 import ch.elmootan.core.universe.Universe;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -76,6 +77,29 @@ public class ClientHandler {
                                 } catch (JsonProcessingException jpe) {
                                     writer.println(Protocol.PLANET_IO_FAILURE);
                                 }
+                            }
+                            break;
+                        }
+                        // Client wants to joi a game.
+                        case Protocol.CMD_JOIN_GAME: {
+                            if(cmdAndArgs.length > 1)
+                            {
+                                int idGame = Integer.parseInt(cmdAndArgs[1]);
+                                if(idGame >= 0 && idGame < lobby.getGamesList().size())
+                                {
+                                    writer.println(Protocol.PLANET_IO_SUCCESS);
+                                    Planet userPlanet = mapper.readValue(reader.readLine(), Planet.class);
+                                    userPlanet = lobby.getEngineList().get(idGame).generateUserPlanet(userPlanet);
+                                    writer.println(mapper.writeValueAsString(userPlanet));
+                                }
+                                else
+                                {
+                                    writer.println(Protocol.PLANET_IO_FAILURE);
+                                }
+                            }
+                            else
+                            {
+                                writer.println(Protocol.PLANET_IO_FAILURE);
                             }
                             break;
                         }

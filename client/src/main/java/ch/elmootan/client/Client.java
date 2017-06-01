@@ -205,6 +205,32 @@ public class Client implements Runnable {
         }
     }
 
+    public void joinServer(int skin) {
+        synchronized (lobbyClient) {
+            try {
+                serverWrite(Protocol.CMD_JOIN_GAME
+                + Protocol.CMD_SEPARATOR
+                + idCurrentGame);
+                if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
+                    serverWrite(mapper.writeValueAsString(new Planet(player.getName(),skin)));
+                    Planet initialPlanet = mapper.readValue(serverRead(),Planet.class);
+                    gui = new GUniverse(
+                          out,
+                          in,
+                          clientMulticast.getSocket(),
+                          idCurrentGame,
+                          initialPlanet);
+                    gui.showUI();
+                } else {
+                    System.out.println("Error, this game is not reachable");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     public void exit() {
         try {
             if (!noGUI) {
@@ -230,9 +256,7 @@ public class Client implements Runnable {
                     public void actionPerformed(ActionEvent e) {
                         if (e.getSource() == createGame) {
                             Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
-//                            newGame.setUniverse(new Universe());
                             sendGameToServer(newGame);
-
                             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                         }
                     }
@@ -247,14 +271,8 @@ public class Client implements Runnable {
                             if (e.getSource() == btnChoose) {
                                 System.out.println(idSkin);
                                 chooseStatus = true;
-//                                gamesList.get(indexGame).join(player.getName(), idSkin);
-                                gui = new GUniverse(
-                                      out,
-                                      in,
-                                      clientMulticast.getSocket(),
-                                      idCurrentGame,
-                                      new Planet("TEST",100000,1000));
-                                gui.showUI();
+                                idCurrentGame = gamesList.get(indexGame).getGameId();
+                                joinServer(idSkin);
                                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                             }
 

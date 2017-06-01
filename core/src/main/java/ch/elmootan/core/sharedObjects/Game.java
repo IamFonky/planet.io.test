@@ -21,6 +21,9 @@ public class Game implements Serializable {
     //!
     private int nbPlayersMax;
 
+    //!
+    private int gameId;
+
     //Je déconseille sérieusement de mettre un Univers dans la Game
     //Déja simplement parce qu'on lance une fenetre des qu'on l'appelle donc
     //chaque fois que tu fais new Game() tu lance une GUI du jeu, donc tu attend pas de join
@@ -71,5 +74,14 @@ public class Game implements Serializable {
 
     public void setNbPlaylersCurrent(int nbPlaylersCurrent) {
         this.nbPlaylersCurrent = nbPlaylersCurrent;
+    }
+
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 }

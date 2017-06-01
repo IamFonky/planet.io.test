@@ -3,7 +3,6 @@ package ch.elmootan.core.universe;
 import ch.elmootan.core.physics.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -11,11 +10,14 @@ import static java.lang.Math.*;
 
 public class Engine {
 
+   private int nbUserPlanet = 0;
+
    private final ArrayList<Body> allThings = new ArrayList<>();
+   private final ArrayList<Body> userPlanets = new ArrayList<>();
    private double zoom = 500.0;
 
    private Planet clickedPlanet;
-   private Planet myPlanet;
+//   private Planet myPlanet;
    private double myPlanetInitMass;
    private double nbClicks;
    private boolean mousePressed = false;
@@ -123,6 +125,7 @@ public class Engine {
          synchronized (body) {
             body.getPosition().setX(body.getPosition().getX() + body.getSpeed().getX());
             body.getPosition().setY(body.getPosition().getY() + body.getSpeed().getY());
+            System.out.print(body);
          }
 
          // Freinage des corps
@@ -194,6 +197,30 @@ public class Engine {
       allThings.add(newP);
       return newP;
    }
+
+   public Planet generateUserPlanet(Planet planet)
+   {
+      Random rand = new Random();
+      Planet newPlanet = this.addNewPlanet(
+            planet.getName(),
+            rand.nextDouble() * 400000 + -200000,
+            rand.nextDouble() * 400000 + -200000,
+            rand.nextDouble() * 1E+22 + 1E+21,
+            rand.nextDouble() * 1000 + 4000,
+            planet.getIdSkin(),
+            userPlanets.size());
+      newPlanet.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
+            rand.nextDouble() * 100 - 50));
+      userPlanets.add(newPlanet);
+      return newPlanet;
+   }
+
+   public void removeUserPlanet(int idPlanet)
+   {
+      allThings.remove(userPlanets.get(idPlanet));
+      userPlanets.remove(idPlanet);
+   }
+
 
    public synchronized ArrayList<Body> getAllThings() {
       return allThings;
