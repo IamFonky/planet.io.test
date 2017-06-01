@@ -192,6 +192,10 @@ public class Universe extends JFrame {
       add(rootPane);
 
       setSize(1000, 1000);
+      //setVisible(true);
+   }
+
+   public void showUI() {
       setVisible(true);
    }
 
@@ -415,16 +419,17 @@ public class Universe extends JFrame {
 
    }
 
-   private void generateMyPlanet() {
+   public void generateMyPlanet(String name, int skin)
+   {
       Random rand = new Random();
       myPlanet = this.addNewPlanet(
-            "GatiGato",
-            rand.nextDouble() * 400000 + -200000,
-            rand.nextDouble() * 400000 + -200000,
-            rand.nextDouble() * 1E+22 + 1E+21,
-            rand.nextDouble() * 1000 + 4000,
-            rand.nextInt(8) + 1,
-            1);
+              "name",
+              rand.nextDouble() * 400000 + -200000,
+              rand.nextDouble() * 400000 + -200000,
+              rand.nextDouble() * 1E+22 + 1E+21,
+              rand.nextDouble() * 1000 + 4000,
+              skin + 1,
+              1);
       myPlanet.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
             rand.nextDouble() * 100 - 50));
    }

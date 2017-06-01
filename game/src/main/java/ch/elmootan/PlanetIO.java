@@ -97,6 +97,8 @@ public class PlanetIO {
             pseudoPanel.add(new JLabel("Pseudo"));
             pseudoPanel.add(pseudo);
 
+            getRootPane().setDefaultButton(done);
+
             getContentPane().add(pseudoPanel, BorderLayout.CENTER);
             getContentPane().add(done, BorderLayout.SOUTH);
 
@@ -110,7 +112,7 @@ public class PlanetIO {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == done && pseudo.getText() != "") {
                 // TODO check if in DB
-                Client client = new Client(new Player(pseudo.getText()));
+                Client client = new Client(new Player(pseudo.getText()), false);
                 this.dispose();
             }
         }

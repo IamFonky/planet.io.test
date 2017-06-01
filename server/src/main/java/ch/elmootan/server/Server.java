@@ -145,5 +145,6 @@ public class Server implements Observer {
                 gameJson + "\n" +
                 Protocol.END_OF_COMMAND;
         serverMulticast.send(command);
+
     }
 }

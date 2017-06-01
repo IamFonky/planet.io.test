@@ -67,7 +67,7 @@ public class GameCreator extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        /*if(e.getSource() == createGame) {
+       /* if(e.getSource() == createGame) {
             Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
             addGame(newGame);
             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));

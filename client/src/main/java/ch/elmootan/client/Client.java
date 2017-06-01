@@ -5,11 +5,13 @@ import ch.elmootan.core.sharedObjects.GameCreator;
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.sharedObjects.Player;
 import ch.elmootan.core.universe.Bonus;
+import ch.elmootan.core.universe.Universe;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -23,8 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
-public class Client implements Runnable
-{
+public class Client implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(Client.class.getName());
 
@@ -42,16 +43,16 @@ public class Client implements Runnable
 
     static LobbyClient lobbyClient = null;
 
+    public static int idCurrentGame;
+
     private ClientMulticast clientMulticast;
 
 
-    public String serverRead() throws IOException
-    {
+    public String serverRead() throws IOException {
         return in.readLine();
     }
 
-    public void serverWrite(String toWrite)
-    {
+    public void serverWrite(String toWrite) {
         out.println(toWrite);
         out.flush();
     }
@@ -73,59 +74,49 @@ public class Client implements Runnable
             clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
 
             new Thread(clientMulticast).start();
-        } catch (UnknownHostException e)
-        {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         }
         this.player = player;
         socket = new Socket();
 
-        if(!debug)
-        {
+        if (!debug) {
             lobbyClient = new LobbyClient();
             lobbyClient.showUI();
         }
 
-        try
-        {
+        try {
             connect("localhost", Protocol.PORT);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void connect(String server, int port) throws IOException
-    {
+    public void connect(String server, int port) throws IOException {
 
         if (socket != null)
             socket.close();
 
         socket = new Socket(server, port);
 
-        try
-        {
+        try {
             out = new PrintWriter(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             LOG.warning(e.toString());
         }
         LOG.info(serverRead());
 
         serverWrite(Protocol.PLANET_IO_HELLO);
 
-        if (serverRead().equals(Protocol.PLANET_IO_SUCCESS))
-        {
+        if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
             LOG.info("Connexion successful");
             String gameListJSON = serverRead();
-            ArrayList<Game> initialGameList = mapper.readValue(gameListJSON, new TypeReference<ArrayList<Game>>()
-            {
+            ArrayList<Game> initialGameList = mapper.readValue(gameListJSON, new TypeReference<ArrayList<Game>>() {
             });
 
             System.out.println(gameListJSON);
-            if(!noGUI)
-            {
+            if (!noGUI) {
                 lobbyClient.addGameList(initialGameList);
             }
         }
@@ -133,11 +124,9 @@ public class Client implements Runnable
         new Thread(this).start();
     }
 
-    public void run()
-    {
+    public void run() {
         connectionRunning = true;
-        while (connectionRunning)
-        {
+        while (connectionRunning) {
             //Tu ne peux pas faire communiquer simultanément cette thread et les commandes
             //si cette thread fait un read alors qu'une autre commande est en train d'être faite
             //alors cette thread nique le protocole x).
@@ -172,10 +161,8 @@ public class Client implements Runnable
 
     }
 
-     public void disconnect() throws IOException
-    {
-        synchronized(lobbyClient)
-        {
+    public void disconnect() throws IOException {
+        synchronized (lobbyClient) {
             serverWrite(Protocol.CMD_DISCONNECT);
             connectionRunning = false;
             out.close();
@@ -184,90 +171,91 @@ public class Client implements Runnable
         }
     }
 
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         LOG.info(String.valueOf(socket.isConnected()));
         return socket.isConnected() && !socket.isClosed();
     }
 
-    public void sendGameToServer(Game game)
-    {
-        synchronized(lobbyClient)
-        {
-            try
-            {
+    public void sendGameToServer(Game game) {
+        synchronized (lobbyClient) {
+            try {
                 serverWrite(Protocol.CMD_CREATE_GAME);
-                if (serverRead().equals(Protocol.PLANET_IO_SUCCESS))
-                {
+                if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
                     serverWrite(mapper.writeValueAsString(game));
-                    if (serverRead().equals(Protocol.PLANET_IO_SUCCESS))
-                    {
+                    if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
                         System.out.println("Game created");
-                    } else
-                    {
+                    } else {
                         System.out.println("Error, game was not created");
                     }
-                } else
-                {
+                } else {
                     System.out.println("Error, game was not created");
                 }
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void exit()
-    {
-        try
-        {
-            if(!noGUI)
-            {
+    public void exit() {
+        try {
+            if (!noGUI) {
                 lobbyClient.dispose();
                 disconnect();
             }
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
-    public static void addGameToLobby(Game game)
-    {
+    public static void addGameToLobby(Game game) {
         lobbyClient.addGame(game);
     }
 
-    private class LobbyClient extends Lobby
-    {
+    private class LobbyClient extends Lobby {
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            if (e.getSource() == addGameButton)
-            {
-                new GameCreator()
-                {
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == addGameButton) {
+                new GameCreator() {
                     @Override
-                    public void actionPerformed(ActionEvent e)
-                    {
-                        if (e.getSource() == createGame)
-                        {
+                    public void actionPerformed(ActionEvent e) {
+                        if (e.getSource() == createGame) {
                             Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
 
+                            //newGame.setUniverse(new Universe());
                             sendGameToServer(newGame);
 
                             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                         }
                     }
                 };
-            } else
-            {
+            } else if (e.getSource() == joinGameButton) {
                 int indexGame = table.getSelectedRow();
-                if (indexGame != -1)
-                {
-                    gamesList.get(indexGame).join();
+                if (indexGame != -1) {
+                    // Choix du skin quand on rejoint la partie.
+                    SkinChooser skinChooser = new SkinChooser() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (e.getSource() == btnChoose) {
+                                System.out.println(idSkin);
+                                chooseStatus = true;
+                                gamesList.get(indexGame).join(player.getName(), idSkin);
+                                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+                            }
+
+                            if (e.getSource() == btnNext) {
+                                idSkin = idSkin + 1 > 7 ? 0 : ++idSkin;
+                            }
+                            if (e.getSource() == btnPrev) {
+                                idSkin = idSkin - 1 < 0 ? 7 : --idSkin;
+                            }
+
+                            imgSkin.setIcon(new ImageIcon(skins.get(idSkin)));
+                            revalidate();
+                            repaint();
+                        }
+                    };
+                    //while (!skinChooser.skinChoosed());
                 }
             }
         }
