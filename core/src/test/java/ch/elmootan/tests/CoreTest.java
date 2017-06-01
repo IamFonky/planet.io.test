@@ -9,8 +9,12 @@ import java.awt.*;
 import static org.junit.Assert.*;
 
 public class CoreTest extends Universe {
+    static public void main(String... args)
+    {
+        new Universe();
+    }
     @Test
-    public void itShouldBePossibleToBigBang() {
+    public void itShouldBePossibleToBigBang() throws InterruptedException {
         Universe universe = new Universe();
         assertNotNull(universe);
     }

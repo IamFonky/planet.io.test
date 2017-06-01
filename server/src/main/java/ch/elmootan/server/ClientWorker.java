@@ -1,8 +1,11 @@
 package ch.elmootan.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import ch.elmootan.core.sharedObjects.Game;
+import ch.elmootan.protocol.Protocol;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.*;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -76,5 +79,4 @@ public class ClientWorker implements Runnable {
             LOG.log(Level.INFO, "Exception while closing socket on the server: {0}", ex.getMessage());
         }
     }
-
 }
