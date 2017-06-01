@@ -132,9 +132,8 @@ public class Universe extends JFrame {
          @Override
          protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D)g;
-            synchronized (allThings)
-            {
+            Graphics2D g2d = (Graphics2D) g;
+            synchronized (allThings) {
                g.setColor(Color.WHITE);
 
                for (Body body : allThings) {
@@ -164,7 +163,7 @@ public class Universe extends JFrame {
                int i = 0, j = 1;
                while (i != nbScores) {
                   if (!(allThings.get(i) instanceof InvisiblePlanet)) {
-                     g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int)allThings.get(i).getRadius(), 0, 15*(++j) + 10);
+                     g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
                   } else if (allThings.size() > 5) {
                      nbScores++;
                   }
@@ -252,7 +251,7 @@ public class Universe extends JFrame {
                   //   - Si c'est la planète cliquée et la planète du joueur.
                   //   - Si aucune des deux planète n'est une planète cliquée.
                   else if ((!(body instanceof InvisiblePlanet) && !(surrounding instanceof InvisiblePlanet)) ||
-                          (body.getId() == surrounding.getId())) {
+                        (body.getId() == surrounding.getId())) {
                      //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
                      double rDX = dX / Math.sqrt(sqDistance);
                      double rDY = dY / Math.sqrt(sqDistance);
@@ -309,12 +308,12 @@ public class Universe extends JFrame {
          double fragMass = oldMass * rand.nextDouble() / 2;
          double fragRadius = sqrt(fragMass / (dThis * PI));
          Body frag = addNewFragment(
-                 "FRAG" + body.getName(),
-                 body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
-                 body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
-                 fragMass,
-                 fragRadius,
-                 Color.RED
+               "FRAG" + body.getName(),
+               body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
+               body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
+               fragMass,
+               fragRadius,
+               Color.RED
          );
 
          double newDirection = rand.nextDouble() * 2 * PI;
@@ -385,15 +384,15 @@ public class Universe extends JFrame {
          Random rand = new Random();
          double x = rand.nextDouble() * 400000 + -200000;
          Planet lune = this.addNewPlanet(
-                 "Lune" + i,
-                 x,
-                 rand.nextDouble() * 400000 + -200000,
-                 2E+21,
-                 3000,
-                 rand.nextInt(8) + 1,
-                 (int) x);
+               "Lune" + i,
+               x,
+               rand.nextDouble() * 400000 + -200000,
+               2E+21,
+               3000,
+               rand.nextInt(8) + 1,
+               (int) x);
          lune.setSpeed(new Speed(rand.nextDouble() * 1500 - 750,
-                 rand.nextDouble() * 1500 - 750));
+               rand.nextDouble() * 1500 - 750));
 
       }
 
@@ -403,15 +402,15 @@ public class Universe extends JFrame {
       for (int i = 0; i < 1; ++i) {
          Random rand = new Random();
          Planet lune = this.addNewPlanet(
-                 "Lune" + rand.nextInt(100) + 1,
-                 rand.nextDouble() * 400000 + -200000,
-                 rand.nextDouble() * 400000 + -200000,
-                 rand.nextDouble() * 1E+22 + 1E+21,
-                 rand.nextDouble() * 1000 + 4000,
-                 rand.nextInt(8) + 1,
-                 0);
+               "Lune" + rand.nextInt(100) + 1,
+               rand.nextDouble() * 400000 + -200000,
+               rand.nextDouble() * 400000 + -200000,
+               rand.nextDouble() * 1E+22 + 1E+21,
+               rand.nextDouble() * 1000 + 4000,
+               rand.nextInt(8) + 1,
+               0);
          lune.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
-                 rand.nextDouble() * 100 - 50));
+               rand.nextDouble() * 100 - 50));
       }
 
    }
@@ -419,15 +418,15 @@ public class Universe extends JFrame {
    private void generateMyPlanet() {
       Random rand = new Random();
       myPlanet = this.addNewPlanet(
-              "GatiGato",
-              rand.nextDouble() * 400000 + -200000,
-              rand.nextDouble() * 400000 + -200000,
-              rand.nextDouble() * 1E+22 + 1E+21,
-              rand.nextDouble() * 1000 + 4000,
-              rand.nextInt(8) + 1,
-              1);
+            "GatiGato",
+            rand.nextDouble() * 400000 + -200000,
+            rand.nextDouble() * 400000 + -200000,
+            rand.nextDouble() * 1E+22 + 1E+21,
+            rand.nextDouble() * 1000 + 4000,
+            rand.nextInt(8) + 1,
+            1);
       myPlanet.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
-              rand.nextDouble() * 100 - 50));
+            rand.nextDouble() * 100 - 50));
    }
 
    private void hollySong(String soundFile, double intiVolume) {

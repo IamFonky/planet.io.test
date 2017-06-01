@@ -56,9 +56,18 @@ public class Client implements Runnable
         out.flush();
     }
 
+    public Client(Player player)
+    {
+        createClient(player,false);
+    }
+
     public Client(Player player, boolean debug)
     {
-        noGUI = debug;
+        createClient(player,debug);
+    }
+
+    private void createClient(Player player, boolean debug)
+    {
         try
         {
             clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
