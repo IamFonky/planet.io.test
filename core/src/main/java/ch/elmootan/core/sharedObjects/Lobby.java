@@ -1,5 +1,6 @@
 package ch.elmootan.core.sharedObjects;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -8,8 +9,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Vector;
 
 /**
@@ -17,15 +23,31 @@ import java.util.Vector;
  */
 public class Lobby extends JFrame implements ActionListener {
 
-    private ArrayList<Game> gamesList = new ArrayList<>();
-    private JList<Game> games;
+    protected ArrayList<Game> gamesList = new ArrayList<>();
+    protected JTable table;
 
-    private JTable table;
+    protected JButton addGameButton;
+    protected JButton joinGameButton;
 
-    private JButton addGameButton;
-    private JButton joinGameButton;
+    protected int nbGamesMax;
 
-    public Lobby() {
+    private Observable lobbyChanged = new Observable() {
+        public void notifyObservers(Object obj) {
+            super.setChanged();
+            super.notifyObservers(obj);
+        }
+    };
+
+    private static Lobby sharedLobby = null;
+
+    public static Lobby getSharedInstance() {
+        if (sharedLobby == null) {
+            sharedLobby = new Lobby();
+        }
+        return sharedLobby;
+    }
+
+    protected Lobby() {
         super("Best lobby. Ever.");
 
         Object[] tableTitles = {"Name", "Players"};
@@ -51,8 +73,8 @@ public class Lobby extends JFrame implements ActionListener {
         Game gameTest1 = new Game("Test1", null, 12);
         Game gameTest2 = new Game("Test2", null, 39);
 
-        addGame(gameTest1);
-        addGame(gameTest2);
+        //addGame(gameTest1);
+        //addGame(gameTest2);
 
         JScrollPane js = new JScrollPane(table);
 
@@ -69,20 +91,25 @@ public class Lobby extends JFrame implements ActionListener {
 
 
         setSize(500, 500);
-        setVisible(true);
+
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+    }
+
+    public void showUI() {
+        setVisible(true);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == addGameButton) {
             new GameCreator();
-
-
-        } else {
+        } else if (e.getSource() == joinGameButton){
             int indexGame = table.getSelectedRow();
-            if(indexGame!= -1) {
+            if(indexGame != -1) {
+                // Choix du skin quand on rejoint la partie.
+                SkinChooser skinChooser = new SkinChooser();
+                //while (!skinChooser.skinChoosed());
                 gamesList.get(indexGame).join();
             }
         }
@@ -92,78 +119,104 @@ public class Lobby extends JFrame implements ActionListener {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.addRow(new Object[] {game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
+        lobbyChanged.notifyObservers(game);
+    }
+
+    public void addGameList(ArrayList<Game> gameList) {
+        for (Game game : gameList) {
+            addGame(game);
+        }
+    }
+
+    public ArrayList<Game> getGamesList() {
+        return gamesList;
     }
 
 
-    private class GameCreator extends JFrame implements ActionListener {
+    public void setNbGamesMax(int nbGamesMax) {
+        this.nbGamesMax = nbGamesMax;
+    }
 
-        JTextField gameName;
-        JFormattedTextField playerMax;
-
-        JButton createGame;
-
-        public GameCreator() {
-            JPanel topPanel = new JPanel(new GridLayout(1, 2));
-
-            JPanel namePanel = new JPanel(new FlowLayout());
-            namePanel.setPreferredSize(new Dimension(100, 20));
-            JPanel numberOfPlayerPanel = new JPanel(new FlowLayout());
-            numberOfPlayerPanel.setPreferredSize(new Dimension(30, 20));
-
-            playerMax = new JFormattedTextField(NumberFormat.getIntegerInstance());
-            playerMax.setColumns(10);
-            playerMax.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent arg0) {
-                    createGame.doClick();
-                }
-            });
-
-            gameName = new JTextField(17);
-
-            namePanel.add(new JLabel("Game name"));
-            namePanel.add(gameName);
-
-            numberOfPlayerPanel.add(new JLabel("Number of player max"));
-            numberOfPlayerPanel.add(playerMax);
-
-            topPanel.add(namePanel);
-            topPanel.add(numberOfPlayerPanel);
-
-            createGame = new JButton("Create Game!");
-            createGame.addActionListener(this);
+    public int getNbGamesMax() {
+        return nbGamesMax;
+    }
 
 
-            JPanel bottomPanel = new JPanel();
-            bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+    private class SkinChooser extends JFrame implements ActionListener {
+        private JButton btnNext = new JButton(">");
+        private JButton btnPrev = new JButton("<");
 
-            bottomPanel.add(createGame);
+        private JButton btnChoose = new JButton("GO!");
 
-            this.getContentPane().add(topPanel, BorderLayout.CENTER);
-            this.getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
+        private ArrayList<BufferedImage> skins = new ArrayList<>();
+        private JLabel imgSkin;
+        private int idSkin = 0;
 
-            getRootPane().setDefaultButton(createGame);
+        private boolean chooseStatus = false;
 
-            pack();
+        public SkinChooser() {
+            JPanel imgPanel = new JPanel(new FlowLayout());
+            JPanel goPanel = new JPanel();
 
-            this.setResizable(false);
-            this.setSize(450, 150);
-            this.setVisible(true);
+            try {
+                for (int i=1; i<=8; i++)
+                    skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet"+i+"_64x64.png")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+            imgSkin = new JLabel(new ImageIcon(skins.get(idSkin)));
+            imgPanel.add(btnPrev);
+            btnPrev.addActionListener(this);
+            imgPanel.add(imgSkin);
+            btnNext.addActionListener(this);
+            imgPanel.add(btnNext);
+
+            goPanel.add(btnChoose);
+            btnChoose.addActionListener(this);
+
+            getContentPane().add(imgPanel, BorderLayout.CENTER);
+            getContentPane().add(goPanel, BorderLayout.PAGE_END);
+            setTitle("Choix du skin");
+            setResizable(false);
+            setSize(200,150);
+            setVisible(true);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(e.getSource() == createGame) {
-                Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
-                addGame(newGame);
+            if (e.getSource() == btnChoose) {
+                System.out.println(idSkin);
+                chooseStatus = true;
                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             }
+
+            if (e.getSource() == btnNext) {
+                idSkin = idSkin+1 > 7 ? 0 : ++idSkin;
+            }
+            if (e.getSource() == btnPrev) {
+                idSkin = idSkin-1 < 0 ? 7 : --idSkin;
+            }
+
+            imgSkin.setIcon(new ImageIcon(skins.get(idSkin)));
+            revalidate();
+            repaint();
+        }
+
+        public boolean skinChoosed() {
+            return chooseStatus;
         }
     }
 
     public static void main(String... args) {
         new Lobby();
+    }
 
+
+    public void addServerObserver(Observer server) {
+        if (server != null) {
+            lobbyChanged.addObserver(server);
+        }
     }
 
 }
