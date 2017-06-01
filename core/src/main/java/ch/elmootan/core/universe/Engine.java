@@ -54,7 +54,7 @@ public class Engine {
                      // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
                      // (on évite ainsi les valeurs limites).
                      if (body.getId() == surrounding.getId()) {
-                        removePlanet(clickedPlanet);
+                        removeBody(clickedPlanet);
                      }
                      // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
                      // est invisible et n'interragit pas avec celle des autres joueurs.
@@ -166,19 +166,27 @@ public class Engine {
    }
 
    public Planet addNewPlanet(String name, double x, double y, double mass, double radius, int skin, int id) {
-      Planet newP = new Planet(name, new Position(x, y), mass, radius, skin, id);
-      allThings.add(newP);
-      return newP;
+      return addNewPlanet(new Planet(name, new Position(x, y), mass, radius, skin, id));
    }
 
-   public InvisiblePlanet addNewPlanet(InvisiblePlanet newP) {
-      allThings.add(newP);
-      return newP;
+   public Planet addNewPlanet(Planet newP)
+   {
+      return (Planet) addNewBody(newP);
    }
 
-   public void removePlanet(Planet planet) {
-      allThings.remove(planet);
-      planet = null;
+   public InvisiblePlanet addNewInvisiblePlanet(InvisiblePlanet newP) {
+      return (InvisiblePlanet)addNewBody(newP);
+   }
+
+   public Body addNewBody(Body body)
+   {
+      allThings.add(body);
+      return body;
+   }
+
+   public void removeBody(Body body)
+   {
+      allThings.remove(body);
    }
 
    private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur) {

@@ -1,30 +1,29 @@
 package ch.elmootan.core.universe;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.Timer;
-
 import ch.elmootan.core.physics.*;
-
-//import com.zenjava.javafx.maven.plugin.*;
-
 import ch.elmootan.core.sharedObjects.GameCreator;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 
 import static java.lang.Math.*;
 
-public class Universe extends JFrame {
+//import com.zenjava.javafx.maven.plugin.*;
+
+public class GUniverse extends JFrame {
 
    private final ArrayList<Body> allThings = new ArrayList<>();
    private double zoom = 500.0;
@@ -42,13 +41,13 @@ public class Universe extends JFrame {
 
 //   private boolean tadaam = false;
 
-   public Universe() {
+   public GUniverse(PrintWriter wr, BufferedReader rd) {
       super("Mon univers");
 
       try {
          for (int i = 1; i <= 8; i++)
-            planets.add(ImageIO.read(Universe.class.getResource("../skins/planet" + i + "_32x32.png")));
-         invisible = ImageIO.read(Universe.class.getResource("../skins/invisible_64x64.png"));
+            planets.add(ImageIO.read(GUniverse.class.getResource("../skins/planet" + i + "_32x32.png")));
+         invisible = ImageIO.read(GUniverse.class.getResource("../skins/invisible_64x64.png"));
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -169,7 +168,7 @@ public class Universe extends JFrame {
       ActionListener repaintLol = new ActionListener() {
          public void actionPerformed(ActionEvent evt) {
             //scorePane.setScores();
-            drawBodies();
+            refreshBodies();
             rootPane.repaint();
          }
       };
@@ -185,141 +184,9 @@ public class Universe extends JFrame {
       setVisible(true);
    }
 
-   private void drawBodies() {
-      for (int i = 0; i < allThings.size(); ++i) {
-         Body body = allThings.get(i);
-         if (body != null) {
-            for (int j = i + 1; j < allThings.size(); ++j) {
-               Body surrounding = allThings.get(j);
-               if (surrounding != null) {
-                  double gTgDistance = 0;
-                  double sqDistance = 0;
-                  double dX = 0;
-                  double dY = 0;
-                  //On calcule les distances x et y et la distance au carré
-                  synchronized (body) {
-                     dX = surrounding.getPosition().getX() - body.getPosition().getX();
-                     dY = surrounding.getPosition().getY() - body.getPosition().getY();
-                     sqDistance = dX * dX + dY * dY;
-
-                     //On calcule la distance réelle (Ground to ground)
-                     gTgDistance = Math.sqrt(sqDistance) - body.getRadius() / 2 - surrounding.getRadius() / 2;
-                  }
-
-                  if (gTgDistance < 0) //Collision!
-                  {
-                     // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
-                     // (on évite ainsi les valeurs limites).
-                     if (body.getId() == surrounding.getId()) {
-                        removePlanet(clickedPlanet);
-                     }
-                     // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
-                     // est invisible et n'interragit pas avec celle des autres joueurs.
-                     else if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
-                        continue;
-                     } else {
-                        BodyState eatState;
-                        synchronized (allThings) {
-                           if (body.getMass() > surrounding.getMass()) {
-                              eatState = body.eat(surrounding);
-                              allThings.remove(surrounding);
-                           } else {
-                              eatState = surrounding.eat(body);
-                              allThings.remove(body);
-                           }
-
-                           switch (eatState) {
-                              case EXPLODE:
-                                 explode(body);
-                                 break;
-                              //On peut imaginer ici un case SUN ou BLACKHOLE
-                           }
-                        }
-                     }
-                  }
-                  // On applique la gravité et la physique uniquement dans 2 cas :
-                  //   - Si c'est la planète cliquée et la planète du joueur.
-                  //   - Si aucune des deux planète n'est une planète cliquée.
-                  else if ((!(body instanceof InvisiblePlanet) && !(surrounding instanceof InvisiblePlanet)) ||
-                          (body.getId() == surrounding.getId())) {
-                     //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
-                     double rDX = dX / Math.sqrt(sqDistance);
-                     double rDY = dY / Math.sqrt(sqDistance);
-
-                     //Loi de gravité : F [N] = G [N*m2*kg-2] * mA [kg] * mB [kg] / d2 [m2]
-                     //un Newton = 1 [kg*m*s-2]. Plus simplement [kg*a] ou a est l'accélération
-                     //donc G [kg*m*s-2*m2*kg-2] ==> G [m3*s-2*kg-1]
-                     //On peut donc calculer simplement l'accélération aN sur chaque corps avec :
-                     //aA [m*s-2] = G [m3*s-2*kg-1] * mB [kg] / d2 [m2]
-                     double bodyA = Constants.GRAVITATION.valeur * surrounding.getMass() / sqDistance;
-                     //A cette étape nous avons un vecteur d'accélération mais pas de direction
-                     //Il décomposer en deux composantes x et y
-                     double bodyAX = bodyA * rDX;
-                     double bodyAY = bodyA * rDY;
-
-                     //Même chose pour les deuxième corps
-                     double surrA = Constants.GRAVITATION.valeur * body.getMass() / sqDistance;
-                     double surrAX = surrA * -rDX;
-                     double surrAY = surrA * -rDY;
-
-                     //Il faut maintenant appliquer accélérations x et y aux vitesses x et y
-                     //Pour le moment la cadence du processeur règle la vitesse du programme
-                     synchronized (body) {
-                        body.getSpeed().setX(body.getSpeed().getX() + bodyAX);
-                        body.getSpeed().setY(body.getSpeed().getY() + bodyAY);
-
-                        surrounding.getSpeed().setX(surrounding.getSpeed().getX() + surrAX);
-                        surrounding.getSpeed().setY(surrounding.getSpeed().getY() + surrAY);
-                     }
-
-                  }
-               }
-            }
-         }
-
-         synchronized (body) {
-            body.getPosition().setX(body.getPosition().getX() + body.getSpeed().getX());
-            body.getPosition().setY(body.getPosition().getY() + body.getSpeed().getY());
-         }
-
-         // Freinage des corps
-         // body.speed.x -= 0.005 * body.speed.x;
-         // body.speed.y -= 0.005 * body.speed.y;
-      }
-   }
-
-   public void explode(Body body) {
-      Random rand = new Random();
-      double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
-      double oldMass = body.getMass();
-
-
-      while (body.getMass() > 0) {
-         double fragMass = oldMass * rand.nextDouble() / 2;
-         double fragRadius = sqrt(fragMass / (dThis * PI));
-         Body frag = addNewFragment(
-                 "FRAG" + body.getName(),
-                 body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
-                 body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
-                 fragMass,
-                 fragRadius,
-                 Color.RED
-         );
-
-         double newDirection = rand.nextDouble() * 2 * PI;
-         double newVX = cos(newDirection) * body.getSpeed().getSpeed();
-         double newVY = sin(newDirection) * body.getSpeed().getSpeed();
-
-         frag.setSpeed(new Speed(newVX, newVY));
-
-         if (body.getMass() - fragMass < 0) {
-            body.setMass(0);
-         } else {
-            body.setMass(body.getMass() - fragMass);
-         }
-      }
-      allThings.remove(body);
-//        hollySong("boom",0.001);
+   private void refreshBodies()
+   {
+      //WAIT FOR UNIVERSE INFOS
    }
 
    private int getControlForce(MouseEvent e) {
