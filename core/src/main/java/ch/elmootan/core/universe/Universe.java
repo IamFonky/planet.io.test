@@ -145,18 +145,9 @@ public class Universe extends JFrame
          {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D)g;
-            g.setColor(Color.WHITE);
             synchronized (allThings)
             {
-               allThings.sort(Comparator.comparingDouble(Body::getRadius));
-               Collections.reverse(allThings);
-
-               g2d.drawString("Top bitches:", 0, 10);
-
-               int nbScores = allThings.size() > 5 ? 5 : allThings.size();
-               for (int i = 0; i < nbScores; i++) {
-                  g2d.drawString(allThings.get(i).getName() + " : " + (int)allThings.get(i).getRadius(), 0, 15*(i+2));
-               }
+               g.setColor(Color.WHITE);
 
                for (Body body : allThings)
                {
@@ -176,6 +167,25 @@ public class Universe extends JFrame
                   {
                      g.drawRect(x, y, radius, radius);
                   }
+               }
+
+               allThings.sort(Comparator.comparingDouble(Body::getRadius));
+               Collections.reverse(allThings);
+
+               g.setColor(Color.RED);
+               g2d.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+               g2d.drawString("Top scores:", 0, 20);
+               g2d.setFont(new Font("TimesRoman", Font.PLAIN, 12));
+
+               int nbScores = allThings.size() > 5 ? 5 : allThings.size();
+               int i = 0, j = 1;
+               while (i != nbScores) {
+                  if (!(allThings.get(i) instanceof InvisiblePlanet)) {
+                     g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int)allThings.get(i).getRadius(), 0, 15*(++j) + 10);
+                  } else if (allThings.size() > 5) {
+                     nbScores++;
+                  }
+                  i++;
                }
             }
          }
