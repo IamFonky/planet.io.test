@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 
 public class ClientHandler {
 
-    final static ObjectMapper jsonMapper = new ObjectMapper();
     private final static Logger LOG = Logger.getLogger(ClientHandler.class.getName());
 
     private final GamesManager gamesManager = GamesManager.getSharedManager();
@@ -70,8 +69,10 @@ public class ClientHandler {
                                 writer.println(Protocol.PLANET_IO_SUCCESS);
                                 try {
                                     Game newGame = mapper.readValue(reader.readLine(), Game.class);
-                                    lobby.addGame(newGame);
-                                    writer.println(Protocol.PLANET_IO_SUCCESS);
+                                    int newGameID = lobby.addGame(newGame);
+                                    writer.println(Protocol.PLANET_IO_SUCCESS
+                                    + Protocol.CMD_SEPARATOR
+                                    + newGameID);
                                 } catch (JsonProcessingException jpe) {
                                     writer.println(Protocol.PLANET_IO_FAILURE);
                                 }

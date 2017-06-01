@@ -5,6 +5,8 @@ import ch.elmootan.core.sharedObjects.GameCreator;
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.sharedObjects.Player;
 import ch.elmootan.core.universe.Bonus;
+import ch.elmootan.core.universe.GUniverse;
+import ch.elmootan.core.universe.Planet;
 import ch.elmootan.core.universe.Universe;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -31,7 +34,9 @@ public class Client implements Runnable {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    protected Socket socket;
+    protected Socket tcpSocket;
+
+    private GUniverse gui;
 
     PrintWriter out;
     BufferedReader in;
@@ -69,6 +74,7 @@ public class Client implements Runnable {
 
     private void createClient(Player player, boolean debug)
     {
+        noGUI = debug;
         try
         {
             clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
@@ -78,7 +84,8 @@ public class Client implements Runnable {
             e.printStackTrace();
         }
         this.player = player;
-        socket = new Socket();
+        tcpSocket = new Socket();
+
 
         if (!debug) {
             lobbyClient = new LobbyClient();
@@ -94,14 +101,14 @@ public class Client implements Runnable {
 
     public void connect(String server, int port) throws IOException {
 
-        if (socket != null)
-            socket.close();
+        if (tcpSocket != null)
+            tcpSocket.close();
 
-        socket = new Socket(server, port);
+        tcpSocket = new Socket(server, port);
 
         try {
-            out = new PrintWriter(socket.getOutputStream());
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(tcpSocket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
         } catch (IOException e) {
             LOG.warning(e.toString());
         }
@@ -167,13 +174,13 @@ public class Client implements Runnable {
             connectionRunning = false;
             out.close();
             in.close();
-            socket.close();
+            tcpSocket.close();
         }
     }
 
     public boolean isConnected() {
-        LOG.info(String.valueOf(socket.isConnected()));
-        return socket.isConnected() && !socket.isClosed();
+        LOG.info(String.valueOf(tcpSocket.isConnected()));
+        return tcpSocket.isConnected() && !tcpSocket.isClosed();
     }
 
     public void sendGameToServer(Game game) {
@@ -182,8 +189,10 @@ public class Client implements Runnable {
                 serverWrite(Protocol.CMD_CREATE_GAME);
                 if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
                     serverWrite(mapper.writeValueAsString(game));
-                    if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
-                        System.out.println("Game created");
+                    String succesAndGameId = serverRead();
+                    if (succesAndGameId.indexOf(Protocol.PLANET_IO_SUCCESS) != -1) {
+                        idCurrentGame = Integer.parseInt(succesAndGameId.split(Protocol.CMD_SEPARATOR)[1]);
+                        System.out.println("Game n° " + idCurrentGame + " created");
                     } else {
                         System.out.println("Error, game was not created");
                     }
@@ -221,8 +230,7 @@ public class Client implements Runnable {
                     public void actionPerformed(ActionEvent e) {
                         if (e.getSource() == createGame) {
                             Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
-
-                            //newGame.setUniverse(new Universe());
+//                            newGame.setUniverse(new Universe());
                             sendGameToServer(newGame);
 
                             dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
@@ -239,7 +247,14 @@ public class Client implements Runnable {
                             if (e.getSource() == btnChoose) {
                                 System.out.println(idSkin);
                                 chooseStatus = true;
-                                gamesList.get(indexGame).join(player.getName(), idSkin);
+//                                gamesList.get(indexGame).join(player.getName(), idSkin);
+                                gui = new GUniverse(
+                                      out,
+                                      in,
+                                      clientMulticast.getSocket(),
+                                      idCurrentGame,
+                                      new Planet("TEST",100000,1000));
+                                gui.showUI();
                                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                             }
 

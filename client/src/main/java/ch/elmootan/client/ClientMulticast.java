@@ -29,6 +29,10 @@ public class ClientMulticast implements Runnable {
     //! Multicast address.
     private InetAddress multicastGroup;
 
+    public MulticastSocket getSocket() {
+        return socket;
+    }
+
     //! Socket to use.
     private MulticastSocket socket;
 

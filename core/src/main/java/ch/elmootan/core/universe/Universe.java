@@ -111,7 +111,7 @@ public class Universe extends JFrame {
                   }
                   break;
                case 'q':
-                  generateMyPlanet();
+                  generateMyPlanet("Yo mama",3);
                   break;
             }
             System.out.println(e.getKeyChar());
@@ -423,7 +423,7 @@ public class Universe extends JFrame {
    {
       Random rand = new Random();
       myPlanet = this.addNewPlanet(
-              "name",
+            name,
               rand.nextDouble() * 400000 + -200000,
               rand.nextDouble() * 400000 + -200000,
               rand.nextDouble() * 1E+22 + 1E+21,

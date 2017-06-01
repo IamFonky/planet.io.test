@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,7 +50,7 @@ public class GUniverse extends JFrame {
 
 //   private boolean tadaam = false;
 
-   public GUniverse(PrintWriter wr, BufferedReader rd, int gameId, Planet myPlanet) {
+   public GUniverse(PrintWriter wr, BufferedReader rd, MulticastSocket udpSocket, int gameId, Planet myPlanet) {
       super("Mon univers");
       this.rd = rd;
       this.wr = wr;
@@ -172,6 +173,10 @@ public class GUniverse extends JFrame {
       add(rootPane);
 
       setSize(1000, 1000);
+      setVisible(true);
+   }
+
+   public void showUI() {
       setVisible(true);
    }
 

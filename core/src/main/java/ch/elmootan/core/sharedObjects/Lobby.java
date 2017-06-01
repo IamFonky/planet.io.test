@@ -1,5 +1,7 @@
 package ch.elmootan.core.sharedObjects;
 
+import ch.elmootan.core.universe.Engine;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -24,6 +26,7 @@ import java.util.Vector;
 public class Lobby extends JFrame implements ActionListener {
 
     protected ArrayList<Game> gamesList = new ArrayList<>();
+    protected ArrayList<Engine> engineList = new ArrayList<>();
     protected JTable table;
 
     protected JButton addGameButton;
@@ -113,11 +116,13 @@ public class Lobby extends JFrame implements ActionListener {
         }*/
     }
 
-    public void addGame(Game game) {
+    public int addGame(Game game) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.addRow(new Object[]{game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
+        engineList.add(new Engine());
         lobbyChanged.notifyObservers(game);
+        return gamesList.size();
     }
 
     public void addGameList(ArrayList<Game> gameList) {

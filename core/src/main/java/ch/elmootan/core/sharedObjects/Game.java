@@ -21,7 +21,10 @@ public class Game implements Serializable {
     //!
     private int nbPlayersMax;
 
-    private final Universe universe = new Universe();
+    //Je déconseille sérieusement de mettre un Univers dans la Game
+    //Déja simplement parce qu'on lance une fenetre des qu'on l'appelle donc
+    //chaque fois que tu fais new Game() tu lance une GUI du jeu, donc tu attend pas de join
+//    private final Universe universe = new Universe();
 
     public Game(String name, HashSet<Bonus> bonuses, int nbPlayersMax) {
         this.name = name;
@@ -57,10 +60,10 @@ public class Game implements Serializable {
         this.nbPlayersMax = nbPlayersMax;
     }
 
-    public void join(String playerName, int skin) {
-        universe.showUI();
-        universe.generateMyPlanet(playerName, skin);
-    }
+//    public void join(String playerName, int skin) {
+//        universe.showUI();
+//        universe.generateMyPlanet(playerName, skin);
+//    }
 
     public int getNbPlaylersCurrent() {
         return nbPlaylersCurrent;
