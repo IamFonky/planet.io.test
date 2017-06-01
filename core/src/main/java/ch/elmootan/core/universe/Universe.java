@@ -74,7 +74,7 @@ public class Universe extends JFrame {
             if (clickedPlanet == null || !mousePressed) {
                generatePlanetFromClick(e.getX(), e.getY());
                myPlanetInitMass = clickedPlanet.getMass();
-               clickedPlanet.setMass(myPlanetInitMass);
+               clickedPlanet.setMass(myPlanetInitMass * getControlForce(e));
                //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
                mousePressed = true;
             }

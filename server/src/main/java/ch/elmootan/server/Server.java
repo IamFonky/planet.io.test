@@ -16,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server implements Observer {
-
+    
     //! Logger.
     final static Logger LOG = Logger.getLogger(Server.class.getName());
 

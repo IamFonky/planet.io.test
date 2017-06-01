@@ -2,6 +2,8 @@ package ch.elmootan.core.universe;
 
 import ch.elmootan.core.physics.*;
 import ch.elmootan.core.sharedObjects.GameCreator;
+import ch.elmootan.protocol.Protocol;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -33,16 +35,26 @@ public class GUniverse extends JFrame {
    private Planet clickedPlanet;
    private Planet myPlanet;
    private double myPlanetInitMass;
-   private double nbClicks;
    private boolean mousePressed = false;
 
    private ArrayList<BufferedImage> planets = new ArrayList<>();
    private BufferedImage invisible;
 
+   private BufferedReader rd;
+   private PrintWriter wr;
+
+   private int gameId;
+
+   private final ObjectMapper mapper = new ObjectMapper();
+
 //   private boolean tadaam = false;
 
-   public GUniverse(PrintWriter wr, BufferedReader rd) {
+   public GUniverse(PrintWriter wr, BufferedReader rd, int gameId, Planet myPlanet) {
       super("Mon univers");
+      this.rd = rd;
+      this.wr = wr;
+      this.gameId = gameId;
+      this.myPlanet = myPlanet;
 
       try {
          for (int i = 1; i <= 8; i++)
@@ -56,11 +68,8 @@ public class GUniverse extends JFrame {
 
          @Override
          public void mouseDragged(MouseEvent e) {
-            //A transformer de manière à send une commande
-            //ex : CDM_SET_POSITION:<userID>\r\n{InvisiblePlanet:{JSONblabla}}
             if (clickedPlanet != null && mousePressed) {
-               clickedPlanet.setMass(myPlanetInitMass * getControlForce(e));
-               clickedPlanet.setPosition(convertXYToPosition(e.getX(), e.getY()));
+               setInvisiblePlanet(e);
             }
          }
       });
@@ -68,24 +77,14 @@ public class GUniverse extends JFrame {
       addMouseListener(new MouseAdapter() {
          @Override
          public void mousePressed(MouseEvent e) {
-            //A transformer de manière à send une commande
-            //ex : CDM_SET_POSITION:<userID>\r\n{InvisiblePlanet:{JSONblabla}}
             if (clickedPlanet == null || !mousePressed) {
-               generatePlanetFromClick(e.getX(), e.getY());
-               myPlanetInitMass = clickedPlanet.getMass();
-               clickedPlanet.setMass(myPlanetInitMass);
-               //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
-               mousePressed = true;
+               createInvisiblePlanet(e);
             }
          }
 
          @Override
          public void mouseReleased(MouseEvent e) {
-            //A transformer de manière à send une commande
-            //ex : CDM_REMOVE_PLANET:<userID>
-            removePlanet(clickedPlanet);
-            clickedPlanet = null;
-            mousePressed = false;
+            killInvisiblePlanet(e);
          }
       });
 
@@ -102,15 +101,7 @@ public class GUniverse extends JFrame {
                case 'd':
                   zoom -= zoom * 0.1;
                   break;
-               case ' ':
-                  if (e.isShiftDown()) {
-                     generateExactSameShit();
-                  } else {
-                     generateRandomShit();
-                  }
-                  break;
-               case 'q':
-                  generateMyPlanet();
+               default:
                   break;
             }
             System.out.println(e.getKeyChar());
@@ -201,6 +192,83 @@ public class GUniverse extends JFrame {
       }
    }
 
+   private boolean createInvisiblePlanet(MouseEvent e) {
+      try
+      {
+         wr.println(Protocol.PLANET_IO_CREATE_PLANET + Protocol.CMD_SEPARATOR + gameId);
+         if(rd.readLine() == Protocol.PLANET_IO_SUCCESS)
+         {
+            generatePlanetFromClick(e.getX(), e.getY());
+            myPlanetInitMass = clickedPlanet.getMass();
+            clickedPlanet.setMass(myPlanetInitMass * getControlForce(e));
+            //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
+            mousePressed = true;
+            wr.println(mapper.writeValueAsString(clickedPlanet));
+            if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
+            {
+               mousePressed = true;
+            }
+            else
+            {
+               clickedPlanet = null;
+            }
+         }
+      }
+      catch (IOException ioe)
+      {
+         ioe.printStackTrace();
+         return false;
+      }
+      return false;
+   }
+
+   private boolean setInvisiblePlanet(MouseEvent e) {
+      try
+      {
+         mousePressed = false;
+         //Demande des modification de la planete au serveur
+         wr.println(Protocol.PLANET_IO_SET_PLANET + Protocol.CMD_SEPARATOR + gameId);
+         //Vérification si la demande est valable
+         if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS)) {
+            //Récupération de la masse de la planete cliquée
+            myPlanetInitMass = clickedPlanet.getMass();
+            clickedPlanet.setMass(myPlanetInitMass * getControlForce(e));
+            //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
+            wr.println(mapper.writeValueAsString(clickedPlanet));
+            if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
+            {
+               mousePressed = true;
+            }
+            else
+            {
+               clickedPlanet = null;
+            }
+         }
+      }
+      catch (IOException ioe)
+      {
+         ioe.printStackTrace();
+      }
+      return mousePressed;
+   }
+
+   private boolean killInvisiblePlanet(MouseEvent e) {
+      try
+      {
+         wr.println(Protocol.PLANET_IO_KILL_PLANET + Protocol.CMD_SEPARATOR + gameId);
+         if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
+         {
+            mousePressed = false;
+            clickedPlanet = null;
+         }
+      }
+      catch (IOException ioe)
+      {
+         ioe.printStackTrace();
+      }
+      return mousePressed;
+   }
+
    private Position convertXYToPosition(double x, double y) {
       double bodyX = ((x - (getWidth() / 2)) * zoom);
       double bodyY = ((y - (getHeight() / 2)) * zoom);
@@ -209,81 +277,12 @@ public class GUniverse extends JFrame {
 
    private void generatePlanetFromClick(double x, double y) {
       double bodyRadius = 30000;
-      InvisiblePlanet p = new InvisiblePlanet("Invisible", convertXYToPosition(x, y), 1E+24, bodyRadius, 1);
-
-      clickedPlanet = addNewPlanet(p);
-   }
-
-   public Planet addNewPlanet(String name, double x, double y, double mass, double radius, int skin, int id) {
-      Planet newP = new Planet(name, new Position(x, y), mass, radius, skin, id);
-      allThings.add(newP);
-      return newP;
-   }
-
-   public InvisiblePlanet addNewPlanet(InvisiblePlanet newP) {
-      allThings.add(newP);
-      return newP;
-   }
-
-   public void removePlanet(Planet planet) {
-      allThings.remove(planet);
-      planet = null;
-   }
-
-   private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur) {
-      Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
-      allThings.add(newP);
-      return newP;
-   }
-
-   private void generateExactSameShit() {
-      for (int i = 0; i < 25; ++i) {
-         Random rand = new Random();
-         double x = rand.nextDouble() * 400000 + -200000;
-         Planet lune = this.addNewPlanet(
-                 "Lune" + i,
-                 x,
-                 rand.nextDouble() * 400000 + -200000,
-                 2E+21,
-                 3000,
-                 rand.nextInt(8) + 1,
-                 (int) x);
-         lune.setSpeed(new Speed(rand.nextDouble() * 1500 - 750,
-                 rand.nextDouble() * 1500 - 750));
-
-      }
-
-   }
-
-   private void generateRandomShit() {
-      for (int i = 0; i < 1; ++i) {
-         Random rand = new Random();
-         Planet lune = this.addNewPlanet(
-                 "Lune" + rand.nextInt(100) + 1,
-                 rand.nextDouble() * 400000 + -200000,
-                 rand.nextDouble() * 400000 + -200000,
-                 rand.nextDouble() * 1E+22 + 1E+21,
-                 rand.nextDouble() * 1000 + 4000,
-                 rand.nextInt(8) + 1,
-                 0);
-         lune.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
-                 rand.nextDouble() * 100 - 50));
-      }
-
-   }
-
-   private void generateMyPlanet() {
-      Random rand = new Random();
-      myPlanet = this.addNewPlanet(
-              "GatiGato",
-              rand.nextDouble() * 400000 + -200000,
-              rand.nextDouble() * 400000 + -200000,
-              rand.nextDouble() * 1E+22 + 1E+21,
-              rand.nextDouble() * 1000 + 4000,
-              rand.nextInt(8) + 1,
-              1);
-      myPlanet.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
-              rand.nextDouble() * 100 - 50));
+      clickedPlanet = new InvisiblePlanet(
+              "Invisible-" + myPlanet.getName(),
+              convertXYToPosition(x, y),
+              1E+24,
+              bodyRadius,
+              myPlanet.getId());
    }
 
    private void hollySong(String soundFile, double intiVolume) {
