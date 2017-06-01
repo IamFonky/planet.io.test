@@ -6,8 +6,7 @@ import java.awt.*;
 
 import static java.lang.Math.*;
 
-public abstract class Body
-{
+public abstract class Body {
     private Position position;
 
     private double mass;
@@ -25,8 +24,7 @@ public abstract class Body
 
     private int id;
 
-    public Body(String name, Position position, double mass, double radius, Color couleur, double fragmentationRatio)
-    {
+    public Body(String name, Position position, double mass, double radius, Color couleur, double fragmentationRatio) {
         this.name = name;
         this.position = position;
         this.mass = mass;
@@ -35,73 +33,59 @@ public abstract class Body
         this.fragmentationRatio = fragmentationRatio;
     }
 
-    public double getMass()
-    {
+    public double getMass() {
         return mass;
     }
 
-    public Position getPosition()
-    {
+    public Position getPosition() {
         return position;
     }
 
-    public double getRadius()
-    {
+    public double getRadius() {
         return radius;
     }
 
-    public void setMass(double mass)
-    {
+    public void setMass(double mass) {
         this.mass = mass;
     }
 
-    public void setPosition(Position position)
-    {
+    public void setPosition(Position position) {
         this.position = position;
     }
 
-    public void setRadius(double radius)
-    {
+    public void setRadius(double radius) {
         this.radius = radius;
     }
 
-    public Body getOrbiting()
-    {
+    public Body getOrbiting() {
         return orbiting;
     }
 
-    public void setOrbiting(Body orbiting)
-    {
+    public void setOrbiting(Body orbiting) {
         this.orbiting = orbiting;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public Color getCouleur()
-    {
+    public Color getCouleur() {
         return couleur;
     }
 
-    public void setCouleur(Color couleur)
-    {
+    public void setCouleur(Color couleur) {
         this.couleur = couleur;
     }
 
-    public Speed getSpeed()
-    {
+    public Speed getSpeed() {
         return speed;
     }
 
-    public void setSpeed(Speed speed)
-    {
+    public void setSpeed(Speed speed) {
         this.speed = speed;
     }
 
@@ -113,8 +97,7 @@ public abstract class Body
         this.id = id;
     }
 
-    public BodyState eat(Body meal)
-    {
+    public BodyState eat(Body meal) {
         if (this instanceof Fragment)
             return BodyState.DEFAULT;
         boolean explode = (abs(mass - meal.mass) < mass * fragmentationRatio);
@@ -135,11 +118,9 @@ public abstract class Body
         setRadius(newRadius);
         setSpeed(new Speed(newVX, newVY));
 
-        if (!explode)
-        {
+        if (!explode) {
             return BodyState.EAT_MEAL;
-        }
-        else //Too much to eat, the planet with explode!
+        } else //Too much to eat, the planet with explode!
         {
             return BodyState.EXPLODE;
         }

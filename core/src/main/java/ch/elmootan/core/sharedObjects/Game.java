@@ -1,6 +1,7 @@
 package ch.elmootan.core.sharedObjects;
 
 import ch.elmootan.core.universe.Bonus;
+import ch.elmootan.core.universe.Universe;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -20,6 +21,8 @@ public class Game implements Serializable {
     //!
     private int nbPlayersMax;
 
+    private final Universe universe = new Universe();
+
     public Game(String name, HashSet<Bonus> bonuses, int nbPlayersMax) {
         this.name = name;
         this.availableBonuses = bonuses;
@@ -28,7 +31,6 @@ public class Game implements Serializable {
 
     //! Dumme constructor needed for deserialization
     public Game() {
-
     }
 
     public String getName() {
@@ -55,8 +57,9 @@ public class Game implements Serializable {
         this.nbPlayersMax = nbPlayersMax;
     }
 
-    public void join() {
-        System.out.println("Game " + name + " joined!");
+    public void join(String playerName, int skin) {
+        universe.showUI();
+        universe.generateMyPlanet(playerName, skin);
     }
 
     public int getNbPlaylersCurrent() {

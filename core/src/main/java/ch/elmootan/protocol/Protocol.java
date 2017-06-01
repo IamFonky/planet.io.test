@@ -7,6 +7,7 @@ public final class Protocol {
     public static final String PLANET_IO_FAILURE = "AH!AH!";
 
     public static final String LOBBY_UPDATED = "OHBOITHELOBBYISUPDATED!";
+    public static final String GAME_UPDATE = "OHBOITHEGAMEISUPDATED!";
 
     // Commandes envoyées par le client.
     public static final String PLANET_IO_HELLO = "HELLOPELO";
