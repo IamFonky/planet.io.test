@@ -6,10 +6,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import ch.elmootan.core.physics.*;
 
@@ -141,39 +139,37 @@ public class Universe extends JFrame
                         }
       );
 
-      ActionListener repaintLol = new ActionListener() {
-         public void actionPerformed(ActionEvent evt) {
-            drawBodies();
-            rootPane.repaint();
-         }
-      };
-
       rootPane = new JPanel() {
          @Override
          protected void paintComponent(Graphics g)
          {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D)g;
+            g.setColor(Color.WHITE);
             synchronized (allThings)
             {
+               allThings.sort(Comparator.comparingDouble(Body::getRadius));
+               Collections.reverse(allThings);
+
+               g2d.drawString("Top bitches:", 0, 10);
+
+               int nbScores = allThings.size() > 5 ? 5 : allThings.size();
+               for (int i = 0; i < nbScores; i++) {
+                  g2d.drawString(allThings.get(i).getName() + " : " + (int)allThings.get(i).getRadius(), 0, 15*(i+2));
+               }
+
                for (Body body : allThings)
                {
                   int radius = (int) (body.getRadius() / zoom);
                   int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
                   int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
-                  g.setColor(Color.WHITE);
-                  String pseudo;
 
                   if (InvisiblePlanet.class.isInstance(body)) {
                      g2d.drawImage(invisible.getScaledInstance(radius, radius, 0),x,y,this);
                   }
                   else if (Planet.class.isInstance(body))
                   {
-                     if (body == myPlanet)
-                        pseudo = "GatiGato";
-                     else
-                        pseudo = "ImFonky";
-                     g2d.drawString(pseudo, x-(pseudo.length()/2)*5+radius/2, y-10);
+                     g2d.drawString(body.getName(), x-(body.getName().length()/2)*5+radius/2, y-10);
                      g2d.drawImage(planets.get(((Planet)body).getIdSkin()-1).getScaledInstance(radius, radius, 0),x,y,this);
                   }
                   else if (Fragment.class.isInstance(body))
@@ -182,6 +178,17 @@ public class Universe extends JFrame
                   }
                }
             }
+         }
+      };
+
+      //ScorePane scorePane = new ScorePane();
+     // rootPane.add(scorePane);
+
+      ActionListener repaintLol = new ActionListener() {
+         public void actionPerformed(ActionEvent evt) {
+            //scorePane.setScores();
+            drawBodies();
+            rootPane.repaint();
          }
       };
 
@@ -433,7 +440,7 @@ public class Universe extends JFrame
       {
          Random rand = new Random();
          Planet lune = this.addNewPlanet(
-                 "Lune" + i,
+                 "Lune" + rand.nextInt(100) + 1,
                  rand.nextDouble() * 400000 + -200000,
                  rand.nextDouble() * 400000 + -200000,
                  rand.nextDouble() * 1E+22 + 1E+21,
@@ -450,7 +457,7 @@ public class Universe extends JFrame
    {
       Random rand = new Random();
       myPlanet = this.addNewPlanet(
-              "MYPLANET",
+              "GatiGato",
               rand.nextDouble() * 400000 + -200000,
               rand.nextDouble() * 400000 + -200000,
               rand.nextDouble() * 1E+22 + 1E+21,
