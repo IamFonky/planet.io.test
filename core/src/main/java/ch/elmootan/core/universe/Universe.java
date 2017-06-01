@@ -24,8 +24,7 @@ import javax.swing.*;
 
 import static java.lang.Math.*;
 
-public class Universe extends JFrame
-{
+public class Universe extends JFrame {
 
    private final ArrayList<Body> allThings = new ArrayList<>();
    private double zoom = 500.0;
@@ -43,39 +42,31 @@ public class Universe extends JFrame
 
 //   private boolean tadaam = false;
 
-   public Universe()
-   {
+   public Universe() {
       super("Mon univers");
 
-      try
-      {
+      try {
          for (int i = 1; i <= 8; i++)
             planets.add(ImageIO.read(Universe.class.getResource("../skins/planet" + i + "_32x32.png")));
          invisible = ImageIO.read(Universe.class.getResource("../skins/invisible_64x64.png"));
-      }
-      catch (IOException e)
-      {
+      } catch (IOException e) {
          e.printStackTrace();
       }
 
       addMouseMotionListener(new MouseMotionAdapter() {
 
          @Override
-         public void mouseDragged(MouseEvent e)
-         {
-            if(clickedPlanet != null && mousePressed)
-            {
-               clickedPlanet.setMass(myPlanetInitMass*getControlForce(e));
-               clickedPlanet.setPosition(convertXYToPosition(e.getX(),e.getY()));
+         public void mouseDragged(MouseEvent e) {
+            if (clickedPlanet != null && mousePressed) {
+               clickedPlanet.setMass(myPlanetInitMass * getControlForce(e));
+               clickedPlanet.setPosition(convertXYToPosition(e.getX(), e.getY()));
             }
          }
       });
 
-      addMouseListener(new MouseAdapter()
-      {
+      addMouseListener(new MouseAdapter() {
          @Override
-         public void mousePressed(MouseEvent e)
-         {
+         public void mousePressed(MouseEvent e) {
             if (clickedPlanet == null || !mousePressed) {
                generatePlanetFromClick(e.getX(), e.getY());
                myPlanetInitMass = clickedPlanet.getMass();
@@ -93,13 +84,10 @@ public class Universe extends JFrame
          }
       });
 
-      addKeyListener(new KeyAdapter()
-      {
+      addKeyListener(new KeyAdapter() {
          @Override
-         public void keyTyped(KeyEvent e)
-         {
-            switch (e.getKeyChar())
-            {
+         public void keyTyped(KeyEvent e) {
+            switch (e.getKeyChar()) {
                case 's':
                   hollySong("starwars", 0.025);
                   break;
@@ -110,12 +98,9 @@ public class Universe extends JFrame
                   zoom -= zoom * 0.1;
                   break;
                case ' ':
-                  if (e.isShiftDown())
-                  {
+                  if (e.isShiftDown()) {
                      generateExactSameShit();
-                  }
-                  else
-                  {
+                  } else {
                      generateRandomShit();
                   }
                   break;
@@ -129,10 +114,8 @@ public class Universe extends JFrame
 
       setSize(1000, 1000);
       setVisible(true);
-      addWindowListener(new WindowAdapter()
-                        {
-                           public void windowClosing(WindowEvent e)
-                           {
+      addWindowListener(new WindowAdapter() {
+                           public void windowClosing(WindowEvent e) {
                               dispose();
                               System.exit(0);
                            }
@@ -141,13 +124,11 @@ public class Universe extends JFrame
 
       rootPane = new JPanel() {
          @Override
-         protected void paintComponent(Graphics g)
-         {
+         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D)g;
+            Graphics2D g2d = (Graphics2D) g;
             g.setColor(Color.WHITE);
-            synchronized (allThings)
-            {
+            synchronized (allThings) {
                allThings.sort(Comparator.comparingDouble(Body::getRadius));
                Collections.reverse(allThings);
 
@@ -155,25 +136,20 @@ public class Universe extends JFrame
 
                int nbScores = allThings.size() > 5 ? 5 : allThings.size();
                for (int i = 0; i < nbScores; i++) {
-                  g2d.drawString(allThings.get(i).getName() + " : " + (int)allThings.get(i).getRadius(), 0, 15*(i+2));
+                  g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
                }
 
-               for (Body body : allThings)
-               {
+               for (Body body : allThings) {
                   int radius = (int) (body.getRadius() / zoom);
                   int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
                   int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
 
                   if (InvisiblePlanet.class.isInstance(body)) {
-                     g2d.drawImage(invisible.getScaledInstance(radius, radius, 0),x,y,this);
-                  }
-                  else if (Planet.class.isInstance(body))
-                  {
-                     g2d.drawString(body.getName(), x-(body.getName().length()/2)*5+radius/2, y-10);
-                     g2d.drawImage(planets.get(((Planet)body).getIdSkin()-1).getScaledInstance(radius, radius, 0),x,y,this);
-                  }
-                  else if (Fragment.class.isInstance(body))
-                  {
+                     g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
+                  } else if (Planet.class.isInstance(body)) {
+                     g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
+                     g2d.drawImage(planets.get(((Planet) body).getIdSkin() - 1).getScaledInstance(radius, radius, 0), x, y, this);
+                  } else if (Fragment.class.isInstance(body)) {
                      g.drawRect(x, y, radius, radius);
                   }
                }
@@ -182,7 +158,7 @@ public class Universe extends JFrame
       };
 
       //ScorePane scorePane = new ScorePane();
-     // rootPane.add(scorePane);
+      // rootPane.add(scorePane);
 
       ActionListener repaintLol = new ActionListener() {
          public void actionPerformed(ActionEvent evt) {
@@ -192,7 +168,7 @@ public class Universe extends JFrame
          }
       };
 
-      javax.swing.Timer displayTimer = new javax.swing.Timer(10,repaintLol);
+      javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
       displayTimer.start();
 
       rootPane.setBackground(Color.BLACK);
@@ -204,23 +180,18 @@ public class Universe extends JFrame
    }
 
    private void drawBodies() {
-      for (int i = 0; i < allThings.size(); ++i)
-      {
+      for (int i = 0; i < allThings.size(); ++i) {
          Body body = allThings.get(i);
-         if(body != null)
-         {
-            for (int j = i + 1; j < allThings.size(); ++j)
-            {
+         if (body != null) {
+            for (int j = i + 1; j < allThings.size(); ++j) {
                Body surrounding = allThings.get(j);
-               if (surrounding != null)
-               {
+               if (surrounding != null) {
                   double gTgDistance = 0;
                   double sqDistance = 0;
                   double dX = 0;
                   double dY = 0;
                   //On calcule les distances x et y et la distance au carré
-                  synchronized (body)
-                  {
+                  synchronized (body) {
                      dX = surrounding.getPosition().getX() - body.getPosition().getX();
                      dY = surrounding.getPosition().getY() - body.getPosition().getY();
                      sqDistance = dX * dX + dY * dY;
@@ -263,9 +234,8 @@ public class Universe extends JFrame
                   // On applique la gravité et la physique uniquement dans 2 cas :
                   //   - Si c'est la planète cliquée et la planète du joueur.
                   //   - Si aucune des deux planète n'est une planète cliquée.
-                  else if ((!(body instanceof InvisiblePlanet) && !(surrounding instanceof InvisiblePlanet))||
-                          (body.getId() == surrounding.getId()))
-                  {
+                  else if ((!(body instanceof InvisiblePlanet) && !(surrounding instanceof InvisiblePlanet)) ||
+                          (body.getId() == surrounding.getId())) {
                      //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
                      double rDX = dX / Math.sqrt(sqDistance);
                      double rDY = dY / Math.sqrt(sqDistance);
@@ -288,8 +258,7 @@ public class Universe extends JFrame
 
                      //Il faut maintenant appliquer accélérations x et y aux vitesses x et y
                      //Pour le moment la cadence du processeur règle la vitesse du programme
-                     synchronized (body)
-                     {
+                     synchronized (body) {
                         body.getSpeed().setX(body.getSpeed().getX() + bodyAX);
                         body.getSpeed().setY(body.getSpeed().getY() + bodyAY);
 
@@ -302,8 +271,7 @@ public class Universe extends JFrame
             }
          }
 
-         synchronized (body)
-         {
+         synchronized (body) {
             body.getPosition().setX(body.getPosition().getX() + body.getSpeed().getX());
             body.getPosition().setY(body.getPosition().getY() + body.getSpeed().getY());
          }
@@ -314,15 +282,13 @@ public class Universe extends JFrame
       }
    }
 
-   public void explode(Body body)
-   {
+   public void explode(Body body) {
       Random rand = new Random();
       double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
       double oldMass = body.getMass();
 
 
-      while (body.getMass() > 0)
-      {
+      while (body.getMass() > 0) {
          double fragMass = oldMass * rand.nextDouble() / 2;
          double fragRadius = sqrt(fragMass / (dThis * PI));
          Body frag = addNewFragment(
@@ -340,12 +306,9 @@ public class Universe extends JFrame
 
          frag.setSpeed(new Speed(newVX, newVY));
 
-         if (body.getMass() - fragMass < 0)
-         {
+         if (body.getMass() - fragMass < 0) {
             body.setMass(0);
-         }
-         else
-         {
+         } else {
             body.setMass(body.getMass() - fragMass);
          }
       }
@@ -353,50 +316,38 @@ public class Universe extends JFrame
 //        hollySong("boom",0.001);
    }
 
-   private int getControlForce(MouseEvent e)
-   {
-      if (e.isShiftDown() && e.isControlDown())
-      {
+   private int getControlForce(MouseEvent e) {
+      if (e.isShiftDown() && e.isControlDown()) {
          return 10;
-      }
-      else if (e.isShiftDown())
-      {
+      } else if (e.isShiftDown()) {
          return 2;
-      }
-      else if (e.isControlDown())
-      {
+      } else if (e.isControlDown()) {
          return 3;
-      }
-      else
-      {
+      } else {
          return 1;
       }
    }
 
-   private Position convertXYToPosition(double x, double y)
-   {
+   private Position convertXYToPosition(double x, double y) {
       double bodyX = ((x - (getWidth() / 2)) * zoom);
       double bodyY = ((y - (getHeight() / 2)) * zoom);
-      return new Position(bodyX,bodyY);
+      return new Position(bodyX, bodyY);
    }
 
-   private void generatePlanetFromClick(double x, double y)
-   {
+   private void generatePlanetFromClick(double x, double y) {
       double bodyRadius = 30000;
-      InvisiblePlanet p = new InvisiblePlanet("Invisible", convertXYToPosition(x,y), 1E+24, bodyRadius, 1);
+      InvisiblePlanet p = new InvisiblePlanet("Invisible", convertXYToPosition(x, y), 1E+24, bodyRadius, 1);
 
       clickedPlanet = addNewPlanet(p);
    }
 
-   public Planet addNewPlanet(String name, double x, double y, double mass, double radius, int skin, int id)
-   {
+   public Planet addNewPlanet(String name, double x, double y, double mass, double radius, int skin, int id) {
       Planet newP = new Planet(name, new Position(x, y), mass, radius, skin, id);
       allThings.add(newP);
       return newP;
    }
 
-   public InvisiblePlanet addNewPlanet(InvisiblePlanet newP)
-   {
+   public InvisiblePlanet addNewPlanet(InvisiblePlanet newP) {
       allThings.add(newP);
       return newP;
    }
@@ -406,17 +357,14 @@ public class Universe extends JFrame
       planet = null;
    }
 
-   private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur)
-   {
+   private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur) {
       Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
       allThings.add(newP);
       return newP;
    }
 
-   private void generateExactSameShit()
-   {
-      for (int i = 0; i < 25; ++i)
-      {
+   private void generateExactSameShit() {
+      for (int i = 0; i < 25; ++i) {
          Random rand = new Random();
          double x = rand.nextDouble() * 400000 + -200000;
          Planet lune = this.addNewPlanet(
@@ -426,7 +374,7 @@ public class Universe extends JFrame
                  2E+21,
                  3000,
                  rand.nextInt(8) + 1,
-                 (int)x);
+                 (int) x);
          lune.setSpeed(new Speed(rand.nextDouble() * 1500 - 750,
                  rand.nextDouble() * 1500 - 750));
 
@@ -434,10 +382,8 @@ public class Universe extends JFrame
 
    }
 
-   private void generateRandomShit()
-   {
-      for (int i = 0; i < 1; ++i)
-      {
+   private void generateRandomShit() {
+      for (int i = 0; i < 1; ++i) {
          Random rand = new Random();
          Planet lune = this.addNewPlanet(
                  "Lune" + rand.nextInt(100) + 1,
@@ -453,8 +399,7 @@ public class Universe extends JFrame
 
    }
 
-   private void generateMyPlanet()
-   {
+   private void generateMyPlanet() {
       Random rand = new Random();
       myPlanet = this.addNewPlanet(
               "GatiGato",
@@ -468,16 +413,13 @@ public class Universe extends JFrame
               rand.nextDouble() * 100 - 50));
    }
 
-   private void hollySong(String soundFile, double intiVolume)
-   {
+   private void hollySong(String soundFile, double intiVolume) {
       final String sound = soundFile;
       final double volume = intiVolume;
 
-      (new Runnable()
-      {
+      (new Runnable() {
          @Override
-         public void run()
-         {
+         public void run() {
             new JFXPanel();
             System.out.println(System.getProperty("user.dir"));
             String bip = "sounds/" + sound + ".mp3";
@@ -493,7 +435,7 @@ public class Universe extends JFrame
 
    }
 
-   public ArrayList<Body> getAllThings() {
+   public synchronized ArrayList<Body> getAllThings() {
       return allThings;
    }
 }
