@@ -129,6 +129,8 @@ public class Universe extends JFrame
          }
       });
 
+      setSize(1000, 1000);
+      setVisible(true);
       addWindowListener(new WindowAdapter()
                         {
                            public void windowClosing(WindowEvent e)

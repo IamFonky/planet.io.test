@@ -2,10 +2,11 @@ package ch.elmootan.core.sharedObjects;
 
 import ch.elmootan.core.universe.Bonus;
 
+import java.io.Serializable;
 import java.util.HashSet;
 
 
-public class Game {
+public class Game implements Serializable {
 
     //!
     private String name;
@@ -23,6 +24,11 @@ public class Game {
         this.name = name;
         this.availableBonuses = bonuses;
         this.nbPlayersMax = nbPlayersMax;
+    }
+
+    //! Dumme constructor needed for deserialization
+    public Game() {
+
     }
 
     public String getName() {
