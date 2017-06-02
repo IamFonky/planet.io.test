@@ -10,9 +10,9 @@ import java.io.IOException;
 
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.sharedObjects.Player;
+import ch.elmootan.core.universe.Universe;
 import ch.elmootan.server.Server;
 import ch.elmootan.client.Client;
-import com.sun.deploy.util.SessionState;
 
 public class PlanetIO {
 
@@ -112,7 +112,7 @@ public class PlanetIO {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == done && pseudo.getText() != "") {
                 // TODO check if in DB
-                Client client = new Client(new Player(pseudo.getText()));
+                Client client = new Client(new Player(pseudo.getText()),false);
                 this.dispose();
             }
         }
