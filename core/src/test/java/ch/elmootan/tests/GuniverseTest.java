@@ -1,16 +1,13 @@
 package ch.elmootan.tests;
 
-import ch.elmootan.core.universe.GUniverse;
 import ch.elmootan.core.universe.Planet;
 import ch.elmootan.core.universe.Universe;
 import org.junit.Test;
 
-import java.awt.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import static org.junit.Assert.*;
-
-public class CoreTest extends Universe {
-
+public class GuniverseTest extends Universe {
     static public void main(String... args)
     {
         new Universe();

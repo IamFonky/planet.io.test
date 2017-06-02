@@ -1,10 +1,5 @@
 package ch.elmootan.server;
 
-import ch.elmootan.core.sharedObjects.Game;
-import ch.elmootan.protocol.Protocol;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.logging.Level;

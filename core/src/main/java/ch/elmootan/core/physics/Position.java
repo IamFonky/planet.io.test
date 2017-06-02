@@ -7,6 +7,8 @@ public class Position {
     // Position horizontale.
     private double y;
 
+    public Position(){}
+
     public Position(double x, double y) {
         this.x = x;
         this.y = y;
@@ -26,5 +28,12 @@ public class Position {
 
     public void setY(double y) {
         this.y = y;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "Position : (" + x + ";" + y + ")";
     }
 }
