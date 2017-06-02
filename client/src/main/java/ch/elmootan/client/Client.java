@@ -1,9 +1,6 @@
 package ch.elmootan.client;
 
-import ch.elmootan.core.sharedObjects.Game;
-import ch.elmootan.core.sharedObjects.GameCreator;
-import ch.elmootan.core.sharedObjects.Lobby;
-import ch.elmootan.core.sharedObjects.Player;
+import ch.elmootan.core.sharedObjects.*;
 import ch.elmootan.core.universe.Bonus;
 import ch.elmootan.core.universe.GUniverse;
 import ch.elmootan.core.universe.Planet;
@@ -32,7 +29,7 @@ public class Client implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(Client.class.getName());
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final CustomObjectMapper mapper = new CustomObjectMapper();
 
     protected Socket tcpSocket;
 

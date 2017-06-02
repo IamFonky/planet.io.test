@@ -153,8 +153,8 @@ public class Engine {
          );
 
          double newDirection = rand.nextDouble() * 2 * PI;
-         double newVX = cos(newDirection) * body.getSpeed().getSpeed();
-         double newVY = sin(newDirection) * body.getSpeed().getSpeed();
+         double newVX = cos(newDirection) * body.getSpeed().speedVector();
+         double newVY = sin(newDirection) * body.getSpeed().speedVector();
 
          frag.setSpeed(new Speed(newVX, newVY));
 

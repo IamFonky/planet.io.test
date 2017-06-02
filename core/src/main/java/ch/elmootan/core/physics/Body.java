@@ -17,7 +17,7 @@ public abstract class Body {
     private String name;
 
     //TODO : Find a fking workaround beacause jackson won't parse à Color that have no default constructor...
-    private JSONColor couleur;
+    private Color couleur;
 
     private Speed speed = new Speed(0, 0);
 
@@ -32,7 +32,7 @@ public abstract class Body {
         this.position = position;
         this.mass = mass;
         this.radius = radius;
-        this.couleur = new JSONColor(couleur);
+        this.couleur = couleur;
         this.fragmentationRatio = fragmentationRatio;
     }
 
@@ -81,7 +81,7 @@ public abstract class Body {
     }
 
     public void setCouleur(Color couleur) {
-        this.couleur = new JSONColor(couleur);
+        this.couleur = couleur;
     }
 
     public Speed getSpeed() {
