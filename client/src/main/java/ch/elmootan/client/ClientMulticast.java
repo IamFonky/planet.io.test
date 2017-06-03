@@ -1,5 +1,6 @@
 package ch.elmootan.client;
 
+import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -150,12 +152,12 @@ public class ClientMulticast implements Runnable {
             command = commands.remove(0);
 
             // Prepare the args to send to the controller
-            ArrayList<Object> args = new ArrayList<>(commands);
+            ArrayList<String> args = new ArrayList<>(commands);
 
             switch (command) {
                 case Protocol.LOBBY_UPDATED:
                     try {
-                        Game newGame = mapper.readValue((String) args.get(0), Game.class);
+                        Game newGame = mapper.readValue(args.get(0), Game.class);
                         Client.addGameToLobby(newGame);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -163,8 +165,17 @@ public class ClientMulticast implements Runnable {
                     break;
 
                 case Protocol.GAME_UPDATE:
-                    if (Integer.parseInt((String) args.get(0)) == Client.idCurrentGame) {
-                        //TODO: update UI with args(1)
+                    if (args.size() > 1) {
+                        if (Integer.parseInt(args.get(0)) == Client.idCurrentGame) {
+                            try {
+                                Body[] bodies = mapper.readValue(args.get(1), Body[].class);
+                                Client.updateGUniverse(new ArrayList<>(Arrays.asList(bodies)));
+                            }
+                            catch (IOException ioe)
+                            {
+                                ioe.printStackTrace();
+                            }
+                        }
                     }
             }
         }

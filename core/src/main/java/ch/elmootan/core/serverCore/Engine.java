@@ -1,6 +1,13 @@
-package ch.elmootan.core.universe;
+package ch.elmootan.core.serverCore;
 
 import ch.elmootan.core.physics.*;
+import ch.elmootan.core.universe.Fragment;
+import ch.elmootan.core.universe.InvisiblePlanet;
+import ch.elmootan.core.universe.Planet;
+import ch.elmootan.protocol.Protocol;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -10,21 +17,14 @@ import static java.lang.Math.*;
 
 public class Engine {
 
-   private int nbUserPlanet = 0;
-
    private final ArrayList<Body> allThings = new ArrayList<>();
    private final ArrayList<Body> userPlanets = new ArrayList<>();
-   private double zoom = 500.0;
+   private ServerMulticast multicastServer;
+   private int engineId;
 
-   private Planet clickedPlanet;
-//   private Planet myPlanet;
-   private double myPlanetInitMass;
-   private double nbClicks;
-   private boolean mousePressed = false;
-
-//   private boolean tadaam = false;
-
-   public Engine() {
+   public Engine(ServerMulticast udpServer,int serverId) {
+      engineId = serverId;
+      multicastServer = udpServer;
       ActionListener repaintLol = evt -> calculateBodies();
       javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
       displayTimer.start();
@@ -56,7 +56,14 @@ public class Engine {
                      // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
                      // (on évite ainsi les valeurs limites).
                      if (body.getId() == surrounding.getId()) {
-                        removeBody(clickedPlanet);
+                        if(InvisiblePlanet.class.isInstance(body))
+                        {
+                           removeBody(body);
+                        }
+                        else if(InvisiblePlanet.class.isInstance(surrounding))
+                        {
+                           removeBody(surrounding);
+                        }
                      }
                      // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
                      // est invisible et n'interragit pas avec celle des autres joueurs.
@@ -125,12 +132,16 @@ public class Engine {
          synchronized (body) {
             body.getPosition().setX(body.getPosition().getX() + body.getSpeed().getX());
             body.getPosition().setY(body.getPosition().getY() + body.getSpeed().getY());
-            System.out.print(body);
+
+            //Débug
+//            System.out.print(body);
          }
 
          // Freinage des corps
          // body.speed.x -= 0.005 * body.speed.x;
          // body.speed.y -= 0.005 * body.speed.y;
+
+         sendInfos();
       }
    }
 
@@ -166,6 +177,26 @@ public class Engine {
       }
       allThings.remove(body);
 //        hollySong("boom",0.001);
+   }
+
+   private void sendInfos()
+   {
+      if(multicastServer != null)
+      {
+         ObjectMapper mapper = new ObjectMapper();
+         String infosJson = "";
+         try {
+            infosJson = mapper.writeValueAsString(allThings.toArray());
+            String command = Protocol.GAME_UPDATE + "\n" +
+                  engineId + "\n" +
+                  infosJson + "\n" +
+                  Protocol.END_OF_COMMAND;
+            multicastServer.send(command);
+
+         } catch (JsonProcessingException e) {
+            e.printStackTrace();
+         }
+      }
    }
 
    public Planet addNewPlanet(String name, double x, double y, double mass, double radius, int skin, int id) {

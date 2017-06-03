@@ -21,7 +21,6 @@ public class ClientHandler {
 
     private final static Logger LOG = Logger.getLogger(ClientHandler.class.getName());
 
-    private final GamesManager gamesManager = GamesManager.getSharedManager();
     private Lobby lobby = Lobby.getSharedInstance();
 
     private final CustomObjectMapper mapper = new CustomObjectMapper();

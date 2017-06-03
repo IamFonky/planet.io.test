@@ -1,11 +1,11 @@
 package ch.elmootan.core.sharedObjects;
 
-import ch.elmootan.core.universe.Engine;
+import ch.elmootan.core.serverCore.Engine;
+import ch.elmootan.core.serverCore.ServerMulticast;
+import org.apache.maven.settings.Server;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,11 +14,9 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Vector;
 
 /**
  * Created by David on 04.05.2017.
@@ -33,6 +31,12 @@ public class Lobby extends JFrame implements ActionListener {
     protected JButton joinGameButton;
 
     protected int nbGamesMax;
+
+    public void setMulticastServer(ServerMulticast multicastServer) {
+        this.multicastServer = multicastServer;
+    }
+
+    private ServerMulticast multicastServer;
 
     private Observable lobbyChanged = new Observable() {
         public void notifyObservers(Object obj) {
@@ -120,7 +124,7 @@ public class Lobby extends JFrame implements ActionListener {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.addRow(new Object[]{game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
-        engineList.add(new Engine());
+        engineList.add(new Engine(multicastServer, gamesList.size()-1));
         lobbyChanged.notifyObservers(game);
         return gamesList.size();
     }

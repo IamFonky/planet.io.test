@@ -1,11 +1,15 @@
 package ch.elmootan.core.physics;
 
 import ch.elmootan.core.universe.Fragment;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.awt.*;
 
 import static java.lang.Math.*;
 
+////Bitching JSONparser to force implement the real class of the object when deserializing
+//@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
+//@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class")
 public abstract class Body {
     private Position position;
 

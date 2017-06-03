@@ -1,5 +1,6 @@
 package ch.elmootan.client;
 
+import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.*;
 import ch.elmootan.core.universe.Bonus;
 import ch.elmootan.core.universe.GUniverse;
@@ -22,6 +23,8 @@ import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
@@ -33,7 +36,7 @@ public class Client implements Runnable {
 
     protected Socket tcpSocket;
 
-    private GUniverse gui;
+    private static GUniverse gui;
 
     PrintWriter out;
     BufferedReader in;
@@ -241,6 +244,11 @@ public class Client implements Runnable {
 
     public static void addGameToLobby(Game game) {
         lobbyClient.addGame(game);
+    }
+
+    protected static void updateGUniverse(ArrayList<Body> bodies)
+    {
+        gui.setAllThings(bodies);
     }
 
     private class LobbyClient extends Lobby {

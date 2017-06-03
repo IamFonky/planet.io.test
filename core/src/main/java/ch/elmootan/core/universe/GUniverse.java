@@ -315,4 +315,8 @@ public class GUniverse extends JFrame {
    public synchronized ArrayList<Body> getAllThings() {
       return allThings;
    }
+   public synchronized void setAllThings(ArrayList<Body> bodies) {
+      allThings.clear();
+      allThings.addAll(bodies);
+   }
 }
