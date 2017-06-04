@@ -145,7 +145,7 @@ public class GUniverse extends JFrame {
                      g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
                   } else if (Planet.class.isInstance(body)) {
                      g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
-                     g2d.drawImage(planets.get(((Planet) body).getIdSkin() - 1).getScaledInstance(radius, radius, 0), x, y, this);
+                     g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
                   } else if (Fragment.class.isInstance(body)) {
                      g.drawRect(x, y, radius, radius);
                   }
@@ -315,8 +315,10 @@ public class GUniverse extends JFrame {
    public synchronized ArrayList<Body> getAllThings() {
       return allThings;
    }
-   public synchronized void setAllThings(ArrayList<Body> bodies) {
-      allThings.clear();
-      allThings.addAll(bodies);
+   public void setAllThings(ArrayList<Body> bodies) {
+      synchronized (allThings) {
+         allThings.clear();
+         allThings.addAll(bodies);
+      }
    }
 }

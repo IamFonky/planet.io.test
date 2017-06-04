@@ -44,7 +44,7 @@ public class Client implements Runnable {
     boolean connectionRunning = false;
 
     //débug
-    boolean noGUI = true;
+    boolean noGUI = false;
 
     static LobbyClient lobbyClient = null;
 
@@ -247,9 +247,15 @@ public class Client implements Runnable {
         lobbyClient.addGame(game);
     }
 
-    protected static void updateGUniverse(ArrayList<Body> bodies)
-    {
-        gui.setAllThings(bodies);
+    protected static void updateGUniverse(ArrayList<Body> bodies) {
+        synchronized (lobbyClient) {
+            if (gui != null) {
+                gui.setAllThings(bodies);
+            }
+            else {
+                System.out.println("qu'Allah te brise le dos fdp");
+            }
+        }
     }
 
     private class LobbyClient extends Lobby {

@@ -2,7 +2,6 @@ package ch.elmootan.core.sharedObjects;
 
 import ch.elmootan.core.serverCore.Engine;
 import ch.elmootan.core.serverCore.ServerMulticast;
-import org.apache.maven.settings.Server;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

@@ -5,11 +5,16 @@ import ch.elmootan.core.universe.Fragment;
 import ch.elmootan.core.universe.InvisiblePlanet;
 import ch.elmootan.core.universe.Planet;
 import ch.elmootan.protocol.Protocol;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -179,14 +184,30 @@ public class Engine {
 //        hollySong("boom",0.001);
    }
 
+   private static class ColorSerializer extends JsonSerializer<Color> {
+      @Override
+      public void serialize(Color value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+         gen.writeStartObject();
+         gen.writeFieldName("argb");
+         gen.writeString(Integer.toHexString(value.getRGB()));
+         gen.writeEndObject();
+      }
+   }
+
    private void sendInfos()
    {
       if(multicastServer != null)
       {
          ObjectMapper mapper = new ObjectMapper();
+
+         SimpleModule module = new SimpleModule();
+         module.addSerializer(Color.class, new ColorSerializer());
+
+         mapper.registerModule(module);
+
          String infosJson = "";
          try {
-            infosJson = mapper.writeValueAsString(allThings.toArray());
+            infosJson = mapper.writeValueAsString(allThings);
             String command = Protocol.GAME_UPDATE + "\n" +
                   engineId + "\n" +
                   infosJson + "\n" +

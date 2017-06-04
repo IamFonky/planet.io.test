@@ -1,12 +1,26 @@
 package ch.elmootan.core.physics;
 
+import ch.elmootan.core.universe.Bonus;
 import ch.elmootan.core.universe.Fragment;
+import ch.elmootan.core.universe.InvisiblePlanet;
+import ch.elmootan.core.universe.Planet;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.awt.*;
 
 import static java.lang.Math.*;
 
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include=JsonTypeInfo.As.PROPERTY,
+        property = "shittyClass")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value=Planet.class, name = "Planet"),
+        @JsonSubTypes.Type(value=InvisiblePlanet.class, name = "InvisiblePlanet"),
+        @JsonSubTypes.Type(value=Bonus.class, name = "Bonus"),
+        @JsonSubTypes.Type(value=Fragment.class, name = "Fragment")
+})
 public abstract class Body {
     private Position position;
 
