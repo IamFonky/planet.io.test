@@ -40,25 +40,14 @@ public class CustomObjectMapper extends ObjectMapper {
       }
    }
 
-//   public static class BodiesSerializer extends JsonSerializer<List<Body>> {
-//      @Override
-//      public void serialize(Color value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-//         gen.writeStartObject();
-//         gen.writeFieldName("argb");
-//         gen.writeString(Integer.toHexString(value.getRGB()));
-//         gen.writeEndObject();
-//      }
-//   }
-
-//   public static class CBodiesDeserializer extends JsonDeserializer<ArrayList<Body>> {
-//      @Override
-//      public ArrayList<Body> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-//         if()
-//         TreeNode root = p.getCodec().readTree(p);
-//         TextNode rgba = (TextNode) root.get("argb");
-//         return new Color(Integer.parseUnsignedInt(rgba.textValue(), 16), true);
-//      }
-//   }
+   public static class BodiesDeserializer extends JsonDeserializer<ArrayList<Body>> {
+      @Override
+      public ArrayList<Body> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+         TreeNode root = p.getCodec().readTree(p);
+         TextNode rgba = (TextNode) root.get("argb");
+         return new ArrayList<Body>();
+      }
+   }
 
 
 }

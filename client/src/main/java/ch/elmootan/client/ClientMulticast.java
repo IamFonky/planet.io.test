@@ -2,16 +2,18 @@ package ch.elmootan.client;
 
 import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.Game;
+import ch.elmootan.core.universe.Bonus;
+import ch.elmootan.core.universe.Fragment;
 import ch.elmootan.protocol.Protocol;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import sun.plugin.javascript.navig.Array;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Logger;
 
 
@@ -168,8 +170,12 @@ public class ClientMulticast implements Runnable {
                     if (args.size() > 1) {
                         if (Integer.parseInt(args.get(0)) == Client.idCurrentGame) {
                             try {
-                                Body[] bodies = mapper.readValue(args.get(1), Body[].class);
-                                Client.updateGUniverse(new ArrayList<>(Arrays.asList(bodies)));
+                                ArrayList<Body> bodies = mapper.readValue(args.get(1), new TypeReference<List<Body>>(){});
+                                for(Body bitch : bodies)
+                                {
+                                    System.out.println("FUCK THAT SHIIIT");
+                                }
+//                                Client.updateGUniverse(new ArrayList<>(Arrays.asList(bodies)));
                             }
                             catch (IOException ioe)
                             {

@@ -48,6 +48,7 @@ public class Client implements Runnable {
 
     static LobbyClient lobbyClient = null;
 
+    //Current game is set for
     public static int idCurrentGame;
 
     private ClientMulticast clientMulticast;
