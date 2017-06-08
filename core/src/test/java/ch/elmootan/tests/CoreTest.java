@@ -43,7 +43,7 @@ public class CoreTest extends Universe {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        assertEquals(-1, universe.getAllThings().indexOf(mars));
+        assertEquals(1, universe.getAllThings().indexOf(mars));
         assertNotNull(jupiter);
         assertEquals(0, Double.compare(jupiterMass+marsMass, jupiter.getMass()));
     }

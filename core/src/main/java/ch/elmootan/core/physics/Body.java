@@ -143,6 +143,16 @@ public abstract class Body {
         }
     }
     @Override
+    public boolean equals(Object o)
+    {
+        if(o.getClass().isInstance(this))
+        {
+            name.equals(((Body)o).getName());
+        }
+        return false;
+    }
+
+    @Override
     public String toString()
     {
         return "Body : " + name + "\r\n" + position + "\r\n" + speed;
