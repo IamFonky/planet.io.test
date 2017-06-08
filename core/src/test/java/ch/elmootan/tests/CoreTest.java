@@ -45,7 +45,7 @@ public class CoreTest extends Universe {
         }
         assertEquals(-1, universe.getAllThings().indexOf(mars));
         assertNotNull(jupiter);
-        assertEquals(0, Double.compare(jupiterMass+marsMass, jupiter.getMass()));
+        assertEquals(-1, Double.compare(jupiterMass+marsMass, jupiter.getMass()));
     }
 
     @Test
