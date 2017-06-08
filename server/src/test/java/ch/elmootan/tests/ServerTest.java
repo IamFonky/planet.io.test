@@ -11,6 +11,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.HashSet;
 
+import static java.lang.Thread.sleep;
+
 public class ServerTest
 {
 
@@ -36,8 +38,17 @@ public class ServerTest
 
       client.joinServer(2);
 
-      client.disconnect();
+      try
+      {
+         while(client.isConnected())
+         {
+            sleep(10000);
+         }
+      }
+      catch (InterruptedException ie){ie.printStackTrace();}
 
-      client.exit();
+//      client.disconnect();
+//
+//      client.exit();
    }
 }
