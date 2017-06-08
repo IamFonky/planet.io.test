@@ -276,9 +276,15 @@ public class Universe extends JFrame {
                         BodyState eatState;
                         synchronized (allThings) {
                            if (body.getMass() > surrounding.getMass()) {
+                              if (isProtected(surrounding)) {
+                                 continue;
+                              }
                               eatState = body.eat(surrounding);
                               allThings.remove(surrounding);
                            } else {
+                              if (isProtected(body)) {
+                                 continue;
+                              }
                               eatState = surrounding.eat(body);
                               allThings.remove(body);
                            }
@@ -341,6 +347,21 @@ public class Universe extends JFrame {
          // body.speed.x -= 0.005 * body.speed.x;
          // body.speed.y -= 0.005 * body.speed.y;
       }
+   }
+
+   private boolean isProtected(Body body) {
+      if (!(body instanceof Planet))
+         return false;
+
+      switch (((Planet)body).getActiveBonus()) {
+         case ATMOSPHER:
+            return true;
+         case MOONS:
+            ((Planet) body).setActiveBonus(BonusType.NONE);
+            return true;
+      }
+
+      return false;
    }
 
    public void explode(Body body) {
@@ -502,8 +523,6 @@ public class Universe extends JFrame {
 
       new JFXPanel();
       String bip = "core/src/main/resources/ch/elmootan/core/sounds/" + sound + ".wav";
-
-//         File file = new File(bip);
 
       if (mediaPlayer != null) {
          mediaPlayer.stop();
