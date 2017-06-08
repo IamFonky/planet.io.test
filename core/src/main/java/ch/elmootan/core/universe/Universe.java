@@ -2,12 +2,9 @@ package ch.elmootan.core.universe;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.Timer;
 
 import ch.elmootan.core.physics.*;
 
@@ -321,8 +318,8 @@ public class Universe extends JFrame {
          );
 
          double newDirection = rand.nextDouble() * 2 * PI;
-         double newVX = cos(newDirection) * body.getSpeed().getSpeed();
-         double newVY = sin(newDirection) * body.getSpeed().getSpeed();
+         double newVX = cos(newDirection) * body.getSpeed().speedVector();
+         double newVY = sin(newDirection) * body.getSpeed().speedVector();
 
          frag.setSpeed(new Speed(newVX, newVY));
 

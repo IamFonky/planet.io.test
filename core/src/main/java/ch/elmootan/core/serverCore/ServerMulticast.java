@@ -1,8 +1,5 @@
-package ch.elmootan.server;
+package ch.elmootan.core.serverCore;
 
-import ch.elmootan.core.sharedObjects.Game;
-import ch.elmootan.client.Client;
-import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
