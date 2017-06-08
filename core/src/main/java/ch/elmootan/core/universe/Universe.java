@@ -37,6 +37,8 @@ public class Universe extends JFrame {
    private ArrayList<BufferedImage> planets = new ArrayList<>();
    private BufferedImage invisible;
 
+   private float bonusCounter = 0;
+
 //   private boolean tadaam = false;
 
    public Universe() {
@@ -100,6 +102,9 @@ public class Universe extends JFrame {
                case 'd':
                   zoom -= zoom * 0.1;
                   break;
+               case 'j':
+                  generateJupiter();
+                  break;
                case ' ':
                   if (e.isShiftDown()) {
                      generateExactSameShit();
@@ -139,6 +144,26 @@ public class Universe extends JFrame {
                   int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
 
                   if (InvisiblePlanet.class.isInstance(body)) {
+                     g2d.drawImage(invisible.getScaledInstance(radius, radius, 0),x,y,this);
+                  }
+                  else if (Planet.class.isInstance(body))
+                  {
+                     g2d.drawString(body.getName(), x-(body.getName().length()/2)*5+radius/2, y-10);
+                     g2d.drawImage(planets.get(((Planet)body).getIdSkin()-1).getScaledInstance(radius, radius, 0),x,y,this);
+
+                     Double xB = new Double(x+radius/4+(radius*(Math.cos(Math.toRadians(bonusCounter)))));
+                     Double yB = new Double(y+radius/4+(radius*(Math.sin(Math.toRadians(bonusCounter)))));
+                     int xp = xB.intValue();
+                     int yp = yB.intValue();
+
+                     g.drawOval(xp,yp, radius/5, radius/5);
+
+                     bonusCounter += 0.1f;
+                     if (bonusCounter > 360)
+                        bonusCounter = 0;
+                  }
+                  else if (Fragment.class.isInstance(body))
+                  {
                      g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
                   } else if (Planet.class.isInstance(body)) {
                      g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
@@ -378,6 +403,11 @@ public class Universe extends JFrame {
       Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
       allThings.add(newP);
       return newP;
+   }
+
+   private void generateJupiter() {
+      double jupiterMass = 1.8986e27;
+      Planet jupiter = addNewPlanet("Jupiter", 666, 666, jupiterMass, 71492, 2, 1);
    }
 
    private void generateExactSameShit() {
