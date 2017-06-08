@@ -29,6 +29,10 @@ public class ClientMulticast implements Runnable {
     //! Multicast address.
     private InetAddress multicastGroup;
 
+    public MulticastSocket getSocket() {
+        return socket;
+    }
+
     //! Socket to use.
     private MulticastSocket socket;
 
@@ -155,6 +159,12 @@ public class ClientMulticast implements Runnable {
                         Client.addGameToLobby(newGame);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    }
+                    break;
+
+                case Protocol.GAME_UPDATE:
+                    if (Integer.parseInt((String) args.get(0)) == Client.idCurrentGame) {
+                        //TODO: update UI with args(1)
                     }
             }
         }

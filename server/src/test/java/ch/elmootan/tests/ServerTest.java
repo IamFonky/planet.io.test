@@ -14,6 +14,14 @@ import java.util.HashSet;
 public class ServerTest
 {
 
+   public static void main(String... args) throws IOException
+   {
+      Server testServer = new Server();
+      testServer.startServer();
+
+      Client client = new Client(new Player("Bro"),false);
+   }
+
    @Test
    public void aClientShouldConnectToAServer() throws IOException
    {

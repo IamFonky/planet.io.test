@@ -1,5 +1,7 @@
 package ch.elmootan.core.sharedObjects;
 
+import ch.elmootan.core.universe.Engine;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -24,6 +26,7 @@ import java.util.Vector;
 public class Lobby extends JFrame implements ActionListener {
 
     protected ArrayList<Game> gamesList = new ArrayList<>();
+    protected ArrayList<Engine> engineList = new ArrayList<>();
     protected JTable table;
 
     protected JButton addGameButton;
@@ -70,9 +73,6 @@ public class Lobby extends JFrame implements ActionListener {
 
         DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-        Game gameTest1 = new Game("Test1", null, 12);
-        Game gameTest2 = new Game("Test2", null, 39);
-
         //addGame(gameTest1);
         //addGame(gameTest2);
 
@@ -100,26 +100,29 @@ public class Lobby extends JFrame implements ActionListener {
         setVisible(true);
     }
 
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == addGameButton) {
+        /*if (e.getSource() == addGameButton) {
             new GameCreator();
-        } else if (e.getSource() == joinGameButton){
+        } else if (e.getSource() == joinGameButton) {
             int indexGame = table.getSelectedRow();
-            if(indexGame != -1) {
+            if (indexGame != -1) {
                 // Choix du skin quand on rejoint la partie.
                 SkinChooser skinChooser = new SkinChooser();
                 //while (!skinChooser.skinChoosed());
                 gamesList.get(indexGame).join();
             }
-        }
+        }*/
     }
 
-    public void addGame(Game game) {
+    public int addGame(Game game) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.addRow(new Object[] {game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
+        model.addRow(new Object[]{game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
+        engineList.add(new Engine());
         lobbyChanged.notifyObservers(game);
+        return gamesList.size();
     }
 
     public void addGameList(ArrayList<Game> gameList) {
@@ -130,6 +133,9 @@ public class Lobby extends JFrame implements ActionListener {
 
     public ArrayList<Game> getGamesList() {
         return gamesList;
+    }
+    public ArrayList<Engine> getEngineList() {
+        return engineList;
     }
 
 
@@ -142,25 +148,25 @@ public class Lobby extends JFrame implements ActionListener {
     }
 
 
-    private class SkinChooser extends JFrame implements ActionListener {
-        private JButton btnNext = new JButton(">");
-        private JButton btnPrev = new JButton("<");
+    protected class SkinChooser extends JFrame implements ActionListener {
+        protected JButton btnNext = new JButton(">");
+        protected JButton btnPrev = new JButton("<");
 
-        private JButton btnChoose = new JButton("GO!");
+        protected JButton btnChoose = new JButton("GO!");
 
-        private ArrayList<BufferedImage> skins = new ArrayList<>();
-        private JLabel imgSkin;
-        private int idSkin = 0;
+        protected ArrayList<BufferedImage> skins = new ArrayList<>();
+        protected JLabel imgSkin;
+        protected int idSkin = 0;
 
-        private boolean chooseStatus = false;
+        protected boolean chooseStatus = false;
 
         public SkinChooser() {
             JPanel imgPanel = new JPanel(new FlowLayout());
             JPanel goPanel = new JPanel();
 
             try {
-                for (int i=1; i<=8; i++)
-                    skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet"+i+"_64x64.png")));
+                for (int i = 1; i <= 8; i++)
+                    skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet" + i + "_64x64.png")));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -179,7 +185,7 @@ public class Lobby extends JFrame implements ActionListener {
             getContentPane().add(goPanel, BorderLayout.PAGE_END);
             setTitle("Choix du skin");
             setResizable(false);
-            setSize(200,150);
+            setSize(200, 150);
             setVisible(true);
         }
 
@@ -192,10 +198,10 @@ public class Lobby extends JFrame implements ActionListener {
             }
 
             if (e.getSource() == btnNext) {
-                idSkin = idSkin+1 > 7 ? 0 : ++idSkin;
+                idSkin = idSkin + 1 > 7 ? 0 : ++idSkin;
             }
             if (e.getSource() == btnPrev) {
-                idSkin = idSkin-1 < 0 ? 7 : --idSkin;
+                idSkin = idSkin - 1 < 0 ? 7 : --idSkin;
             }
 
             imgSkin.setIcon(new ImageIcon(skins.get(idSkin)));

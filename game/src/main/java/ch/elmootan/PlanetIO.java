@@ -5,14 +5,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.sharedObjects.Player;
 import ch.elmootan.server.Server;
 import ch.elmootan.client.Client;
-import com.sun.deploy.util.SessionState;
 
 public class PlanetIO {
 
@@ -99,6 +97,8 @@ public class PlanetIO {
             pseudoPanel.add(new JLabel("Pseudo"));
             pseudoPanel.add(pseudo);
 
+            getRootPane().setDefaultButton(done);
+
             getContentPane().add(pseudoPanel, BorderLayout.CENTER);
             getContentPane().add(done, BorderLayout.SOUTH);
 
@@ -112,7 +112,7 @@ public class PlanetIO {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == done && pseudo.getText() != "") {
                 // TODO check if in DB
-                Client client = new Client(new Player(pseudo.getText()));
+                Client client = new Client(new Player(pseudo.getText()), false);
                 this.dispose();
             }
         }

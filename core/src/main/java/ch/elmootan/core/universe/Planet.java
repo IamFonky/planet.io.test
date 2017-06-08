@@ -10,6 +10,13 @@ public class Planet extends Body
 {
     private int idSkin = 1;
 
+    public Planet(){}
+
+    public Planet(String name, int skin) {
+        super(name, new Position(0, 0), 10, 10, Color.BLACK,0.1);
+        idSkin = skin;
+    }
+
     public Planet(String name, double mass, double radius) {
         super(name, new Position(0, 0), mass, radius, Color.BLACK,0.1);
     }
