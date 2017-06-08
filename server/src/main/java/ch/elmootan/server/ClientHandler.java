@@ -122,6 +122,11 @@ public class ClientHandler {
 
                             break;
                         }
+
+                        case Protocol.NB_GAME_MAX_UPDATE: {
+                            lobby.setNbGamesMax(Integer.parseInt(cmdAndArgs[1]));
+                            LOG.info("New max nb games: " + lobby.getNbGamesMax());
+                        }
                     }
                 } else {
                     writer.println(Protocol.PLANET_IO_FAILURE);

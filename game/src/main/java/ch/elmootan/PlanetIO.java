@@ -84,6 +84,9 @@ public class PlanetIO {
         private JTextField pseudo;
         private JButton done;
 
+
+        JCheckBox admin = new JCheckBox("Admin");
+
         public CredentialsPrompt() {
             //setLayout(new FlowLayout());
 
@@ -92,19 +95,21 @@ public class PlanetIO {
 
             JPanel pseudoPanel = new JPanel(new FlowLayout());
 
+
             pseudo = new JTextField(17);
 
             pseudoPanel.add(new JLabel("Pseudo"));
-            pseudoPanel.add(pseudo);
+            pseudoPanel.add(pseudo, BorderLayout.CENTER);
 
             getRootPane().setDefaultButton(done);
 
-            getContentPane().add(pseudoPanel, BorderLayout.CENTER);
+            getContentPane().add(pseudoPanel, BorderLayout.WEST);
             getContentPane().add(done, BorderLayout.SOUTH);
+            getContentPane().add(admin, BorderLayout.EAST);
 
 
             setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            setSize(300, 150);
+            setSize(350, 150);
 
             setVisible(true);
         }
@@ -112,7 +117,11 @@ public class PlanetIO {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == done && pseudo.getText() != "") {
                 // TODO check if in DB
-                Client client = new Client(new Player(pseudo.getText()), false);
+                if (admin.isSelected()) {
+                    new Client(new Player(pseudo.getText()), true, false);
+                } else {
+                    new Client(new Player(pseudo.getText()), false, false);
+                }
                 this.dispose();
             }
         }

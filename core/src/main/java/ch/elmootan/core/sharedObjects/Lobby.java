@@ -29,15 +29,17 @@ public class Lobby extends JFrame implements ActionListener {
     protected JButton addGameButton;
     protected JButton joinGameButton;
 
+    protected JPanel bottomPanel = new JPanel();
+
     protected int nbGamesMax;
 
     public void setMulticastServer(ServerMulticast multicastServer) {
         this.multicastServer = multicastServer;
     }
 
-    private ServerMulticast multicastServer;
+    protected ServerMulticast multicastServer;
 
-    private Observable lobbyChanged = new Observable() {
+    protected Observable lobbyChanged = new Observable() {
         public void notifyObservers(Object obj) {
             super.setChanged();
             super.notifyObservers(obj);
@@ -54,7 +56,7 @@ public class Lobby extends JFrame implements ActionListener {
     }
 
     protected Lobby() {
-        super("Best lobby. Ever.");
+        super("Lobby");
 
         Object[] tableTitles = {"Name", "Players"};
 
@@ -81,7 +83,7 @@ public class Lobby extends JFrame implements ActionListener {
 
         JScrollPane js = new JScrollPane(table);
 
-        JPanel bottomPanel = new JPanel();
+
         bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 
         bottomPanel.add(addGameButton);

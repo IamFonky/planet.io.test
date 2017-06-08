@@ -9,6 +9,8 @@ public final class Protocol {
     public static final String LOBBY_UPDATED = "OHBOITHELOBBYISUPDATED!";
     public static final String GAME_UPDATE = "OHBOITHEGAMEISUPDATED!";
 
+    public static final String NB_GAME_MAX_UPDATE = "NB_GAME_MAX_UPDATE";
+
     // Commandes envoyées par le client.
     public static final String PLANET_IO_HELLO = "HELLOPELO";
     public static final String PLANET_IO_LOGIN = "LOGIN";
