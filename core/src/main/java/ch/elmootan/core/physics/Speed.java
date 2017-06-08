@@ -35,7 +35,7 @@ public class Speed {
         this.y = y;
     }
 
-    public double getSpeed()
+    public double speedVector()
     {
         return sqrt(x*x+y*y);
     }

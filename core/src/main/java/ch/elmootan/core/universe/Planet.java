@@ -2,12 +2,16 @@ package ch.elmootan.core.universe;
 
 import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.physics.Position;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import javax.swing.*;
 import java.awt.*;
 
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class")
 public class Planet extends Body
 {
+    public String shittyClass = "Planet";
+
     private int idSkin = 1;
 
     public Planet(){}

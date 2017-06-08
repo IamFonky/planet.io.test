@@ -1,9 +1,7 @@
 package ch.elmootan.client;
 
-import ch.elmootan.core.sharedObjects.Game;
-import ch.elmootan.core.sharedObjects.GameCreator;
-import ch.elmootan.core.sharedObjects.Lobby;
-import ch.elmootan.core.sharedObjects.Player;
+import ch.elmootan.core.physics.Body;
+import ch.elmootan.core.sharedObjects.*;
 import ch.elmootan.core.universe.Bonus;
 import ch.elmootan.core.universe.GUniverse;
 import ch.elmootan.core.universe.Planet;
@@ -25,6 +23,8 @@ import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
@@ -32,11 +32,11 @@ public class Client implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(Client.class.getName());
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final CustomObjectMapper mapper = new CustomObjectMapper();
 
     protected Socket tcpSocket;
 
-    private GUniverse gui;
+    private static GUniverse gui;
 
     PrintWriter out;
     BufferedReader in;
@@ -44,10 +44,11 @@ public class Client implements Runnable {
     boolean connectionRunning = false;
 
     //débug
-    boolean noGUI = true;
+    boolean noGUI = false;
 
     static LobbyClient lobbyClient = null;
 
+    //Current game is set for
     public static int idCurrentGame;
 
     private ClientMulticast clientMulticast;
@@ -244,6 +245,17 @@ public class Client implements Runnable {
 
     public static void addGameToLobby(Game game) {
         lobbyClient.addGame(game);
+    }
+
+    protected static void updateGUniverse(ArrayList<Body> bodies) {
+        synchronized (lobbyClient) {
+            if (gui != null) {
+                gui.setAllThings(bodies);
+            }
+            else {
+                System.out.println("qu'Allah te brise le dos fdp");
+            }
+        }
     }
 
     private class LobbyClient extends Lobby {

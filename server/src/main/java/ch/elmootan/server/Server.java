@@ -2,6 +2,7 @@ package ch.elmootan.server;
 
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.core.sharedObjects.Lobby;
+import ch.elmootan.core.serverCore.ServerMulticast;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,6 +59,7 @@ public class Server implements Observer {
 
 //        GamesManager.getSharedManager(serverMulticast);
         Lobby.getSharedInstance().setNbGamesMax(7);
+        Lobby.getSharedInstance().setMulticastServer(serverMulticast);
 
         serverSocket = new ServerSocket();
         serverSocket.setReuseAddress(true);

@@ -1,15 +1,24 @@
 package ch.elmootan.client;
 
+import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.protocol.Protocol;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.TextNode;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -39,6 +48,15 @@ public class ClientMulticast implements Runnable {
     //! Tells if the client is running.
     private boolean running;
 
+    private static class ColorDeserializer extends JsonDeserializer<Color> {
+        @Override
+        public Color deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            TreeNode root = p.getCodec().readTree(p);
+            TextNode rgba = (TextNode) root.get("argb");
+            return new Color(Integer.parseUnsignedInt(rgba.textValue(), 16), true);
+        }
+    }
+
     /**
      * @param multicastAddress Multicast address to use.
      * @param port             Port to use for the communication.
@@ -48,6 +66,11 @@ public class ClientMulticast implements Runnable {
     public ClientMulticast(String multicastAddress, int port, InetAddress interfaceToUse) {
         this.port = port;
         this.running = false;
+
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(Color.class, new ColorDeserializer());
+
+        mapper.registerModule(module);
 
         try {
             socket = new MulticastSocket(port);
@@ -150,12 +173,12 @@ public class ClientMulticast implements Runnable {
             command = commands.remove(0);
 
             // Prepare the args to send to the controller
-            ArrayList<Object> args = new ArrayList<>(commands);
+            ArrayList<String> args = new ArrayList<>(commands);
 
             switch (command) {
                 case Protocol.LOBBY_UPDATED:
                     try {
-                        Game newGame = mapper.readValue((String) args.get(0), Game.class);
+                        Game newGame = mapper.readValue(args.get(0), Game.class);
                         Client.addGameToLobby(newGame);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -163,8 +186,18 @@ public class ClientMulticast implements Runnable {
                     break;
 
                 case Protocol.GAME_UPDATE:
-                    if (Integer.parseInt((String) args.get(0)) == Client.idCurrentGame) {
-                        //TODO: update UI with args(1)
+                    if (args.size() > 1) {
+                        if (Integer.parseInt(args.get(0)) == Client.idCurrentGame) {
+                            try {
+                                ArrayList<Body> bodies = mapper.readValue(args.get(1), new TypeReference<List<Body>>(){});
+
+                                Client.updateGUniverse(bodies);
+                            }
+                            catch (IOException ioe)
+                            {
+                                ioe.printStackTrace();
+                            }
+                        }
                     }
             }
         }

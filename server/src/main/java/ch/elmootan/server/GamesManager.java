@@ -1,6 +1,7 @@
 package ch.elmootan.server;
 
-import ch.elmootan.core.universe.Engine;
+import ch.elmootan.core.serverCore.ServerMulticast;
+import ch.elmootan.core.serverCore.Engine;
 import ch.elmootan.protocol.Protocol;
 
 import java.net.InetAddress;
@@ -58,10 +59,10 @@ public class GamesManager {
 
 
     public void addGame(String name) {
-        if (!gamesList.contains(name)) {
-            gamesList.add(name);
-            engineList.add(new Engine());
-        }
+//        if (!gamesList.contains(name)) {
+//            gamesList.add(name);
+//            engineList.add(new Engine());
+//        }
     }
 
     public List<String> getGamesList() {
