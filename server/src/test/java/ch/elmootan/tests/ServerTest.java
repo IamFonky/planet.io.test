@@ -26,13 +26,15 @@ public class ServerTest
    public void aClientShouldConnectToAServer() throws IOException
    {
       Server testServer = new Server();
-      testServer.startServer();
+       testServer.startServer();
 
       Client client = new Client(new Player("Bro"),false);
 
 //      client.connect("localhost", Protocol.PORT);
 
       client.sendGameToServer(new Game("TEST GAME",new HashSet<>(),32));
+
+      client.joinServer(2);
 
       client.disconnect();
 

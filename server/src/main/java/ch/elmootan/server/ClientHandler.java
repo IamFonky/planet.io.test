@@ -1,5 +1,6 @@
 package ch.elmootan.server;
 
+import ch.elmootan.core.sharedObjects.CustomObjectMapper;
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.universe.Planet;
@@ -20,10 +21,9 @@ public class ClientHandler {
 
     private final static Logger LOG = Logger.getLogger(ClientHandler.class.getName());
 
-    private final GamesManager gamesManager = GamesManager.getSharedManager();
     private Lobby lobby = Lobby.getSharedInstance();
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final CustomObjectMapper mapper = new CustomObjectMapper();
 
     public ClientHandler() {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
