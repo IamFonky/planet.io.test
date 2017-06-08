@@ -201,7 +201,8 @@ public class GUniverse extends JFrame {
       try
       {
          wr.println(Protocol.PLANET_IO_CREATE_PLANET + Protocol.CMD_SEPARATOR + gameId);
-         if(rd.readLine() == Protocol.PLANET_IO_SUCCESS)
+         wr.flush();
+         if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
          {
             generatePlanetFromClick(e.getX(), e.getY());
             myPlanetInitMass = clickedPlanet.getMass();
@@ -209,6 +210,7 @@ public class GUniverse extends JFrame {
             //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
             mousePressed = true;
             wr.println(mapper.writeValueAsString(clickedPlanet));
+            wr.flush();
             if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
             {
                mousePressed = true;
@@ -233,6 +235,7 @@ public class GUniverse extends JFrame {
          mousePressed = false;
          //Demande des modification de la planete au serveur
          wr.println(Protocol.PLANET_IO_SET_PLANET + Protocol.CMD_SEPARATOR + gameId);
+         wr.flush();
          //Vérification si la demande est valable
          if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS)) {
             //Récupération de la masse de la planete cliquée
@@ -240,6 +243,7 @@ public class GUniverse extends JFrame {
             clickedPlanet.setMass(myPlanetInitMass * getControlForce(e));
             //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
             wr.println(mapper.writeValueAsString(clickedPlanet));
+            wr.flush();
             if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
             {
                mousePressed = true;
@@ -261,6 +265,7 @@ public class GUniverse extends JFrame {
       try
       {
          wr.println(Protocol.PLANET_IO_KILL_PLANET + Protocol.CMD_SEPARATOR + gameId);
+         wr.flush();
          if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
          {
             mousePressed = false;

@@ -1,5 +1,6 @@
 package ch.elmootan.server;
 
+import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.CustomObjectMapper;
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.core.sharedObjects.Lobby;
@@ -32,19 +33,7 @@ public class ClientHandler {
 
     public void handleClientConnection(InputStream is, OutputStream os) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        PrintWriter writer = new PrintWriter(new OutputStreamWriter(os)) {
-            @Override
-            public void println(String x) {
-                super.println(x);
-                flush();
-            }
-
-            @Override
-            public void println(int x) {
-                super.println(x);
-                flush();
-            }
-        };
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(os));
 
         writer.println("Hello. Online HELP is available. Will you find it?");
         writer.flush();
@@ -67,16 +56,20 @@ public class ClientHandler {
                         case Protocol.CMD_CREATE_GAME: {
                             if (lobby.getGamesList().size() + 1 > lobby.getNbGamesMax()) {
                                 writer.println(Protocol.PLANET_IO_FAILURE);
+                                writer.flush();
                             } else {
                                 writer.println(Protocol.PLANET_IO_SUCCESS);
+                                writer.flush();
                                 try {
                                     Game newGame = mapper.readValue(reader.readLine(), Game.class);
                                     int newGameID = lobby.addGame(newGame);
                                     writer.println(Protocol.PLANET_IO_SUCCESS
                                     + Protocol.CMD_SEPARATOR
                                     + newGameID);
+                                    writer.flush();
                                 } catch (JsonProcessingException jpe) {
                                     writer.println(Protocol.PLANET_IO_FAILURE);
+                                    writer.flush();
                                 }
                             }
                             break;
@@ -89,18 +82,22 @@ public class ClientHandler {
                                 if(idGame >= 0 && idGame < lobby.getGamesList().size())
                                 {
                                     writer.println(Protocol.PLANET_IO_SUCCESS);
+                                    writer.flush();
                                     Planet userPlanet = mapper.readValue(reader.readLine(), Planet.class);
                                     userPlanet = lobby.getEngineList().get(idGame).generateUserPlanet(userPlanet);
                                     writer.println(mapper.writeValueAsString(userPlanet));
+                                    writer.flush();
                                 }
                                 else
                                 {
                                     writer.println(Protocol.PLANET_IO_FAILURE);
+                                    writer.flush();
                                 }
                             }
                             else
                             {
                                 writer.println(Protocol.PLANET_IO_FAILURE);
+                                writer.flush();
                             }
                             break;
                         }
@@ -118,48 +115,48 @@ public class ClientHandler {
                             String serializedData = mapper.writeValueAsString(gameList);
 
                             writer.println(Protocol.PLANET_IO_SUCCESS);
+                            writer.flush();
 
                             writer.println(serializedData);
+                            writer.flush();
 
                             break;
                         }
                         // Client wants to joi a game.
-                        case Protocol.PLANET_IO_SET_PLANET: {
+                        case Protocol.PLANET_IO_CREATE_PLANET: {
                             if(cmdAndArgs.length > 1)
                             {
                                 int idGame = Integer.parseInt(cmdAndArgs[1]);
                                 if(idGame >= 0 && idGame < lobby.getGamesList().size())
                                 {
                                     writer.println(Protocol.PLANET_IO_SUCCESS);
+                                    writer.flush();
                                     InvisiblePlanet invisible = mapper.readValue(reader.readLine(), InvisiblePlanet.class);
                                     invisible = lobby.getEngineList().get(idGame).addNewInvisiblePlanet(invisible);
                                     writer.println(mapper.writeValueAsString(invisible));
+                                    writer.flush();
                                 }
                                 else
                                 {
                                     writer.println(Protocol.PLANET_IO_FAILURE);
+                                    writer.flush();
                                 }
                             }
                             else
                             {
                                 writer.println(Protocol.PLANET_IO_FAILURE);
+                                writer.flush();
                             }
                             break;
                         }
                     }
                 } else {
                     writer.println(Protocol.PLANET_IO_FAILURE);
+                    writer.flush();
                 }
-                writer.flush();
-
             }
-
         } catch (IOException e) {
-            writer.flush();
             e.printStackTrace();
         }
-
     }
-
-
 }

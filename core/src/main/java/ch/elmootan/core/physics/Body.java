@@ -31,7 +31,7 @@ public abstract class Body {
 
     private String name;
 
-    private Color couleur;
+//    private Color couleur;
 
     private Speed speed = new Speed(0, 0);
 
@@ -46,7 +46,7 @@ public abstract class Body {
         this.position = position;
         this.mass = mass;
         this.radius = radius;
-        this.couleur = couleur;
+//        this.couleur = couleur;
         this.fragmentationRatio = fragmentationRatio;
     }
 
@@ -90,13 +90,13 @@ public abstract class Body {
         this.name = name;
     }
 
-    public Color getCouleur() {
-        return couleur;
-    }
+//    public Color getCouleur() {
+//        return couleur;
+//    }
 
-    public void setCouleur(Color couleur) {
-        this.couleur = couleur;
-    }
+//    public void setCouleur(Color couleur) {
+//        this.couleur = couleur;
+//    }
 
     public Speed getSpeed() {
         return speed;
