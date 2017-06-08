@@ -3,6 +3,7 @@ package ch.elmootan.server;
 import ch.elmootan.core.sharedObjects.CustomObjectMapper;
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.core.sharedObjects.Lobby;
+import ch.elmootan.core.universe.InvisiblePlanet;
 import ch.elmootan.core.universe.Planet;
 import ch.elmootan.core.universe.Universe;
 import ch.elmootan.protocol.Protocol;
@@ -120,6 +121,29 @@ public class ClientHandler {
 
                             writer.println(serializedData);
 
+                            break;
+                        }
+                        // Client wants to joi a game.
+                        case Protocol.PLANET_IO_SET_PLANET: {
+                            if(cmdAndArgs.length > 1)
+                            {
+                                int idGame = Integer.parseInt(cmdAndArgs[1]);
+                                if(idGame >= 0 && idGame < lobby.getGamesList().size())
+                                {
+                                    writer.println(Protocol.PLANET_IO_SUCCESS);
+                                    InvisiblePlanet invisible = mapper.readValue(reader.readLine(), InvisiblePlanet.class);
+                                    invisible = lobby.getEngineList().get(idGame).addNewInvisiblePlanet(invisible);
+                                    writer.println(mapper.writeValueAsString(invisible));
+                                }
+                                else
+                                {
+                                    writer.println(Protocol.PLANET_IO_FAILURE);
+                                }
+                            }
+                            else
+                            {
+                                writer.println(Protocol.PLANET_IO_FAILURE);
+                            }
                             break;
                         }
                     }

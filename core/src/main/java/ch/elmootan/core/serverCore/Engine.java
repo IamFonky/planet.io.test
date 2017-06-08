@@ -273,7 +273,6 @@ public class Engine {
       userPlanets.remove(idPlanet);
    }
 
-
    public synchronized ArrayList<Body> getAllThings() {
       return allThings;
    }
