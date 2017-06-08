@@ -32,8 +32,8 @@ public class GUniverse extends JFrame {
    private double zoom = 500.0;
 
    private JPanel rootPane;
-
-   private Planet clickedPlanet;
+   private final double controlPlanetMass = 1E+24;
+   private InvisiblePlanet clickedPlanet;
    private Planet myPlanet;
    private double myPlanetInitMass;
    private boolean mousePressed = false;
@@ -85,6 +85,7 @@ public class GUniverse extends JFrame {
 
          @Override
          public void mouseReleased(MouseEvent e) {
+
             killInvisiblePlanet(e);
          }
       });
@@ -205,14 +206,15 @@ public class GUniverse extends JFrame {
          if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
          {
             generatePlanetFromClick(e.getX(), e.getY());
-            myPlanetInitMass = clickedPlanet.getMass();
-            clickedPlanet.setMass(myPlanetInitMass * getControlForce(e));
+            clickedPlanet.setMass(controlPlanetMass*getControlForce(e));
             //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
             mousePressed = true;
             wr.println(mapper.writeValueAsString(clickedPlanet));
             wr.flush();
-            if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
+            String pressedPlanet = rd.readLine();
+            if(!pressedPlanet.equals(Protocol.PLANET_IO_FAILURE))
             {
+               clickedPlanet = mapper.readValue(pressedPlanet,InvisiblePlanet.class);
                mousePressed = true;
             }
             else
@@ -230,51 +232,47 @@ public class GUniverse extends JFrame {
    }
 
    private boolean setInvisiblePlanet(MouseEvent e) {
-      try
-      {
-         mousePressed = false;
-         //Demande des modification de la planete au serveur
-         wr.println(Protocol.PLANET_IO_SET_PLANET + Protocol.CMD_SEPARATOR + gameId);
-         wr.flush();
-         //Vérification si la demande est valable
-         if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS)) {
-            //Récupération de la masse de la planete cliquée
-            myPlanetInitMass = clickedPlanet.getMass();
-            clickedPlanet.setMass(myPlanetInitMass * getControlForce(e));
-            //clickedPlanet.setRadius(clickedPlanet.getRadius()*nbClicks);
-            wr.println(mapper.writeValueAsString(clickedPlanet));
+      if (clickedPlanet != null && mousePressed) {
+         try {
+            mousePressed = false;
+            //Demande des modification de la planete au serveur
+            wr.println(Protocol.PLANET_IO_SET_PLANET + Protocol.CMD_SEPARATOR + gameId);
             wr.flush();
-            if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
-            {
-               mousePressed = true;
+            //Vérification si la demande est valable
+            if (rd.readLine().equals(Protocol.PLANET_IO_SUCCESS)) {
+               //Récupération de la masse de la planete cliquée
+               clickedPlanet.setMass(controlPlanetMass*getControlForce(e));
+               clickedPlanet.setPosition(convertXYToPosition(e.getX(), e.getY()));
+
+               wr.println(mapper.writeValueAsString(clickedPlanet));
+               wr.flush();
+               if (rd.readLine().equals(Protocol.PLANET_IO_SUCCESS)) {
+                  mousePressed = true;
+               } else {
+                  clickedPlanet = null;
+               }
             }
-            else
-            {
-               clickedPlanet = null;
-            }
+         } catch (IOException ioe) {
+            ioe.printStackTrace();
          }
-      }
-      catch (IOException ioe)
-      {
-         ioe.printStackTrace();
       }
       return mousePressed;
    }
 
    private boolean killInvisiblePlanet(MouseEvent e) {
-      try
-      {
-         wr.println(Protocol.PLANET_IO_KILL_PLANET + Protocol.CMD_SEPARATOR + gameId);
-         wr.flush();
-         if(rd.readLine().equals(Protocol.PLANET_IO_SUCCESS))
-         {
-            mousePressed = false;
-            clickedPlanet = null;
+      if (clickedPlanet != null && mousePressed) {
+         try {
+            wr.println(Protocol.PLANET_IO_KILL_PLANET + Protocol.CMD_SEPARATOR + gameId);
+            wr.flush();
+            if (rd.readLine().equals(Protocol.PLANET_IO_SUCCESS)) {
+               wr.println(mapper.writeValueAsString(clickedPlanet));
+               wr.flush();
+               mousePressed = false;
+               clickedPlanet = null;
+            }
+         } catch (IOException ioe) {
+            ioe.printStackTrace();
          }
-      }
-      catch (IOException ioe)
-      {
-         ioe.printStackTrace();
       }
       return mousePressed;
    }
@@ -290,7 +288,7 @@ public class GUniverse extends JFrame {
       clickedPlanet = new InvisiblePlanet(
               "Invisible-" + myPlanet.getName(),
               convertXYToPosition(x, y),
-              1E+24,
+            controlPlanetMass,
               bodyRadius,
               myPlanet.getId());
    }

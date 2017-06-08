@@ -142,7 +142,6 @@ public abstract class Body {
             return BodyState.EXPLODE;
         }
     }
-
     @Override
     public String toString()
     {

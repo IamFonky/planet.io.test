@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 import static java.lang.Math.*;
@@ -276,4 +277,50 @@ public class Engine {
    public synchronized ArrayList<Body> getAllThings() {
       return allThings;
    }
+
+   public synchronized Body getBodyById(Body body)
+   {
+      for(Body listBody : allThings)
+      {
+         if(listBody.getId() == body.getId())
+         {
+            return listBody;
+         }
+      }
+      return body;
+   }
+
+   public synchronized Body getBodyByName(Body body)
+   {
+      for(Body listBody : allThings)
+      {
+         if(listBody.getName().equals(body.getName()))
+         {
+            return listBody;
+         }
+      }
+      return body;
+   }
+
+   public synchronized boolean killBody(Body body)
+   {
+      try
+      {
+         for(int i = 0; i < allThings.size(); ++i)
+         {
+            if(allThings.get(i).getName().equals(body.getName()))
+            {
+               allThings.remove(i);
+               return true;
+            }
+         }
+         return false;
+      }
+      catch (NullPointerException npe)
+      {
+         npe.printStackTrace();
+         return false;
+      }
+   }
+
 }
