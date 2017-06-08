@@ -39,7 +39,8 @@ public abstract class Body {
 
     private int id;
 
-    public Body(){}
+    public Body() {
+    }
 
     public Body(String name, Position position, double mass, double radius, Color couleur, double fragmentationRatio) {
         this.name = name;
@@ -142,19 +143,17 @@ public abstract class Body {
             return BodyState.EXPLODE;
         }
     }
+
     @Override
-    public boolean equals(Object o)
-    {
-        if(o.getClass().isInstance(this))
-        {
-            name.equals(((Body)o).getName());
+    public boolean equals(Object o) {
+        if (o.getClass().isInstance(this)) {
+            name.equals(((Body) o).getName());
         }
         return false;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Body : " + name + "\r\n" + position + "\r\n" + speed;
     }
 }
