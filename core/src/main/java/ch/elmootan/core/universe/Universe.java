@@ -3,7 +3,10 @@ package ch.elmootan.core.universe;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.util.*;
 
 import ch.elmootan.core.physics.*;
@@ -38,6 +41,8 @@ public class Universe extends JFrame {
    private BufferedImage invisible;
    private BufferedImage atmospher;
    private  BufferedImage bonus;
+
+   private MediaPlayer mediaPlayer;
 
    private float bonusCounter = 0;
 
@@ -111,6 +116,7 @@ public class Universe extends JFrame {
                   break;
                case 'b':
                   generateBonus();
+                  hollySong("JOHNCENA", 1);
                   break;
                case ' ':
                   if (e.isShiftDown()) {
@@ -494,22 +500,17 @@ public class Universe extends JFrame {
       final String sound = soundFile;
       final double volume = intiVolume;
 
-      (new Runnable() {
-         @Override
-         public void run() {
-            new JFXPanel();
-            System.out.println(System.getProperty("user.dir"));
-            String bip = "sounds/" + sound + ".mp3";
+      new JFXPanel();
+      String bip = "core/src/main/resources/ch/elmootan/core/sounds/" + sound + ".wav";
 
 //         File file = new File(bip);
 
-            Media hit = new Media(GameCreator.class.getResource(bip).toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(hit);
-            mediaPlayer.setVolume(volume);
-            mediaPlayer.play();
-         }
-      }).run();
-
+      if (mediaPlayer != null) {
+         mediaPlayer.stop();
+      }
+      Media hit = new Media(new File(bip).toURI().toString());
+      mediaPlayer = new MediaPlayer(hit);
+      mediaPlayer.play();
    }
 
    public synchronized ArrayList<Body> getAllThings() {

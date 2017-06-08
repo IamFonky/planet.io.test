@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.sharedObjects.Player;
+import ch.elmootan.core.universe.Universe;
 import ch.elmootan.server.Server;
 import ch.elmootan.client.Client;
 
@@ -16,9 +17,9 @@ public class PlanetIO {
 
     public static void main(String... args) {
 
-        new IdentityChooser();
+        //new IdentityChooser();
 
-        //new Universe();
+        new Universe();
         //Universe monUnivers = new Universe();
     }
 
