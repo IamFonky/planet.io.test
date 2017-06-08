@@ -117,6 +117,10 @@ public abstract class Body {
     public BodyState eat(Body meal) {
         if (this instanceof Fragment)
             return BodyState.DEFAULT;
+        else if (meal instanceof Bonus && this instanceof Planet) {
+            ((Planet)this).setActiveBonus(((Bonus) meal).getType());
+            return BodyState.EAT_MEAL;
+        }
         boolean explode = (abs(mass - meal.mass) < mass * fragmentationRatio);
 
         double newMass = mass + meal.mass;

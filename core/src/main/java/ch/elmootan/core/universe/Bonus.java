@@ -5,14 +5,22 @@ import ch.elmootan.core.physics.Position;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.awt.*;
+import java.util.Random;
 
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class")
 public class Bonus extends Body {
 
     public String shittyClass = "Bonus";
 
+    public BonusType type;
+
     public Bonus(String name, Position position, double mass, double radius, Color couleur, double fragmentationRatio)
     {
         super(name, position, mass, radius, couleur, 0);
+        type = BonusType.values()[new Random().nextInt(2)+1];
+    }
+
+    public BonusType getType() {
+        return type;
     }
 }

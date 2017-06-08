@@ -12,6 +12,8 @@ public class Planet extends Body
 {
     public String shittyClass = "Planet";
 
+    public BonusType activeBonus = BonusType.NONE;
+
     private int idSkin = 1;
 
     public Planet(){}
@@ -41,5 +43,13 @@ public class Planet extends Body
 
     public int getIdSkin() {
         return idSkin;
+    }
+
+    public void setActiveBonus(BonusType type) {
+        activeBonus = type;
+    }
+
+    public BonusType getActiveBonus() {
+        return activeBonus;
     }
 }
