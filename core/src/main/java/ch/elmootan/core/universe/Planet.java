@@ -6,13 +6,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class")
 public class Planet extends Body
 {
     public String shittyClass = "Planet";
 
-    public BonusType activeBonus = BonusType.NONE;
+    private BonusType activeBonus = BonusType.NONE;
+    private Timer bonusTimer;
+    private int bonusDuration;
 
     private int idSkin = 1;
 
@@ -47,9 +51,23 @@ public class Planet extends Body
 
     public void setActiveBonus(BonusType type) {
         activeBonus = type;
+        if (type != BonusType.NONE) {
+            bonusTimer = new Timer(1000, setBonusTime);
+            bonusTimer.start();
+            bonusDuration = 0;
+        } else {
+            bonusTimer.stop();
+        }
     }
 
     public BonusType getActiveBonus() {
         return activeBonus;
     }
+
+    ActionListener setBonusTime = new ActionListener() {
+        public void actionPerformed(ActionEvent evt) {
+            if (++bonusDuration == 10)
+                setActiveBonus(BonusType.NONE);
+        }
+    };
 }

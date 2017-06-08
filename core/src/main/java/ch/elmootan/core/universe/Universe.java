@@ -39,12 +39,14 @@ public class Universe extends JFrame {
 
    private ArrayList<BufferedImage> planets = new ArrayList<>();
    private BufferedImage invisible;
+   // MODIF BONUS -------------------------------------
    private BufferedImage atmospher;
    private  BufferedImage bonus;
 
    private MediaPlayer mediaPlayer;
 
    private float bonusCounter = 0;
+   //-------------------------------------------------
 
 //   private boolean tadaam = false;
 
@@ -55,8 +57,10 @@ public class Universe extends JFrame {
          for (int i = 1; i <= 8; i++)
             planets.add(ImageIO.read(Universe.class.getResource("../skins/planet" + i + "_32x32.png")));
          invisible = ImageIO.read(Universe.class.getResource("../skins/invisible_64x64.png"));
+         // MODIF BONUS -------------------------------------
          atmospher = ImageIO.read(Universe.class.getResource("../skins/atmospher.png"));
          bonus = ImageIO.read(Universe.class.getResource("../skins/bonus.png"));
+         //--------------------------------------------------
       } catch (IOException e) {
          e.printStackTrace();
       }
@@ -275,16 +279,15 @@ public class Universe extends JFrame {
                      } else {
                         BodyState eatState;
                         synchronized (allThings) {
+                           // MODIF BONUS -------------------------------------
+                           // Un des deux corps est protégé, rien ne se passe.
+                           if (isProtected(body) || isProtected(surrounding))
+                              continue;
+                           //-------------------------------------------------
                            if (body.getMass() > surrounding.getMass()) {
-                              if (isProtected(surrounding)) {
-                                 continue;
-                              }
                               eatState = body.eat(surrounding);
                               allThings.remove(surrounding);
                            } else {
-                              if (isProtected(body)) {
-                                 continue;
-                              }
                               eatState = surrounding.eat(body);
                               allThings.remove(body);
                            }
@@ -348,7 +351,7 @@ public class Universe extends JFrame {
          // body.speed.y -= 0.005 * body.speed.y;
       }
    }
-
+   // MODIF BONUS --------------------------------
    private boolean isProtected(Body body) {
       if (!(body instanceof Planet))
          return false;
@@ -360,9 +363,9 @@ public class Universe extends JFrame {
             ((Planet) body).setActiveBonus(BonusType.NONE);
             return true;
       }
-
       return false;
    }
+   //-------------------------------------------
 
    public void explode(Body body) {
       Random rand = new Random();
@@ -517,6 +520,7 @@ public class Universe extends JFrame {
             rand.nextDouble() * 100 - 50));
    }
 
+   // MODIF BONUS ----------------------------------------------------
    private void hollySong(String soundFile, double intiVolume) {
       final String sound = soundFile;
       final double volume = intiVolume;
@@ -531,6 +535,7 @@ public class Universe extends JFrame {
       mediaPlayer = new MediaPlayer(hit);
       mediaPlayer.play();
    }
+   //---------------------------------------------------------------
 
    public synchronized ArrayList<Body> getAllThings() {
       return allThings;
