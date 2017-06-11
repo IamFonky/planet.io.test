@@ -1,5 +1,7 @@
 package ch.elmootan.server;
 
+import ch.elmootan.core.database.DBObjects.User;
+import ch.elmootan.core.database.Database;
 import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.CustomObjectMapper;
 import ch.elmootan.core.sharedObjects.Game;
@@ -22,6 +24,8 @@ import java.util.logging.Logger;
 public class ClientHandler {
 
     private final static Logger LOG = Logger.getLogger(ClientHandler.class.getName());
+
+    private final Database db = new Database();
 
     private Lobby lobby = Lobby.getSharedInstance();
 
@@ -51,6 +55,44 @@ public class ClientHandler {
                     }
 
                     switch (command) {
+
+/*<<<<<<< HEAD
+                        // Client wants to create a game.
+                        case Protocol.CMD_CREATE_GAME: {
+                            if (lobby.getGamesList().size() + 1 > lobby.getNbGamesMax()) {
+                                writer.println(Protocol.PLANET_IO_FAILURE);
+                                writer.flush();
+                            } else {
+                                writer.println(Protocol.PLANET_IO_SUCCESS);
+                                writer.flush();
+                                try {
+                                    Game newGame = mapper.readValue(reader.readLine(), Game.class);
+                                    int newGameID = lobby.addGame(newGame);
+                                    writer.println(Protocol.PLANET_IO_SUCCESS
+                                            + Protocol.CMD_SEPARATOR
+                                            + newGameID);
+                                    writer.flush();
+                                } catch (JsonProcessingException jpe) {
+                                    writer.println(Protocol.PLANET_IO_FAILURE);
+                                    writer.flush();
+                                }
+                            }
+                            break;
+                        }
+=======*/
+                        // Client wants to click.
+                        case Protocol.PLANET_IO_LOGIN: {
+                            User newUser = mapper.readValue(reader.readLine(), User.class);
+                            db.checkUser(newUser);
+                            if (newUser.getId() == 0) {
+                                db.insertUser(newUser);
+                                writer.println(Protocol.PLANET_IO_SUCCESS);
+                            } else {
+                                writer.println(Protocol.PLANET_IO_FAILURE);
+                            }
+                            writer.flush();
+                            break;
+                        }
 
                         // Client wants to create a game.
                         case Protocol.CMD_CREATE_GAME: {
@@ -105,6 +147,12 @@ public class ClientHandler {
 
                         // Client wants to connect.
                         case Protocol.PLANET_IO_HELLO: {
+                            writer.println(Protocol.PLANET_IO_SUCCESS);
+                            writer.flush();
+                            break;
+                        }
+
+                        case Protocol.PLANET_IO_LOBBY_JOINED: {
                             ArrayList<Game> gameList = Lobby.getSharedInstance().getGamesList();
                             String serializedData = mapper.writeValueAsString(gameList);
 
@@ -113,9 +161,10 @@ public class ClientHandler {
 
                             writer.println(serializedData);
                             writer.flush();
-
                             break;
                         }
+
+
                         // Client wants to click.
                         case Protocol.PLANET_IO_CREATE_PLANET: {
                             if (cmdAndArgs.length > 1) {
@@ -171,6 +220,7 @@ public class ClientHandler {
                         case Protocol.NB_GAME_MAX_UPDATE: {
                             lobby.setNbGamesMax(Integer.parseInt(cmdAndArgs[1]));
                             LOG.info("New max nb games: " + lobby.getNbGamesMax());
+
                         }
                         // Client wants to unclick the control planet.
                         case Protocol.PLANET_IO_KILL_PLANET: {

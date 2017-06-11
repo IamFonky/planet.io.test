@@ -75,11 +75,8 @@ public class Lobby extends JFrame implements ActionListener {
         joinGameButton = new JButton("Join Game");
         joinGameButton.addActionListener(this);
 
-
         DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-        //addGame(gameTest1);
-        //addGame(gameTest2);
 
         JScrollPane js = new JScrollPane(table);
 
@@ -94,11 +91,11 @@ public class Lobby extends JFrame implements ActionListener {
 
         pack();
 
-
         setSize(500, 500);
 
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     public void showUI() {
@@ -108,24 +105,27 @@ public class Lobby extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        /*if (e.getSource() == addGameButton) {
-            new GameCreator();
-        } else if (e.getSource() == joinGameButton) {
-            int indexGame = table.getSelectedRow();
-            if (indexGame != -1) {
-                // Choix du skin quand on rejoint la partie.
-                SkinChooser skinChooser = new SkinChooser();
-                //while (!skinChooser.skinChoosed());
-                gamesList.get(indexGame).join();
-            }
-        }*/
+        if (e.getSource() == addGameButton) {
+            new GameCreator() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() == createGame) {
+                        Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
+                        addGame(newGame);
+                        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+                    }
+                }
+            };
+        }
     }
+
 
     public int addGame(Game game) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.addRow(new Object[]{game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
-        engineList.add(new Engine(multicastServer, gamesList.size()-1));
+        engineList.add(new Engine(multicastServer, gamesList.size() - 1));
         lobbyChanged.notifyObservers(game);
         return gamesList.size();
     }
@@ -139,6 +139,7 @@ public class Lobby extends JFrame implements ActionListener {
     public ArrayList<Game> getGamesList() {
         return gamesList;
     }
+
     public ArrayList<Engine> getEngineList() {
         return engineList;
     }
@@ -153,71 +154,72 @@ public class Lobby extends JFrame implements ActionListener {
     }
 
 
-    protected class SkinChooser extends JFrame implements ActionListener {
-        protected JButton btnNext = new JButton(">");
-        protected JButton btnPrev = new JButton("<");
+protected class SkinChooser extends JFrame implements ActionListener {
+    protected JButton btnNext = new JButton(">");
+    protected JButton btnPrev = new JButton("<");
 
-        protected JButton btnChoose = new JButton("GO!");
+    protected JButton btnChoose = new JButton("GO!");
 
-        protected ArrayList<BufferedImage> skins = new ArrayList<>();
-        protected JLabel imgSkin;
-        protected int idSkin = 0;
+    protected ArrayList<BufferedImage> skins = new ArrayList<>();
+    protected JLabel imgSkin;
+    protected int idSkin = 0;
 
-        protected boolean chooseStatus = false;
+    protected boolean chooseStatus = false;
 
-        public SkinChooser() {
-            JPanel imgPanel = new JPanel(new FlowLayout());
-            JPanel goPanel = new JPanel();
+    public SkinChooser() {
+        JPanel imgPanel = new JPanel(new FlowLayout());
+        JPanel goPanel = new JPanel();
 
-            try {
-                for (int i = 1; i <= 8; i++)
-                    skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet" + i + "_64x64.png")));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            imgSkin = new JLabel(new ImageIcon(skins.get(idSkin)));
-            imgPanel.add(btnPrev);
-            btnPrev.addActionListener(this);
-            imgPanel.add(imgSkin);
-            btnNext.addActionListener(this);
-            imgPanel.add(btnNext);
-
-            goPanel.add(btnChoose);
-            btnChoose.addActionListener(this);
-
-            getContentPane().add(imgPanel, BorderLayout.CENTER);
-            getContentPane().add(goPanel, BorderLayout.PAGE_END);
-            setTitle("Choix du skin");
-            setResizable(false);
-            setSize(200, 150);
-            setVisible(true);
+        try {
+            for (int i = 1; i <= 8; i++)
+                skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet" + i + "_64x64.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == btnChoose) {
-                System.out.println(idSkin);
-                chooseStatus = true;
-                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-            }
+        imgSkin = new JLabel(new ImageIcon(skins.get(idSkin)));
+        imgPanel.add(btnPrev);
+        btnPrev.addActionListener(this);
+        imgPanel.add(imgSkin);
+        btnNext.addActionListener(this);
+        imgPanel.add(btnNext);
 
-            if (e.getSource() == btnNext) {
-                idSkin = idSkin + 1 > 7 ? 0 : ++idSkin;
-            }
-            if (e.getSource() == btnPrev) {
-                idSkin = idSkin - 1 < 0 ? 7 : --idSkin;
-            }
+        goPanel.add(btnChoose);
+        btnChoose.addActionListener(this);
 
-            imgSkin.setIcon(new ImageIcon(skins.get(idSkin)));
-            revalidate();
-            repaint();
-        }
-
-        public boolean skinChoosed() {
-            return chooseStatus;
-        }
+        getContentPane().add(imgPanel, BorderLayout.CENTER);
+        getContentPane().add(goPanel, BorderLayout.PAGE_END);
+        setTitle("Choix du skin");
+        setResizable(false);
+        setSize(200, 150);
+        setVisible(true);
     }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnChoose) {
+            System.out.println(idSkin);
+            chooseStatus = true;
+            dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+        }
+
+        if (e.getSource() == btnNext) {
+            idSkin = idSkin + 1 > 7 ? 0 : ++idSkin;
+        }
+        if (e.getSource() == btnPrev) {
+            idSkin = idSkin - 1 < 0 ? 7 : --idSkin;
+        }
+
+        imgSkin.setIcon(new ImageIcon(skins.get(idSkin)));
+        revalidate();
+        repaint();
+    }
+
+    public boolean skinChoosed() {
+        return chooseStatus;
+    }
+
+}
 
     public static void main(String... args) {
         new Lobby();

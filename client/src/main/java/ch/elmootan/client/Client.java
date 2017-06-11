@@ -1,5 +1,6 @@
 package ch.elmootan.client;
 
+import ch.elmootan.core.database.DBObjects.User;
 import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.*;
 import ch.elmootan.core.universe.GUniverse;
@@ -20,9 +21,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.text.Format;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -36,9 +35,11 @@ public class Client implements Runnable {
 
     protected static GUniverse gui;
 
-    protected PrintWriter out;
-    protected BufferedReader in;
-    protected Player player;
+
+    static PrintWriter out;
+    static BufferedReader in;
+    static Player player = new Player("");
+
     boolean connectionRunning = false;
 
     boolean isAdmin;
@@ -50,30 +51,41 @@ public class Client implements Runnable {
 
     // Current game
     public static Game currentGame;
+    static CredentialsPrompt cPrompt = null;
+
 
     protected ClientMulticast clientMulticast;
 
 
-    public String serverRead() throws IOException {
+    static public String serverRead() throws IOException {
         return in.readLine();
     }
 
-    public void serverWrite(String toWrite) {
+    static public void serverWrite(String toWrite) {
         out.println(toWrite);
         out.flush();
     }
 
-    public Client(Player player, boolean isAdmin) {
-        this.isAdmin = isAdmin;
+
+    public Client() {
         createClient(player, false);
     }
 
-    public Client(Player player, boolean isAdmin, boolean debug) {
-        this.isAdmin = isAdmin;
-        createClient(player, debug);
-    }
 
     private void createClient(Player player, boolean debug) {
+
+        tcpSocket = new Socket();
+
+        cPrompt = new CredentialsPrompt();
+
+        try {
+            connect("localhost", Protocol.PORT);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         noGUI = debug;
         try {
             clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
@@ -82,25 +94,8 @@ public class Client implements Runnable {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        this.player = player;
-        tcpSocket = new Socket();
-
-
-        if (!debug) {
-            if (isAdmin) {
-                lobby = new LobbyAdmin();
-            } else {
-                lobby = new LobbyClient();
-            }
-            lobby.showUI();
-        }
-
-        try {
-            connect("localhost", Protocol.PORT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
+
 
     public void connect(String server, int port) throws IOException {
 
@@ -121,54 +116,21 @@ public class Client implements Runnable {
 
         if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
             LOG.info("Connexion successful");
-            String gameListJSON = serverRead();
-            ArrayList<Game> initialGameList = mapper.readValue(gameListJSON, new TypeReference<ArrayList<Game>>() {
-            });
-
-            System.out.println(gameListJSON);
-            if (!noGUI) {
-                lobby.addGameList(initialGameList);
-            }
+            new Thread(this).start();
         }
-
-        new Thread(this).start();
     }
 
     public void run() {
         connectionRunning = true;
         while (connectionRunning) {
-            //Tu ne peux pas faire communiquer simultanément cette thread et les commandes
-            //si cette thread fait un read alors qu'une autre commande est en train d'être faite
-            //alors cette thread nique le protocole x).
-            //J'ai essayé de synchroniser mais ça bloque tout :(
-            //Je recommande fortement d'utiliser de l'UDP pour refresh ton lobby ;) (ptit datagram vite fait :P)
-
-//            synchronized(lobbyClient)
-//            {
-//                String input = "";
-//                try
-//                {
-//                    input = serverRead();
-//                    switch (input)
-//                    {
-//                        case Protocol.LOBBY_UPDATED:
-//                            input = serverRead();
-//                            Game newGame = mapper.readValue(input, Game.class);
-//                            lobbyClient.addGame(newGame);
-//                            break;
-//
-//                        default:
-//                            break;
-//
-//                    }
-//                } catch (IOException e)
-//                {
-//                    e.printStackTrace();
-//                }
-//            }
+           /* try {
+                synchronized (lobbyClient) {
+                    lobbyClient.wait();
+                }
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }*/
         }
-
-
     }
 
     public void disconnect() throws IOException {
@@ -261,8 +223,14 @@ public class Client implements Runnable {
 
     private class LobbyClient extends Lobby {
 
+        public LobbyClient() {
+            super();
+            setTitle("Lobby Client");
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
+
             if (e.getSource() == addGameButton) {
                 new GameCreator() {
                     @Override
@@ -305,19 +273,120 @@ public class Client implements Runnable {
             }
         }
     }
+
+    private class CredentialsPrompt extends JFrame implements ActionListener {
+
+        private JTextField pseudo;
+
+        private JButton done;
+
+        private JLabel error;
+
+        JCheckBox admin;
+
+        public CredentialsPrompt() {
+            super("Enter your pseudo");
+
+            done = new JButton("Done");
+            done.addActionListener(this);
+
+            pseudo = new JTextField(17);
+
+            admin = new JCheckBox("Admin");
+
+            error = new JLabel("");
+            error.setForeground(Color.RED);
+
+            JPanel pseudoPanel = new JPanel(new FlowLayout());
+
+            pseudoPanel.add(new JLabel("Pseudo"), BorderLayout.CENTER);
+            pseudoPanel.add(pseudo, BorderLayout.CENTER);
+            pseudoPanel.add(admin, BorderLayout.EAST);
+
+            JPanel bottomPanel = new JPanel(new GridLayout(2, 1));
+
+            JPanel donePannel = new JPanel(new FlowLayout());
+
+            donePannel.add(done, BorderLayout.CENTER);
+
+            bottomPanel.add(donePannel);
+            bottomPanel.add(error);
+
+            getRootPane().setDefaultButton(done);
+
+            getContentPane().add(pseudoPanel, BorderLayout.NORTH);
+            getContentPane().add(bottomPanel, BorderLayout.SOUTH);
+
+            setLocationRelativeTo(null);
+
+            setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            setSize(350, 150);
+
+            setVisible(true);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == done) {
+                if (pseudo.getText().equals("")) {
+                    error.setText("You need to choose a pseudo!");
+                } else {
+                    // TODO check if in DB
+                    try {
+                        User checkUser = new User(pseudo.getText());
+                        serverWrite(Protocol.PLANET_IO_LOGIN);
+                        serverWrite(mapper.writeValueAsString(checkUser));
+                        String test = serverRead();
+                        if (test.equals(Protocol.PLANET_IO_SUCCESS)) {
+
+                            player = new Player(pseudo.getText());
+                            if (admin.isSelected()) {
+                                lobby = new LobbyAdmin();
+                                isAdmin = true;
+                            } else {
+                                lobby = new LobbyClient();
+                                isAdmin = false;
+                            }
+
+                            serverWrite(Protocol.PLANET_IO_LOBBY_JOINED);
+                            if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
+                                LOG.info("Connexion successful");
+                                String gameListJSON = serverRead();
+                                ArrayList<Game> initialGameList = mapper.readValue(gameListJSON, new TypeReference<ArrayList<Game>>() {
+                                });
+
+                                System.out.println(gameListJSON);
+                                if (!noGUI) {
+                                    lobby.addGameList(initialGameList);
+                                }
+                            }
+
+                            lobby.showUI();
+
+                            this.dispose();
+                        } else {
+                            error.setText("Pseudo already taken!");
+                        }
+                    } catch (Exception jpe) {
+                        jpe.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
     private class LobbyAdmin extends Lobby {
 
         JButton changeProperties = new JButton("Properties");
 
         public LobbyAdmin() {
             super();
-            setTitle("Lobby Client");
+            setTitle("Lobby Admin");
 
             changeProperties.addActionListener(this);
             bottomPanel.add(changeProperties);
         }
 
-        public void joinServer() {
+        private void joinGame() {
             synchronized (lobby) {
                 try {
                     serverWrite(Protocol.CMD_JOIN_GAME
@@ -361,7 +430,7 @@ public class Client implements Runnable {
                 int indexGame = table.getSelectedRow();
                 if (indexGame != -1) {
                     currentGame = gamesList.get(indexGame);
-                    joinServer();
+                    joinGame();
                 }
             } else if (e.getSource() == changeProperties) {
                 new PropertiesChanger();
