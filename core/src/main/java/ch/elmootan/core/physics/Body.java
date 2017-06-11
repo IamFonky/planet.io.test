@@ -31,7 +31,7 @@ public abstract class Body {
 
     private String name;
 
-    private Color couleur;
+//    private Color couleur;
 
     private Speed speed = new Speed(0, 0);
 
@@ -39,14 +39,15 @@ public abstract class Body {
 
     private int id;
 
-    public Body(){}
+    public Body() {
+    }
 
     public Body(String name, Position position, double mass, double radius, Color couleur, double fragmentationRatio) {
         this.name = name;
         this.position = position;
         this.mass = mass;
         this.radius = radius;
-        this.couleur = couleur;
+//        this.couleur = couleur;
         this.fragmentationRatio = fragmentationRatio;
     }
 
@@ -90,13 +91,13 @@ public abstract class Body {
         this.name = name;
     }
 
-    public Color getCouleur() {
-        return couleur;
-    }
+//    public Color getCouleur() {
+//        return couleur;
+//    }
 
-    public void setCouleur(Color couleur) {
-        this.couleur = couleur;
-    }
+//    public void setCouleur(Color couleur) {
+//        this.couleur = couleur;
+//    }
 
     public Speed getSpeed() {
         return speed;
@@ -144,8 +145,15 @@ public abstract class Body {
     }
 
     @Override
-    public String toString()
-    {
+    public boolean equals(Object o) {
+        if (o.getClass().isInstance(this)) {
+            name.equals(((Body) o).getName());
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
         return "Body : " + name + "\r\n" + position + "\r\n" + speed;
     }
 }
