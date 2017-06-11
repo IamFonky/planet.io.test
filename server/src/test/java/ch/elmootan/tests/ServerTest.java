@@ -21,7 +21,7 @@ public class ServerTest
       Server testServer = new Server();
       testServer.startServer();
 
-      Client client = new Client(new Player("Bro"),false);
+      Client client = new Client();
    }
 
    @Test
@@ -30,7 +30,7 @@ public class ServerTest
       Server testServer = new Server();
        testServer.startServer();
 
-      Client client = new Client(new Player("Bro"),false);
+      Client client = new Client();
 
 //      client.connect("localhost", Protocol.PORT);
 

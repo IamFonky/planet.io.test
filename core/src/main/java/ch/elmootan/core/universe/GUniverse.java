@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import oracle.jrockit.jfr.JFR;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -31,6 +32,7 @@ public class GUniverse extends JFrame {
    private final ArrayList<Body> allThings = new ArrayList<>();
    private double zoom = 500.0;
 
+   private TheEndFrame theEndFrame = new TheEndFrame();
    private JPanel rootPane;
    private final double controlPlanetMass = 1E+24;
    private InvisiblePlanet clickedPlanet;
@@ -45,6 +47,9 @@ public class GUniverse extends JFrame {
    private PrintWriter wr;
 
    private int gameId;
+   private boolean playerAlive = true;
+   private boolean playerIsWatching = false;
+   private boolean playerWantQuit = false;
 
    private final ObjectMapper mapper = new ObjectMapper();
 
@@ -69,7 +74,7 @@ public class GUniverse extends JFrame {
 
          @Override
          public void mouseDragged(MouseEvent e) {
-            if (clickedPlanet != null && mousePressed) {
+            if (!playerIsWatching && clickedPlanet != null && mousePressed) {
                setInvisiblePlanet(e);
             }
          }
@@ -78,15 +83,16 @@ public class GUniverse extends JFrame {
       addMouseListener(new MouseAdapter() {
          @Override
          public void mousePressed(MouseEvent e) {
-            if (clickedPlanet == null || !mousePressed) {
+            if (!playerIsWatching && (clickedPlanet == null || !mousePressed)) {
                createInvisiblePlanet(e);
             }
          }
 
          @Override
          public void mouseReleased(MouseEvent e) {
-
-            killInvisiblePlanet(e);
+            if (clickedPlanet != null && mousePressed) {
+               killInvisiblePlanet(e);
+            }
          }
       });
 
@@ -136,9 +142,14 @@ public class GUniverse extends JFrame {
                for (int i = 0; i < nbScores; i++) {
                   g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
                }
-
+               playerAlive = false;
                for (Body body : allThings) {
+                  if(!playerAlive && body.getId() == myPlanet.getId())
+                  {
+                     playerAlive = true;
+                  }
                   int radius = (int) (body.getRadius() / zoom);
+                  radius = radius > 0 ? radius : 1;
                   int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
                   int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
 
@@ -161,8 +172,16 @@ public class GUniverse extends JFrame {
       ActionListener repaintLol = new ActionListener() {
          public void actionPerformed(ActionEvent evt) {
             //scorePane.setScores();
-            refreshBodies();
             rootPane.repaint();
+            if(!playerAlive && !playerIsWatching && !playerWantQuit)
+            {
+               theEndFrame.setVisible(true);
+            }
+            else if(playerWantQuit)
+            {
+               setVisible(false);
+               dispose();
+            }
          }
       };
 
@@ -232,7 +251,6 @@ public class GUniverse extends JFrame {
    }
 
    private boolean setInvisiblePlanet(MouseEvent e) {
-      if (clickedPlanet != null && mousePressed) {
          try {
             mousePressed = false;
             //Demande des modification de la planete au serveur
@@ -255,12 +273,10 @@ public class GUniverse extends JFrame {
          } catch (IOException ioe) {
             ioe.printStackTrace();
          }
-      }
       return mousePressed;
    }
 
    private boolean killInvisiblePlanet(MouseEvent e) {
-      if (clickedPlanet != null && mousePressed) {
          try {
             wr.println(Protocol.PLANET_IO_KILL_PLANET + Protocol.CMD_SEPARATOR + gameId);
             wr.flush();
@@ -273,7 +289,6 @@ public class GUniverse extends JFrame {
          } catch (IOException ioe) {
             ioe.printStackTrace();
          }
-      }
       return mousePressed;
    }
 
@@ -322,6 +337,50 @@ public class GUniverse extends JFrame {
       synchronized (allThings) {
          allThings.clear();
          allThings.addAll(bodies);
+      }
+   }
+
+   public class TheEndFrame extends JFrame {
+      private TheEndFrame()
+      {
+         super();
+         setSize(500,100);
+         JPanel theEndPannel = new JPanel();
+         JLabel theEndLabel = new JLabel();
+         JButton theEndWatch = new JButton();
+         JButton theEndQuit = new JButton();
+         setTitle("This is the end, my friend.");
+
+
+         //End label
+         theEndLabel.setText("Sorry bro, you died...");
+
+         //Watch button
+         theEndWatch.setText("Keep watching");
+         theEndWatch.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+               playerIsWatching = true;
+               setVisible(false);
+            }
+         });
+
+         //Quit button
+         theEndQuit.setText("Go to lobby");
+         theEndQuit.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+               playerWantQuit = true;
+               setVisible(false);
+            }
+         });
+
+
+         //Adding content to pannel
+         theEndPannel.add(theEndLabel);
+         theEndPannel.add(theEndWatch);
+         theEndPannel.add(theEndQuit);
+         add(theEndPannel);
       }
    }
 }

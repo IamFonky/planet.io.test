@@ -37,7 +37,7 @@ public abstract class Body {
 
     private double fragmentationRatio;
 
-    private int id;
+    private int id = -1;
 
     public Body() {
     }
@@ -147,7 +147,7 @@ public abstract class Body {
     @Override
     public boolean equals(Object o) {
         if (o.getClass().isInstance(this)) {
-            name.equals(((Body) o).getName());
+            return name.equals(((Body) o).getName());
         }
         return false;
     }

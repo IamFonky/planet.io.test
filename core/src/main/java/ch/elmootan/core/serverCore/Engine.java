@@ -79,11 +79,11 @@ public class Engine {
                         BodyState eatState;
                         synchronized (allThings) {
                            if (body.getMass() > surrounding.getMass()) {
-                              eatState = body.eat(surrounding);
                               allThings.remove(surrounding);
+                              eatState = body.eat(surrounding);
                            } else {
-                              eatState = surrounding.eat(body);
                               allThings.remove(body);
+                              eatState = surrounding.eat(body);
                            }
 
                            switch (eatState) {
@@ -161,6 +161,7 @@ public class Engine {
          double fragMass = oldMass * rand.nextDouble() / 2;
          double fragRadius = sqrt(fragMass / (dThis * PI));
          Body frag = addNewFragment(
+                 body.getId(),
                  "FRAG" + body.getName(),
                  body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
                  body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
@@ -208,7 +209,10 @@ public class Engine {
 
          String infosJson = "";
          try {
-            infosJson = mapper.writeValueAsString(allThings);
+            synchronized (allThings)
+            {
+               infosJson = mapper.writeValueAsString(allThings);
+            }
             String command = Protocol.GAME_UPDATE + "\n" +
                   engineId + "\n" +
                   infosJson + "\n" +
@@ -245,8 +249,9 @@ public class Engine {
       allThings.remove(body);
    }
 
-   private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur) {
+   private Fragment addNewFragment(int id, String name, double x, double y, double mass, double radius, Color couleur) {
       Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
+      newP.setId(id);
       allThings.add(newP);
       return newP;
    }

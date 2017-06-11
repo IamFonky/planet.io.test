@@ -1,5 +1,7 @@
 package ch.elmootan.client;
 
+import ch.elmootan.core.database.DBObjects.User;
+import ch.elmootan.core.database.Database;
 import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.*;
 import ch.elmootan.core.universe.Bonus;
@@ -12,7 +14,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,50 +36,41 @@ public class Client implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(Client.class.getName());
 
-    private final CustomObjectMapper mapper = new CustomObjectMapper();
+    private static final CustomObjectMapper mapper = new CustomObjectMapper();
 
     protected Socket tcpSocket;
 
     private static GUniverse gui;
 
-    PrintWriter out;
-    BufferedReader in;
-    Player player;
+    static PrintWriter out;
+    static BufferedReader in;
+    static Player player = new Player("");
     boolean connectionRunning = false;
 
     //débug
     boolean noGUI = false;
 
     static LobbyClient lobbyClient = null;
+    static CredentialsPrompt cPrompt = null;
 
     //Current game is set for
-    public static int idCurrentGame;
+    public static int idCurrentGame = -1;
 
     private ClientMulticast clientMulticast;
 
 
-    public String serverRead() throws IOException {
+    static public String serverRead() throws IOException {
         return in.readLine();
     }
 
-    public void serverWrite(String toWrite) {
+    static public void serverWrite(String toWrite) {
         out.println(toWrite);
         out.flush();
     }
 
-    public Client(Player player)
+    public Client()
     {
-        createClient(player,false);
-    }
-
-    public Client(Player player, boolean debug)
-    {
-        createClient(player,debug);
-    }
-
-    private void createClient(Player player, boolean debug)
-    {
-        noGUI = debug;
+       lobbyClient = new LobbyClient();
         try
         {
             clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
@@ -84,21 +79,58 @@ public class Client implements Runnable {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        this.player = player;
         tcpSocket = new Socket();
-
-
-        if (!debug) {
-            lobbyClient = new LobbyClient();
-            lobbyClient.showUI();
-        }
 
         try {
             connect("localhost", Protocol.PORT);
-        } catch (IOException e) {
+            cPrompt = new CredentialsPrompt();
+            synchronized (cPrompt)
+            {
+                cPrompt.wait();
+            }
+            lobbyClient.showUI();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+//    public Client(Player player)
+//    {
+//        createClient(player,false);
+//    }
+//
+//    public Client(Player player, boolean debug)
+//    {
+//        createClient(player,debug);
+//    }
+//
+//    private void createClient(Player player, boolean debug)
+//    {
+//        noGUI = debug;
+//        try
+//        {
+//            clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
+//
+//            new Thread(clientMulticast).start();
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//        }
+//        player = player;
+//        tcpSocket = new Socket();
+//
+//
+//        if (!debug) {
+//            lobbyClient = new LobbyClient();
+//            lobbyClient.showUI();
+//        }
+//
+//        try {
+//            connect("localhost", Protocol.PORT);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void connect(String server, int port) throws IOException {
 
@@ -135,35 +167,17 @@ public class Client implements Runnable {
     public void run() {
         connectionRunning = true;
         while (connectionRunning) {
-            //Tu ne peux pas faire communiquer simultanément cette thread et les commandes
-            //si cette thread fait un read alors qu'une autre commande est en train d'être faite
-            //alors cette thread nique le protocole x).
-            //J'ai essayé de synchroniser mais ça bloque tout :(
-            //Je recommande fortement d'utiliser de l'UDP pour refresh ton lobby ;) (ptit datagram vite fait :P)
-
-//            synchronized(lobbyClient)
-//            {
-//                String input = "";
-//                try
-//                {
-//                    input = serverRead();
-//                    switch (input)
-//                    {
-//                        case Protocol.LOBBY_UPDATED:
-//                            input = serverRead();
-//                            Game newGame = mapper.readValue(input, Game.class);
-//                            lobbyClient.addGame(newGame);
-//                            break;
-//
-//                        default:
-//                            break;
-//
-//                    }
-//                } catch (IOException e)
-//                {
-//                    e.printStackTrace();
-//                }
-//            }
+            try
+            {
+                synchronized (lobbyClient)
+                {
+                    lobbyClient.wait();
+                };
+            }
+            catch (InterruptedException ie)
+            {
+                ie.printStackTrace();
+            }
         }
 
 
@@ -260,8 +274,20 @@ public class Client implements Runnable {
 
     private class LobbyClient extends Lobby {
 
+        public LobbyClient()
+        {
+            super();
+            addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                    notifyAll();
+                }
+            });
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
+
             if (e.getSource() == addGameButton) {
                 new GameCreator() {
                     @Override
@@ -303,6 +329,75 @@ public class Client implements Runnable {
                     //while (!skinChooser.skinChoosed());
                 }
             }
+        }
+    }
+
+    private static class CredentialsPrompt extends JFrame implements ActionListener {
+
+        private JLabel erreur;
+        private JTextField pseudo;
+        private JPasswordField motdepasse;
+        private JButton done;
+
+        public CredentialsPrompt() {
+            //setLayout(new FlowLayout());
+
+            done = new JButton("Done");
+            done.addActionListener(this);
+
+            JPanel pseudoPanel = new JPanel(new FlowLayout());
+
+            erreur = new JLabel();
+            erreur.setVisible(false);
+            pseudoPanel.add(erreur);
+
+            pseudoPanel.add(new JLabel("Pseudo"));
+            pseudo = new JTextField();
+            pseudoPanel.add(pseudo);
+
+            pseudoPanel.add(new JPasswordField("Mot de passe"));
+            motdepasse = new JPasswordField();
+            pseudoPanel.add(motdepasse);
+
+            getRootPane().setDefaultButton(done);
+
+            getContentPane().add(pseudoPanel);
+
+
+            setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            setSize(300, 150);
+
+            setVisible(true);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == done && pseudo.getText() != "" && motdepasse.getText() != "") {
+                try
+                {
+                    User checkUser = new User(pseudo.getText(),motdepasse.getText());
+                    serverWrite(Protocol.PLANET_IO_LOGIN);
+                    serverWrite(mapper.writeValueAsString(checkUser));
+                    if(serverRead().equals(Protocol.PLANET_IO_SUCCESS))
+                    {
+                        notifyAll();
+                        this.dispose();
+                    }
+                    else
+                    {
+                        erreur.setText("Wrong password bro");
+                        erreur.setVisible(true);
+                    }
+                }
+                catch (Exception jpe)
+                {
+                    jpe.printStackTrace();
+                }
+            }
+        }
+
+        private void checkUser(User user)
+        {
+            serverWrite("");
         }
     }
 }

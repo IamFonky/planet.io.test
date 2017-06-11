@@ -1,5 +1,7 @@
 package ch.elmootan.server;
 
+import ch.elmootan.core.database.DBObjects.User;
+import ch.elmootan.core.database.Database;
 import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.CustomObjectMapper;
 import ch.elmootan.core.sharedObjects.Game;
@@ -22,6 +24,7 @@ import java.util.logging.Logger;
 public class ClientHandler {
 
    private final static Logger LOG = Logger.getLogger(ClientHandler.class.getName());
+   private final Database db = new Database();
 
    private Lobby lobby = Lobby.getSharedInstance();
 
@@ -51,6 +54,22 @@ public class ClientHandler {
                }
 
                switch (command) {
+
+                  // Client wants to click.
+                  case Protocol.PLANET_IO_LOGIN: {
+                     User checkUser = mapper.readValue(reader.readLine(),User.class);
+                     db.checkRegister(checkUser);
+                     if(checkUser.getId() != 0)
+                     {
+                        writer.println(Protocol.PLANET_IO_SUCCESS);
+                     }
+                     else
+                     {
+                        writer.println(Protocol.PLANET_IO_FAILURE);
+                     }
+                     writer.flush();
+                     break;
+                  }
 
                   // Client wants to create a game.
                   case Protocol.CMD_CREATE_GAME: {
