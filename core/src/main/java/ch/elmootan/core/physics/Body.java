@@ -13,13 +13,13 @@ import static java.lang.Math.*;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include=JsonTypeInfo.As.PROPERTY,
+        include = JsonTypeInfo.As.PROPERTY,
         property = "shittyClass")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value=Planet.class, name = "Planet"),
-        @JsonSubTypes.Type(value=InvisiblePlanet.class, name = "InvisiblePlanet"),
-        @JsonSubTypes.Type(value=Bonus.class, name = "Bonus"),
-        @JsonSubTypes.Type(value=Fragment.class, name = "Fragment")
+        @JsonSubTypes.Type(value = Planet.class, name = "Planet"),
+        @JsonSubTypes.Type(value = InvisiblePlanet.class, name = "InvisiblePlanet"),
+        @JsonSubTypes.Type(value = Bonus.class, name = "Bonus"),
+        @JsonSubTypes.Type(value = Fragment.class, name = "Fragment")
 })
 public abstract class Body {
     private Position position;

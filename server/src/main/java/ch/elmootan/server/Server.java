@@ -1,5 +1,6 @@
 package ch.elmootan.server;
 
+import ch.elmootan.core.database.dbCore.DBStructure;
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.serverCore.ServerMulticast;
@@ -134,6 +135,7 @@ public class Server implements Observer {
         for (ClientWorker clientWorker : clientWorkers) {
             clientWorker.notifyServerShutdown();
         }
+        DBStructure.resetPlanetIODatabase();
     }
 
     /**

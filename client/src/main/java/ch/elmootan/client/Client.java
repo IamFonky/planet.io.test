@@ -68,11 +68,9 @@ public class Client implements Runnable {
         out.flush();
     }
 
-    public Client()
-    {
-       lobbyClient = new LobbyClient();
-        try
-        {
+    public Client() {
+        lobbyClient = new LobbyClient();
+        try {
             clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
 
             new Thread(clientMulticast).start();
@@ -84,11 +82,7 @@ public class Client implements Runnable {
         try {
             connect("localhost", Protocol.PORT);
             cPrompt = new CredentialsPrompt();
-            synchronized (cPrompt)
-            {
-                cPrompt.wait();
-            }
-            lobbyClient.showUI();
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -167,15 +161,11 @@ public class Client implements Runnable {
     public void run() {
         connectionRunning = true;
         while (connectionRunning) {
-            try
-            {
-                synchronized (lobbyClient)
-                {
+            try {
+                synchronized (lobbyClient) {
                     lobbyClient.wait();
-                };
-            }
-            catch (InterruptedException ie)
-            {
+                }
+            } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
         }
@@ -224,17 +214,17 @@ public class Client implements Runnable {
         synchronized (lobbyClient) {
             try {
                 serverWrite(Protocol.CMD_JOIN_GAME
-                + Protocol.CMD_SEPARATOR
-                + idCurrentGame);
+                        + Protocol.CMD_SEPARATOR
+                        + idCurrentGame);
                 if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
-                    serverWrite(mapper.writeValueAsString(new Planet(player.getName(),skin)));
-                    Planet initialPlanet = mapper.readValue(serverRead(),Planet.class);
+                    serverWrite(mapper.writeValueAsString(new Planet(player.getName(), skin)));
+                    Planet initialPlanet = mapper.readValue(serverRead(), Planet.class);
                     gui = new GUniverse(
-                          out,
-                          in,
-                          clientMulticast.getSocket(),
-                          idCurrentGame,
-                          initialPlanet);
+                            out,
+                            in,
+                            clientMulticast.getSocket(),
+                            idCurrentGame,
+                            initialPlanet);
                     gui.showUI();
                 } else {
                     System.out.println("Error, this game is not reachable");
@@ -265,8 +255,7 @@ public class Client implements Runnable {
         synchronized (lobbyClient) {
             if (gui != null) {
                 gui.setAllThings(bodies);
-            }
-            else {
+            } else {
                 System.out.println("qu'Allah te brise le dos fdp");
             }
         }
@@ -274,15 +263,8 @@ public class Client implements Runnable {
 
     private class LobbyClient extends Lobby {
 
-        public LobbyClient()
-        {
+        public LobbyClient() {
             super();
-            addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                    notifyAll();
-                }
-            });
         }
 
         @Override
@@ -326,7 +308,6 @@ public class Client implements Runnable {
                             repaint();
                         }
                     };
-                    //while (!skinChooser.skinChoosed());
                 }
             }
         }
@@ -334,70 +315,85 @@ public class Client implements Runnable {
 
     private static class CredentialsPrompt extends JFrame implements ActionListener {
 
-        private JLabel erreur;
         private JTextField pseudo;
-        private JPasswordField motdepasse;
+
         private JButton done;
 
+        private JLabel error;
+
+        JCheckBox admin;
+
         public CredentialsPrompt() {
-            //setLayout(new FlowLayout());
+            super("Enter your pseudo");
 
             done = new JButton("Done");
             done.addActionListener(this);
 
+            pseudo = new JTextField(17);
+
+            admin = new JCheckBox("Admin");
+
+            error = new JLabel("");
+            error.setForeground(Color.RED);
+
             JPanel pseudoPanel = new JPanel(new FlowLayout());
 
-            erreur = new JLabel();
-            erreur.setVisible(false);
-            pseudoPanel.add(erreur);
+            pseudoPanel.add(new JLabel("Pseudo"), BorderLayout.CENTER);
+            pseudoPanel.add(pseudo, BorderLayout.CENTER);
+            pseudoPanel.add(admin, BorderLayout.EAST);
 
-            pseudoPanel.add(new JLabel("Pseudo"));
-            pseudo = new JTextField();
-            pseudoPanel.add(pseudo);
+            JPanel bottomPanel = new JPanel(new GridLayout(2, 1));
 
-            pseudoPanel.add(new JPasswordField("Mot de passe"));
-            motdepasse = new JPasswordField();
-            pseudoPanel.add(motdepasse);
+            JPanel donePannel = new JPanel(new FlowLayout());
+
+            donePannel.add(done, BorderLayout.CENTER);
+
+            bottomPanel.add(donePannel);
+            bottomPanel.add(error);
 
             getRootPane().setDefaultButton(done);
 
-            getContentPane().add(pseudoPanel);
+            getContentPane().add(pseudoPanel, BorderLayout.NORTH);
+            getContentPane().add(bottomPanel, BorderLayout.SOUTH);
 
 
             setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            setSize(300, 150);
+            setSize(350, 150);
 
             setVisible(true);
         }
 
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == done && pseudo.getText() != "" && motdepasse.getText() != "") {
-                try
-                {
-                    User checkUser = new User(pseudo.getText(),motdepasse.getText());
-                    serverWrite(Protocol.PLANET_IO_LOGIN);
-                    serverWrite(mapper.writeValueAsString(checkUser));
-                    if(serverRead().equals(Protocol.PLANET_IO_SUCCESS))
-                    {
-                        notifyAll();
-                        this.dispose();
+            if (e.getSource() == done) {
+                if (pseudo.getText().equals("")) {
+                    error.setText("You need to choose a pseudo!");
+                } else {
+                    // TODO check if in DB
+
+
+                    try {
+                        User checkUser = new User(pseudo.getText());
+                        serverWrite(Protocol.PLANET_IO_LOGIN);
+                        serverWrite(mapper.writeValueAsString(checkUser));
+                        String test = serverRead();
+                        if (test.equals(Protocol.PLANET_IO_SUCCESS)) {
+
+                            if (admin.isSelected()) {
+
+                            } else {
+
+                            }
+
+                            lobbyClient.showUI();
+                            this.dispose();
+                        } else {
+                            error.setText("Pseudo already taken!");
+                        }
+                    } catch (Exception jpe) {
+                        jpe.printStackTrace();
                     }
-                    else
-                    {
-                        erreur.setText("Wrong password bro");
-                        erreur.setVisible(true);
-                    }
-                }
-                catch (Exception jpe)
-                {
-                    jpe.printStackTrace();
                 }
             }
-        }
-
-        private void checkUser(User user)
-        {
-            serverWrite("");
         }
     }
 }

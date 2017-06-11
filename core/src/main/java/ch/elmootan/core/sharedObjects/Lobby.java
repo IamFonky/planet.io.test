@@ -73,11 +73,8 @@ public class Lobby extends JFrame implements ActionListener {
         joinGameButton = new JButton("Join Game");
         joinGameButton.addActionListener(this);
 
-
         DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-        //addGame(gameTest1);
-        //addGame(gameTest2);
 
         JScrollPane js = new JScrollPane(table);
 
@@ -92,11 +89,9 @@ public class Lobby extends JFrame implements ActionListener {
 
         pack();
 
-
         setSize(500, 500);
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
     }
 
     public void showUI() {
@@ -123,7 +118,7 @@ public class Lobby extends JFrame implements ActionListener {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.addRow(new Object[]{game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
-        engineList.add(new Engine(multicastServer, gamesList.size()-1));
+        engineList.add(new Engine(multicastServer, gamesList.size() - 1));
         lobbyChanged.notifyObservers(game);
         return gamesList.size();
     }
@@ -137,6 +132,7 @@ public class Lobby extends JFrame implements ActionListener {
     public ArrayList<Game> getGamesList() {
         return gamesList;
     }
+
     public ArrayList<Engine> getEngineList() {
         return engineList;
     }

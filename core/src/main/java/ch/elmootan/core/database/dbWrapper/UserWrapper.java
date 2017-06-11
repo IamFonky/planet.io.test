@@ -12,8 +12,7 @@ public class UserWrapper extends AWrapper
       return new User(
               set.getInt(offset + 1),
               set.getString(offset + 2),
-              set.getString(offset + 3),
-              set.getInt(offset + 4)
+              set.getInt(offset + 3)
       );
    }
 }
