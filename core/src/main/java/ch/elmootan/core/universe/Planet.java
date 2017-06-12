@@ -14,7 +14,7 @@ public class Planet extends Body
 {
     public String shittyClass = "Planet";
 
-    private BonusType activeBonus = BonusType.NONE;
+    private int activeBonus = Bonus.NONE;
     private Timer bonusTimer;
     private int bonusDuration;
 
@@ -49,25 +49,25 @@ public class Planet extends Body
         return idSkin;
     }
 
-    public void setActiveBonus(BonusType type) {
+    public void setActiveBonus(int type) {
         activeBonus = type;
-        if (type != BonusType.NONE) {
+        if (type != Bonus.NONE) {
             bonusTimer = new Timer(1000, setBonusTime);
             bonusTimer.start();
             bonusDuration = 0;
-        } else {
+        } else if (bonusTimer != null){
             bonusTimer.stop();
         }
     }
 
-    public BonusType getActiveBonus() {
+    public int getActiveBonus() {
         return activeBonus;
     }
 
     ActionListener setBonusTime = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (++bonusDuration == 10)
-                setActiveBonus(BonusType.NONE);
+                setActiveBonus(Bonus.NONE);
         }
     };
 }

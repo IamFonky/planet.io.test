@@ -1,9 +1,7 @@
 package ch.elmootan.core.serverCore;
 
 import ch.elmootan.core.physics.*;
-import ch.elmootan.core.universe.Fragment;
-import ch.elmootan.core.universe.InvisiblePlanet;
-import ch.elmootan.core.universe.Planet;
+import ch.elmootan.core.universe.*;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -151,6 +149,20 @@ public class Engine {
       }
    }
 
+   private boolean isProtected(Body body) {
+      if (!(body instanceof Planet))
+         return false;
+
+      switch (((Planet)body).getActiveBonus()) {
+         case Bonus.ATMOSPHER:
+            return true;
+         case Bonus.MOON:
+            ((Planet) body).setActiveBonus(Bonus.NONE);
+            return true;
+      }
+      return false;
+   }
+
    public void explode(Body body) {
       Random rand = new Random();
       double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
@@ -272,6 +284,20 @@ public class Engine {
    {
       allThings.remove(userPlanets.get(idPlanet));
       userPlanets.remove(idPlanet);
+   }
+
+   private void generateBonus() {
+      Random rand = new Random();
+      Bonus bonus = new Bonus(
+              "",
+              new Position(rand.nextDouble() * 400000 + -200000,
+                      rand.nextDouble() * 400000 + -200000),
+              1,
+              6666,
+              Color.WHITE,
+              1
+      );
+      allThings.add(bonus);
    }
 
    public synchronized ArrayList<Body> getAllThings() {
