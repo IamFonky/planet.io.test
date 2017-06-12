@@ -45,6 +45,13 @@ public class GUniverse extends JFrame {
     private ArrayList<BufferedImage> planets = new ArrayList<>();
     private BufferedImage invisible;
 
+    private BufferedImage atmospher;
+    private  BufferedImage bonus;
+
+    private MediaPlayer mediaPlayer;
+
+    private float bonusCounter = 0;
+
     private BufferedReader rd;
     private PrintWriter wr;
 
@@ -71,6 +78,8 @@ public class GUniverse extends JFrame {
             for (int i = 1; i <= 8; i++)
                 planets.add(ImageIO.read(GUniverse.class.getResource("../skins/planet" + i + "_32x32.png")));
             invisible = ImageIO.read(GUniverse.class.getResource("../skins/invisible_64x64.png"));
+            atmospher = ImageIO.read(Universe.class.getResource("../skins/atmospher.png"));
+            bonus = ImageIO.read(Universe.class.getResource("../skins/bonus.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -171,9 +180,33 @@ public class GUniverse extends JFrame {
 
                     if (body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
                         g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
-                    } else if (body.getClass() == Planet.class) {
-                        g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
-                        g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
+                    }
+                    else if (Bonus.class.isInstance(body))
+                        {
+                            g2d.drawImage(bonus.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
+                        }
+                        else if (Planet.class.isInstance(body))
+                        {
+                            g2d.drawString(body.getName(), x-(body.getName().length()/2)*5+radius/2, y-10);
+                            g2d.drawImage(planets.get(((Planet)body).getIdSkin()).getScaledInstance(radius, radius, 0),x,y,this);
+
+                            switch (((Planet) body).getActiveBonus()) {
+                                case Bonus.MOON:
+                                    Double xB = new Double(x+radius/4+(radius*(Math.cos(Math.toRadians(bonusCounter)))));
+                                    Double yB = new Double(y+radius/4+(radius*(Math.sin(Math.toRadians(bonusCounter)))));
+                                    int xp = xB.intValue();
+                                    int yp = yB.intValue();
+
+                                    g.drawOval(xp,yp, radius/5, radius/5);
+
+                                    bonusCounter += 0.1f;
+                                    if (bonusCounter > 360)
+                                        bonusCounter = 0;
+                                    break;
+                                case Bonus.ATMOSPHER:
+                                    g2d.drawImage(atmospher.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
+                                    break;
+                            }
                     } else if (body.getClass() == Fragment.class) {
                         g.drawRect(x, y, radius, radius);
                     }

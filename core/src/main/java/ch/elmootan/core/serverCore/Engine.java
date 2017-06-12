@@ -26,12 +26,18 @@ public class Engine {
    private ServerMulticast multicastServer;
    private int engineId;
 
+   private Random randomBonus;
+   private int nextBonusTime;
+   private int bonusTime;
+
    public Engine(ServerMulticast udpServer,int serverId) {
       engineId = serverId;
       multicastServer = udpServer;
       ActionListener repaintLol = evt -> calculateBodies();
       javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
       displayTimer.start();
+      randomBonus = new Random();
+      nextBonusTime = randomBonus.nextInt(20000) + 5000;
    }
 
    private void calculateBodies() {
@@ -76,6 +82,8 @@ public class Engine {
                      } else {
                         BodyState eatState;
                         synchronized (allThings) {
+                           if (isProtected(body) || isProtected(surrounding))
+                              continue;
                            if (body.getMass() > surrounding.getMass()) {
                               eatState = body.eat(surrounding);
                               allThings.remove(surrounding);
@@ -144,6 +152,14 @@ public class Engine {
          // Freinage des corps
          // body.speed.x -= 0.005 * body.speed.x;
          // body.speed.y -= 0.005 * body.speed.y;
+
+         bonusTime++;
+
+         if (bonusTime == nextBonusTime) {
+            generateBonus();
+            bonusTime = 0;
+            nextBonusTime = randomBonus.nextInt(20000) + 5000;
+         }
 
          sendInfos();
       }
