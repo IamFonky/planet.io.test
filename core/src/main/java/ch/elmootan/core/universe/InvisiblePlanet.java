@@ -13,6 +13,8 @@ public class InvisiblePlanet extends Planet {
 
     public String shittyClass = "InvisiblePlanet";
 
+    public InvisiblePlanet(){}
+
     public InvisiblePlanet(String name, Position position, double mass, double radius, int id)  {
         super(name, position, mass, radius, 1, id);
     }

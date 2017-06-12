@@ -174,7 +174,7 @@ public class Universe extends JFrame {
                      g2d.drawImage(planets.get(((Planet)body).getIdSkin()-1).getScaledInstance(radius, radius, 0),x,y,this);
 
                      switch (((Planet) body).getActiveBonus()) {
-                        case MOONS:
+                        case Bonus.MOON:
                            Double xB = new Double(x+radius/4+(radius*(Math.cos(Math.toRadians(bonusCounter)))));
                            Double yB = new Double(y+radius/4+(radius*(Math.sin(Math.toRadians(bonusCounter)))));
                            int xp = xB.intValue();
@@ -186,7 +186,7 @@ public class Universe extends JFrame {
                            if (bonusCounter > 360)
                               bonusCounter = 0;
                            break;
-                        case ATMOSPHER:
+                        case Bonus.ATMOSPHER:
                            g2d.drawImage(atmospher.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
                            break;
                      }
@@ -357,74 +357,74 @@ public class Universe extends JFrame {
          return false;
 
       switch (((Planet)body).getActiveBonus()) {
-         case ATMOSPHER:
+         case Bonus.ATMOSPHER:
             return true;
-         case MOONS:
-            ((Planet) body).setActiveBonus(BonusType.NONE);
+         case Bonus.MOON:
+            ((Planet) body).setActiveBonus(Bonus.NONE);
             return true;
       }
       return false;
    }
    //-------------------------------------------
 
-   public void explode(Body body) {
-      Random rand = new Random();
-      double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
-      double oldMass = body.getMass();
+    public void explode(Body body) {
+        Random rand = new Random();
+        double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
+        double oldMass = body.getMass();
 
 
-      while (body.getMass() > 0) {
-         double fragMass = oldMass * rand.nextDouble() / 2;
-         double fragRadius = sqrt(fragMass / (dThis * PI));
-         Body frag = addNewFragment(
-               "FRAG" + body.getName(),
-               body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
-               body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
-               fragMass,
-               fragRadius,
-               Color.RED
-         );
+        while (body.getMass() > 0) {
+            double fragMass = oldMass * rand.nextDouble() / 2;
+            double fragRadius = sqrt(fragMass / (dThis * PI));
+            Body frag = addNewFragment(
+                    "FRAG" + body.getName(),
+                    body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
+                    body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
+                    fragMass,
+                    fragRadius,
+                    Color.RED
+            );
 
-         double newDirection = rand.nextDouble() * 2 * PI;
-         double newVX = cos(newDirection) * body.getSpeed().speedVector();
-         double newVY = sin(newDirection) * body.getSpeed().speedVector();
+            double newDirection = rand.nextDouble() * 2 * PI;
+            double newVX = cos(newDirection) * body.getSpeed().speedVector();
+            double newVY = sin(newDirection) * body.getSpeed().speedVector();
 
-         frag.setSpeed(new Speed(newVX, newVY));
+            frag.setSpeed(new Speed(newVX, newVY));
 
-         if (body.getMass() - fragMass < 0) {
-            body.setMass(0);
-         } else {
-            body.setMass(body.getMass() - fragMass);
-         }
-      }
-      allThings.remove(body);
+            if (body.getMass() - fragMass < 0) {
+                body.setMass(0);
+            } else {
+                body.setMass(body.getMass() - fragMass);
+            }
+        }
+        allThings.remove(body);
 //        hollySong("boom",0.001);
-   }
+    }
 
-   private int getControlForce(MouseEvent e) {
-      if (e.isShiftDown() && e.isControlDown()) {
-         return 10;
-      } else if (e.isShiftDown()) {
-         return 2;
-      } else if (e.isControlDown()) {
-         return 3;
-      } else {
-         return 1;
-      }
-   }
+    private int getControlForce(MouseEvent e) {
+        if (e.isShiftDown() && e.isControlDown()) {
+            return 10;
+        } else if (e.isShiftDown()) {
+            return 2;
+        } else if (e.isControlDown()) {
+            return 3;
+        } else {
+            return 1;
+        }
+    }
 
-   private Position convertXYToPosition(double x, double y) {
-      double bodyX = ((x - (getWidth() / 2)) * zoom);
-      double bodyY = ((y - (getHeight() / 2)) * zoom);
-      return new Position(bodyX, bodyY);
-   }
+    private Position convertXYToPosition(double x, double y) {
+        double bodyX = ((x - (getWidth() / 2)) * zoom);
+        double bodyY = ((y - (getHeight() / 2)) * zoom);
+        return new Position(bodyX, bodyY);
+    }
 
-   private void generatePlanetFromClick(double x, double y) {
-      double bodyRadius = 30000;
-      InvisiblePlanet p = new InvisiblePlanet("Invisible", convertXYToPosition(x, y), 1E+24, bodyRadius, 1);
+    private void generatePlanetFromClick(double x, double y) {
+        double bodyRadius = 30000;
+        InvisiblePlanet p = new InvisiblePlanet("Invisible", convertXYToPosition(x, y), 1E+24, bodyRadius, 1);
 
-      clickedPlanet = addNewPlanet(p);
-   }
+        clickedPlanet = addNewPlanet(p);
+    }
 
    // MODIF BONUS --------------------------------------
    private void generateBonus() {
@@ -448,21 +448,21 @@ public class Universe extends JFrame {
       return newP;
    }
 
-   public InvisiblePlanet addNewPlanet(InvisiblePlanet newP) {
-      allThings.add(newP);
-      return newP;
-   }
+    public InvisiblePlanet addNewPlanet(InvisiblePlanet newP) {
+        allThings.add(newP);
+        return newP;
+    }
 
-   public void removePlanet(Planet planet) {
-      allThings.remove(planet);
-      planet = null;
-   }
+    public void removePlanet(Planet planet) {
+        allThings.remove(planet);
+        planet = null;
+    }
 
-   private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur) {
-      Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
-      allThings.add(newP);
-      return newP;
-   }
+    private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur) {
+        Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
+        allThings.add(newP);
+        return newP;
+    }
 
    private void generateJupiter() {
       double jupiterMass = 1.8986e27;
@@ -484,41 +484,40 @@ public class Universe extends JFrame {
          lune.setSpeed(new Speed(rand.nextDouble() * 1500 - 750,
                rand.nextDouble() * 1500 - 750));
 
-      }
+        }
 
-   }
+    }
 
-   private void generateRandomShit() {
-      for (int i = 0; i < 1; ++i) {
-         Random rand = new Random();
-         Planet lune = this.addNewPlanet(
-               "Lune" + rand.nextInt(100) + 1,
-               rand.nextDouble() * 400000 + -200000,
-               rand.nextDouble() * 400000 + -200000,
-               rand.nextDouble() * 1E+22 + 1E+21,
-               rand.nextDouble() * 1000 + 4000,
-               rand.nextInt(8) + 1,
-               0);
-         lune.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
-               rand.nextDouble() * 100 - 50));
-      }
+    private void generateRandomShit() {
+        for (int i = 0; i < 1; ++i) {
+            Random rand = new Random();
+            Planet lune = this.addNewPlanet(
+                    "Lune" + rand.nextInt(100) + 1,
+                    rand.nextDouble() * 400000 + -200000,
+                    rand.nextDouble() * 400000 + -200000,
+                    rand.nextDouble() * 1E+22 + 1E+21,
+                    rand.nextDouble() * 1000 + 4000,
+                    rand.nextInt(8) + 1,
+                    0);
+            lune.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
+                    rand.nextDouble() * 100 - 50));
+        }
 
-   }
+    }
 
-   public void generateMyPlanet(String name, int skin)
-   {
-      Random rand = new Random();
-      myPlanet = this.addNewPlanet(
-            name,
-              rand.nextDouble() * 400000 + -200000,
-              rand.nextDouble() * 400000 + -200000,
-              rand.nextDouble() * 1E+22 + 1E+21,
-              rand.nextDouble() * 10000,
-              skin + 1,
-              1);
-      myPlanet.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
-            rand.nextDouble() * 100 - 50));
-   }
+    public void generateMyPlanet(String name, int skin) {
+        Random rand = new Random();
+        myPlanet = this.addNewPlanet(
+                name,
+                rand.nextDouble() * 400000 + -200000,
+                rand.nextDouble() * 400000 + -200000,
+                rand.nextDouble() * 1E+22 + 1E+21,
+                rand.nextDouble() * 1000 + 4000,
+                skin + 1,
+                1);
+        myPlanet.setSpeed(new Speed(rand.nextDouble() * 100 - 50,
+                rand.nextDouble() * 100 - 50));
+    }
 
    // MODIF BONUS ----------------------------------------------------
    private void hollySong(String soundFile, double intiVolume) {
@@ -537,7 +536,7 @@ public class Universe extends JFrame {
    }
    //---------------------------------------------------------------
 
-   public synchronized ArrayList<Body> getAllThings() {
-      return allThings;
-   }
+    public synchronized ArrayList<Body> getAllThings() {
+        return allThings;
+    }
 }

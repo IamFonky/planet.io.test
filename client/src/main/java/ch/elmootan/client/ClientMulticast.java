@@ -187,7 +187,7 @@ public class ClientMulticast implements Runnable {
 
                 case Protocol.GAME_UPDATE:
                     if (args.size() > 1) {
-                        if (Integer.parseInt(args.get(0)) == Client.idCurrentGame) {
+                        if (Client.currentGame != null && Integer.parseInt(args.get(0)) == Client.currentGame.getGameId()) {
                             try {
                                 ArrayList<Body> bodies = mapper.readValue(args.get(1), new TypeReference<List<Body>>(){});
 
