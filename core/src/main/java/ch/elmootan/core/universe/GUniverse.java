@@ -112,23 +112,29 @@ public class GUniverse extends JFrame {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_ADD:
                     case KeyEvent.VK_PLUS:
+                    case KeyEvent.VK_Q:
                         zoom -= zoom * 0.1;
                         break;
                     case KeyEvent.VK_MINUS:
                     case KeyEvent.VK_SUBTRACT:
+                    case KeyEvent.VK_E:
                         zoom += zoom * 0.1;
                         break;
 
                     case KeyEvent.VK_LEFT:
+                    case KeyEvent.VK_A:
                         dx -= Math.sqrt(zoom);
                         break;
                     case KeyEvent.VK_RIGHT:
+                    case KeyEvent.VK_D:
                         dx += Math.sqrt(zoom);
                         break;
                     case KeyEvent.VK_UP:
+                    case KeyEvent.VK_W:
                         dy -= Math.sqrt(zoom);
                         break;
                     case KeyEvent.VK_DOWN:
+                    case KeyEvent.VK_S:
                         dy += Math.sqrt(zoom);
                         break;
 
@@ -315,8 +321,8 @@ public class GUniverse extends JFrame {
     }
 
     private Position convertXYToPosition(double x, double y) {
-        double bodyX = ((x - (getWidth() / 2)) * zoom);
-        double bodyY = ((y - (getHeight() / 2)) * zoom);
+        double bodyX = ((x  - (getWidth() / 2) - dx) * zoom);
+        double bodyY = ((y  - (getHeight() / 2) - dy) * zoom);
         return new Position(bodyX, bodyY);
     }
 
