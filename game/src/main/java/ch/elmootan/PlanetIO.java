@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import ch.elmootan.core.sharedObjects.Lobby;
+import ch.elmootan.core.universe.Universe;
 import ch.elmootan.server.Server;
 import ch.elmootan.client.Client;
 

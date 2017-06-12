@@ -1,9 +1,7 @@
 package ch.elmootan.core.serverCore;
 
 import ch.elmootan.core.physics.*;
-import ch.elmootan.core.universe.Fragment;
-import ch.elmootan.core.universe.InvisiblePlanet;
-import ch.elmootan.core.universe.Planet;
+import ch.elmootan.core.universe.*;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -79,11 +77,11 @@ public class Engine {
                         BodyState eatState;
                         synchronized (allThings) {
                            if (body.getMass() > surrounding.getMass()) {
-                              allThings.remove(surrounding);
                               eatState = body.eat(surrounding);
+                              allThings.remove(surrounding);
                            } else {
-                              allThings.remove(body);
                               eatState = surrounding.eat(body);
+                              allThings.remove(body);
                            }
 
                            switch (eatState) {
@@ -151,6 +149,20 @@ public class Engine {
       }
    }
 
+   private boolean isProtected(Body body) {
+      if (!(body instanceof Planet))
+         return false;
+
+      switch (((Planet)body).getActiveBonus()) {
+         case Bonus.ATMOSPHER:
+            return true;
+         case Bonus.MOON:
+            ((Planet) body).setActiveBonus(Bonus.NONE);
+            return true;
+      }
+      return false;
+   }
+
    public void explode(Body body) {
       Random rand = new Random();
       double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
@@ -161,7 +173,6 @@ public class Engine {
          double fragMass = oldMass * rand.nextDouble() / 2;
          double fragRadius = sqrt(fragMass / (dThis * PI));
          Body frag = addNewFragment(
-                 body.getId(),
                  "FRAG" + body.getName(),
                  body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
                  body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
@@ -209,10 +220,7 @@ public class Engine {
 
          String infosJson = "";
          try {
-            synchronized (allThings)
-            {
-               infosJson = mapper.writeValueAsString(allThings);
-            }
+            infosJson = mapper.writeValueAsString(allThings);
             String command = Protocol.GAME_UPDATE + "\n" +
                   engineId + "\n" +
                   infosJson + "\n" +
@@ -249,9 +257,8 @@ public class Engine {
       allThings.remove(body);
    }
 
-   private Fragment addNewFragment(int id, String name, double x, double y, double mass, double radius, Color couleur) {
+   private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur) {
       Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
-      newP.setId(id);
       allThings.add(newP);
       return newP;
    }
@@ -277,6 +284,20 @@ public class Engine {
    {
       allThings.remove(userPlanets.get(idPlanet));
       userPlanets.remove(idPlanet);
+   }
+
+   private void generateBonus() {
+      Random rand = new Random();
+      Bonus bonus = new Bonus(
+              "",
+              new Position(rand.nextDouble() * 400000 + -200000,
+                      rand.nextDouble() * 400000 + -200000),
+              1,
+              6666,
+              Color.WHITE,
+              1
+      );
+      allThings.add(bonus);
    }
 
    public synchronized ArrayList<Body> getAllThings() {
