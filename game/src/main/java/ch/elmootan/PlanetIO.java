@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import ch.elmootan.core.sharedObjects.Lobby;
-import ch.elmootan.core.sharedObjects.Player;
 import ch.elmootan.server.Server;
 import ch.elmootan.client.Client;
 
@@ -24,8 +23,8 @@ public class PlanetIO {
 
     private static class IdentityChooser extends JFrame implements ActionListener {
 
-        JButton server;
-        JButton client;
+        JButton serverChoiceButton;
+        JButton clientChoiceButton;
 
         public IdentityChooser() {
             setLayout(new GridLayout(2, 1));
@@ -37,21 +36,22 @@ public class PlanetIO {
 
             JPanel buttonsPanel = new JPanel(new FlowLayout());
 
-            server = new JButton("Server");
-            server.setHorizontalAlignment(JButton.LEFT);
-            server.addActionListener(this);
+            serverChoiceButton = new JButton("Server");
+            serverChoiceButton.setHorizontalAlignment(JButton.LEFT);
+            serverChoiceButton.addActionListener(this);
 
-            client = new JButton("Client");
-            client.setHorizontalAlignment(JButton.RIGHT);
-            client.addActionListener(this);
+            clientChoiceButton = new JButton("Client");
+            clientChoiceButton.setHorizontalAlignment(JButton.RIGHT);
+            clientChoiceButton.addActionListener(this);
 
-            buttonsPanel.add(server);
-            buttonsPanel.add(client);
+            buttonsPanel.add(serverChoiceButton);
+            buttonsPanel.add(clientChoiceButton);
 
             add(buttonsPanel);
 
-
             setSize(267, 150);
+
+            setLocationRelativeTo(null);
 
             setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             setVisible(true);
@@ -61,16 +61,19 @@ public class PlanetIO {
         public void actionPerformed(ActionEvent e) {
 
             Object id = e.getSource();
-            if (id == client) {
-                new CredentialsPrompt();
+            if (id == clientChoiceButton) {
                 this.dispose();
-                //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-            } else if (id == server) {
-                Server server = new Server();
+                new Client();
 
+                //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+            } else if (id == serverChoiceButton) {
+                clientChoiceButton.setEnabled(false);
+                Server server = new Server();
                 Lobby.getSharedInstance().addServerObserver(server);
 
+
                 try {
+                    serverChoiceButton.setEnabled(false);
                     server.startServer();
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -78,44 +81,4 @@ public class PlanetIO {
             }
         }
     }
-
-    private static class CredentialsPrompt extends JFrame implements ActionListener {
-
-        private JTextField pseudo;
-        private JButton done;
-
-        public CredentialsPrompt() {
-            //setLayout(new FlowLayout());
-
-            done = new JButton("Done");
-            done.addActionListener(this);
-
-            JPanel pseudoPanel = new JPanel(new FlowLayout());
-
-            pseudo = new JTextField(17);
-
-            pseudoPanel.add(new JLabel("Pseudo"));
-            pseudoPanel.add(pseudo);
-
-            getRootPane().setDefaultButton(done);
-
-            getContentPane().add(pseudoPanel, BorderLayout.CENTER);
-            getContentPane().add(done, BorderLayout.SOUTH);
-
-
-            setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            setSize(300, 150);
-
-            setVisible(true);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == done && pseudo.getText() != "") {
-                // TODO check if in DB
-                Client client = new Client(new Player(pseudo.getText()), false);
-                this.dispose();
-            }
-        }
-    }
-
 }

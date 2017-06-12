@@ -3,11 +3,14 @@ package ch.elmootan.core.sharedObjects;
 import ch.elmootan.core.sharedObjects.Game;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.text.Format;
 import java.text.NumberFormat;
+import java.text.ParseException;
 
 public class GameCreator extends JFrame implements ActionListener {
 
@@ -24,7 +27,19 @@ public class GameCreator extends JFrame implements ActionListener {
         JPanel numberOfPlayerPanel = new JPanel(new FlowLayout());
         numberOfPlayerPanel.setPreferredSize(new Dimension(30, 20));
 
-        playerMax = new JFormattedTextField(NumberFormat.getIntegerInstance());
+
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new NumberFormatter(format);
+        formatter.setValueClass(Integer.class);
+        formatter.setMinimum(0);
+        formatter.setMaximum(64);
+        //formatter.setAllowsInvalid(false);
+
+        // If you want the value to be committed on each keystroke instead of focus lost
+        formatter.setCommitsOnValidEdit(true);
+
+        playerMax = new JFormattedTextField(formatter);
+
         playerMax.setColumns(10);
         playerMax.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -62,15 +77,10 @@ public class GameCreator extends JFrame implements ActionListener {
         this.setResizable(false);
         this.setSize(450, 150);
         this.setVisible(true);
-
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-       /* if(e.getSource() == createGame) {
-            Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
-            addGame(newGame);
-            dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-        }*/
+
     }
 }

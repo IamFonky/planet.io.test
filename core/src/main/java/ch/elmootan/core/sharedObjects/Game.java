@@ -4,6 +4,7 @@ import ch.elmootan.core.universe.Bonus;
 import ch.elmootan.core.universe.Universe;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 
@@ -22,6 +23,9 @@ public class Game implements Serializable {
     private int nbPlayersMax;
 
     //!
+    private ArrayList<Player> playersInGame;
+
+    //!
     private int gameId;
 
     //Je déconseille sérieusement de mettre un Univers dans la Game
@@ -33,6 +37,7 @@ public class Game implements Serializable {
         this.name = name;
         this.availableBonuses = bonuses;
         this.nbPlayersMax = nbPlayersMax;
+        playersInGame = new ArrayList<>();
     }
 
     //! Dumme constructor needed for deserialization
