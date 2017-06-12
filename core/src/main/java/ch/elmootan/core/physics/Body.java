@@ -13,13 +13,13 @@ import static java.lang.Math.*;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include=JsonTypeInfo.As.PROPERTY,
+        include = JsonTypeInfo.As.PROPERTY,
         property = "shittyClass")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value=Planet.class, name = "Planet"),
-        @JsonSubTypes.Type(value=InvisiblePlanet.class, name = "InvisiblePlanet"),
-        @JsonSubTypes.Type(value=Bonus.class, name = "Bonus"),
-        @JsonSubTypes.Type(value=Fragment.class, name = "Fragment")
+        @JsonSubTypes.Type(value = Planet.class, name = "Planet"),
+        @JsonSubTypes.Type(value = InvisiblePlanet.class, name = "InvisiblePlanet"),
+        @JsonSubTypes.Type(value = Bonus.class, name = "Bonus"),
+        @JsonSubTypes.Type(value = Fragment.class, name = "Fragment")
 })
 public abstract class Body {
     private Position position;
@@ -37,7 +37,7 @@ public abstract class Body {
 
     private double fragmentationRatio;
 
-    private int id;
+    private int id = -1;
 
     public Body() {
     }
@@ -147,7 +147,7 @@ public abstract class Body {
     @Override
     public boolean equals(Object o) {
         if (o.getClass().isInstance(this)) {
-            name.equals(((Body) o).getName());
+            return name.equals(((Body) o).getName());
         }
         return false;
     }

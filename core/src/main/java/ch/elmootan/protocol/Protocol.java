@@ -8,6 +8,8 @@ public final class Protocol {
 
     public static final String LOBBY_UPDATED = "OHBOITHELOBBYISUPDATED!";
     public static final String GAME_UPDATE = "OHBOITHEGAMEISUPDATED!";
+    public static final String PLANET_IO_LOBBY_JOINED = "LOBBY_JOINED";
+
 
     // Commandes envoyées par le client.
     public static final String PLANET_IO_HELLO = "HELLOPELO";
@@ -16,6 +18,7 @@ public final class Protocol {
     public static final String PLANET_IO_GET_SCORES = "GIVEMEMYSCORESPLZ";
     public static final String PLANET_IO_GET_UNIVERSE = "SHREKISLIFE";
     public static final String PLANET_IO_SEND_POSITION = "IAMHERE";
+    public static final String NB_GAME_MAX_UPDATE = "NB_GAME_MAX_UPDATE";
 
     // Commande de controle
     public static final String PLANET_IO_CREATE_PLANET = "CREATEPLANET";

@@ -1,104 +1,101 @@
 package ch.elmootan.client;
 
+import ch.elmootan.core.database.DBObjects.User;
 import ch.elmootan.core.physics.Body;
 import ch.elmootan.core.sharedObjects.*;
-import ch.elmootan.core.universe.Bonus;
 import ch.elmootan.core.universe.GUniverse;
 import ch.elmootan.core.universe.Planet;
-import ch.elmootan.core.universe.Universe;
 import ch.elmootan.protocol.Protocol;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.logging.Logger;
 
 public class Client implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(Client.class.getName());
 
-    private final CustomObjectMapper mapper = new CustomObjectMapper();
+    protected final CustomObjectMapper mapper = new CustomObjectMapper();
 
     protected Socket tcpSocket;
 
-    private static GUniverse gui;
+    protected static GUniverse gui;
 
-    PrintWriter out;
-    BufferedReader in;
-    Player player;
+
+    static PrintWriter out;
+    static BufferedReader in;
+    static Player player = new Player("");
+
     boolean connectionRunning = false;
+
+    boolean isAdmin;
 
     //débug
     boolean noGUI = false;
 
-    static LobbyClient lobbyClient = null;
+    static protected Lobby lobby = null;
 
-    //Current game is set for
-    public static int idCurrentGame;
+    // Current game
+    public static Game currentGame;
+    static CredentialsPrompt cPrompt = null;
 
-    private ClientMulticast clientMulticast;
+
+    protected ClientMulticast clientMulticast;
 
 
-    public String serverRead() throws IOException {
+    static public String serverRead() throws IOException {
         return in.readLine();
     }
 
-    public void serverWrite(String toWrite) {
+    static public void serverWrite(String toWrite) {
         out.println(toWrite);
         out.flush();
     }
 
-    public Client(Player player)
-    {
-        createClient(player,false);
+
+    public Client() {
+        createClient(player, false);
     }
 
-    public Client(Player player, boolean debug)
-    {
-        createClient(player,debug);
-    }
 
-    private void createClient(Player player, boolean debug)
-    {
+    private void createClient(Player player, boolean debug) {
+
+        tcpSocket = new Socket();
+
+        cPrompt = new CredentialsPrompt();
+
+        try {
+            connect("localhost", Protocol.PORT);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         noGUI = debug;
-        try
-        {
+        try {
             clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
 
             new Thread(clientMulticast).start();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        this.player = player;
-        tcpSocket = new Socket();
-
-
-        if (!debug) {
-            lobbyClient = new LobbyClient();
-            lobbyClient.showUI();
-        }
-
-        try {
-            connect("localhost", Protocol.PORT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
+
 
     public void connect(String server, int port) throws IOException {
 
@@ -119,58 +116,25 @@ public class Client implements Runnable {
 
         if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
             LOG.info("Connexion successful");
-            String gameListJSON = serverRead();
-            ArrayList<Game> initialGameList = mapper.readValue(gameListJSON, new TypeReference<ArrayList<Game>>() {
-            });
-
-            System.out.println(gameListJSON);
-            if (!noGUI) {
-                lobbyClient.addGameList(initialGameList);
-            }
+            new Thread(this).start();
         }
-
-        new Thread(this).start();
     }
 
     public void run() {
         connectionRunning = true;
         while (connectionRunning) {
-            //Tu ne peux pas faire communiquer simultanément cette thread et les commandes
-            //si cette thread fait un read alors qu'une autre commande est en train d'être faite
-            //alors cette thread nique le protocole x).
-            //J'ai essayé de synchroniser mais ça bloque tout :(
-            //Je recommande fortement d'utiliser de l'UDP pour refresh ton lobby ;) (ptit datagram vite fait :P)
-
-//            synchronized(lobbyClient)
-//            {
-//                String input = "";
-//                try
-//                {
-//                    input = serverRead();
-//                    switch (input)
-//                    {
-//                        case Protocol.LOBBY_UPDATED:
-//                            input = serverRead();
-//                            Game newGame = mapper.readValue(input, Game.class);
-//                            lobbyClient.addGame(newGame);
-//                            break;
-//
-//                        default:
-//                            break;
-//
-//                    }
-//                } catch (IOException e)
-//                {
-//                    e.printStackTrace();
-//                }
-//            }
+           /* try {
+                synchronized (lobbyClient) {
+                    lobbyClient.wait();
+                }
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }*/
         }
-
-
     }
 
     public void disconnect() throws IOException {
-        synchronized (lobbyClient) {
+        synchronized (lobby) {
             serverWrite(Protocol.CMD_DISCONNECT);
             connectionRunning = false;
             out.close();
@@ -185,15 +149,15 @@ public class Client implements Runnable {
     }
 
     public void sendGameToServer(Game game) {
-        synchronized (lobbyClient) {
+        synchronized (lobby) {
             try {
                 serverWrite(Protocol.CMD_CREATE_GAME);
                 if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
                     serverWrite(mapper.writeValueAsString(game));
                     String succesAndGameId = serverRead();
                     if (succesAndGameId.indexOf(Protocol.PLANET_IO_SUCCESS) != -1) {
-                        idCurrentGame = Integer.parseInt(succesAndGameId.split(Protocol.CMD_SEPARATOR)[1]);
-                        System.out.println("Game n° " + idCurrentGame + " created");
+                        // currentGame.setGameId(Integer.parseInt(succesAndGameId.split(Protocol.CMD_SEPARATOR)[1]));
+                        System.out.println("Game n° " + Integer.parseInt(succesAndGameId.split(Protocol.CMD_SEPARATOR)[1]) + " created");
                     } else {
                         System.out.println("Error, game was not created");
                     }
@@ -207,20 +171,20 @@ public class Client implements Runnable {
     }
 
     public void joinServer(int skin) {
-        synchronized (lobbyClient) {
+        synchronized (lobby) {
             try {
                 serverWrite(Protocol.CMD_JOIN_GAME
-                + Protocol.CMD_SEPARATOR
-                + idCurrentGame);
+                        + Protocol.CMD_SEPARATOR
+                        + currentGame.getGameId());
                 if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
-                    serverWrite(mapper.writeValueAsString(new Planet(player.getName(),skin)));
-                    Planet initialPlanet = mapper.readValue(serverRead(),Planet.class);
+                    serverWrite(mapper.writeValueAsString(new Planet(player.getName(), skin)));
+                    Planet initialPlanet = mapper.readValue(serverRead(), Planet.class);
                     gui = new GUniverse(
-                          out,
-                          in,
-                          clientMulticast.getSocket(),
-                          idCurrentGame,
-                          initialPlanet);
+                            out,
+                            in,
+                            clientMulticast.getSocket(),
+                            currentGame.getGameId(),
+                            initialPlanet, false);
                     gui.showUI();
                 } else {
                     System.out.println("Error, this game is not reachable");
@@ -235,7 +199,7 @@ public class Client implements Runnable {
     public void exit() {
         try {
             if (!noGUI) {
-                lobbyClient.dispose();
+                lobby.dispose();
                 disconnect();
             }
         } catch (IOException ioe) {
@@ -244,24 +208,29 @@ public class Client implements Runnable {
     }
 
     public static void addGameToLobby(Game game) {
-        lobbyClient.addGame(game);
+        lobby.addGame(game);
     }
 
     protected static void updateGUniverse(ArrayList<Body> bodies) {
-        synchronized (lobbyClient) {
+        synchronized (lobby) {
             if (gui != null) {
                 gui.setAllThings(bodies);
-            }
-            else {
-                System.out.println("qu'Allah te brise le dos fdp");
+            } else {
+                System.out.println("Error");
             }
         }
     }
 
     private class LobbyClient extends Lobby {
 
+        public LobbyClient() {
+            super();
+            setTitle("Lobby Client");
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
+
             if (e.getSource() == addGameButton) {
                 new GameCreator() {
                     @Override
@@ -283,7 +252,7 @@ public class Client implements Runnable {
                             if (e.getSource() == btnChoose) {
                                 System.out.println(idSkin);
                                 chooseStatus = true;
-                                idCurrentGame = gamesList.get(indexGame).getGameId();
+                                currentGame = gamesList.get(indexGame);
                                 joinServer(idSkin);
                                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                             }
@@ -300,9 +269,236 @@ public class Client implements Runnable {
                             repaint();
                         }
                     };
-                    //while (!skinChooser.skinChoosed());
                 }
             }
         }
+    }
+
+    private class CredentialsPrompt extends JFrame implements ActionListener {
+
+        private JTextField pseudo;
+
+        private JButton done;
+
+        private JLabel error;
+
+        JCheckBox admin;
+
+        public CredentialsPrompt() {
+            super("Enter your pseudo");
+
+            done = new JButton("Done");
+            done.addActionListener(this);
+
+            pseudo = new JTextField(17);
+
+            admin = new JCheckBox("Admin");
+
+            error = new JLabel("");
+            error.setForeground(Color.RED);
+
+            JPanel pseudoPanel = new JPanel(new FlowLayout());
+
+            pseudoPanel.add(new JLabel("Pseudo"), BorderLayout.CENTER);
+            pseudoPanel.add(pseudo, BorderLayout.CENTER);
+            pseudoPanel.add(admin, BorderLayout.EAST);
+
+            JPanel bottomPanel = new JPanel(new GridLayout(2, 1));
+
+            JPanel donePannel = new JPanel(new FlowLayout());
+
+            donePannel.add(done, BorderLayout.CENTER);
+
+            bottomPanel.add(donePannel);
+            bottomPanel.add(error);
+
+            getRootPane().setDefaultButton(done);
+
+            getContentPane().add(pseudoPanel, BorderLayout.NORTH);
+            getContentPane().add(bottomPanel, BorderLayout.SOUTH);
+
+            setLocationRelativeTo(null);
+
+            setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            setSize(350, 150);
+
+            setVisible(true);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == done) {
+                if (pseudo.getText().equals("")) {
+                    error.setText("You need to choose a pseudo!");
+                } else {
+                    // TODO check if in DB
+                    try {
+                        User checkUser = new User(pseudo.getText());
+                        serverWrite(Protocol.PLANET_IO_LOGIN);
+                        serverWrite(mapper.writeValueAsString(checkUser));
+                        String test = serverRead();
+                        if (test.equals(Protocol.PLANET_IO_SUCCESS)) {
+
+                            player = new Player(pseudo.getText());
+                            if (admin.isSelected()) {
+                                lobby = new LobbyAdmin();
+                                isAdmin = true;
+                            } else {
+                                lobby = new LobbyClient();
+                                isAdmin = false;
+                            }
+
+                            serverWrite(Protocol.PLANET_IO_LOBBY_JOINED);
+                            if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
+                                LOG.info("Connexion successful");
+                                String gameListJSON = serverRead();
+                                ArrayList<Game> initialGameList = mapper.readValue(gameListJSON, new TypeReference<ArrayList<Game>>() {
+                                });
+
+                                System.out.println(gameListJSON);
+                                if (!noGUI) {
+                                    lobby.addGameList(initialGameList);
+                                }
+                            }
+
+                            lobby.showUI();
+
+                            this.dispose();
+                        } else {
+                            error.setText("Pseudo already taken!");
+                        }
+                    } catch (Exception jpe) {
+                        jpe.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private class LobbyAdmin extends Lobby {
+
+        JButton changeProperties = new JButton("Properties");
+
+        public LobbyAdmin() {
+            super();
+            setTitle("Lobby Admin");
+
+            changeProperties.addActionListener(this);
+            bottomPanel.add(changeProperties);
+        }
+
+        private void joinGame() {
+            synchronized (lobby) {
+                try {
+                    serverWrite(Protocol.CMD_JOIN_GAME
+                            + Protocol.CMD_SEPARATOR
+                            + currentGame.getGameId());
+                    if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
+                        serverWrite(mapper.writeValueAsString(null));
+                        serverRead();
+                        gui = new GUniverse(
+                                out,
+                                in,
+                                clientMulticast.getSocket(),
+                                currentGame.getGameId(),
+                                null, true);
+                        gui.showUI();
+                    } else {
+                        System.out.println("Error, this game is not reachable");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == addGameButton) {
+                new GameCreator() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (e.getSource() == createGame) {
+                            if (!playerMax.getText().matches("[a-zA-Z]+")) {
+                                Game newGame = new Game(gameName.getText(), null, (Integer) playerMax.getValue());
+                                sendGameToServer(newGame);
+                                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+                            }
+                        }
+                    }
+                };
+            } else if (e.getSource() == joinGameButton) {
+                int indexGame = table.getSelectedRow();
+                if (indexGame != -1) {
+                    currentGame = gamesList.get(indexGame);
+                    joinGame();
+                }
+            } else if (e.getSource() == changeProperties) {
+                new PropertiesChanger();
+            }
+        }
+    }
+
+    private class PropertiesChanger extends JFrame implements ActionListener {
+
+        JFormattedTextField maxGame;
+
+        JButton done;
+
+        public PropertiesChanger() {
+            JPanel topPanel = new JPanel(new FlowLayout());
+            topPanel.setPreferredSize(new Dimension(30, 20));
+
+            done = new JButton("Done");
+            done.addActionListener(this);
+
+            NumberFormat format = NumberFormat.getInstance();
+            NumberFormatter formatter = new NumberFormatter(format);
+
+            formatter.setValueClass(Integer.class);
+            formatter.setMinimum(0);
+            formatter.setMaximum(64);
+            formatter.setAllowsInvalid(true);
+            // If you want the value to be committed on each keystroke instead of focus lost
+            formatter.setCommitsOnValidEdit(true);
+
+            maxGame = new JFormattedTextField(formatter);
+            maxGame.setColumns(10);
+            maxGame.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    done.doClick();
+                }
+            });
+
+            topPanel.add(new JLabel("Number of games max"));
+            topPanel.add(maxGame);
+
+            JPanel bottomPanel = new JPanel();
+            bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+
+            bottomPanel.add(done);
+
+            this.getContentPane().add(topPanel, BorderLayout.CENTER);
+            this.getContentPane().add(bottomPanel, BorderLayout.PAGE_END);
+
+            getRootPane().setDefaultButton(done);
+
+            pack();
+
+            this.setResizable(false);
+            this.setSize(150, 200);
+            this.setVisible(true);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == done) {
+
+                if (!maxGame.getText().matches("[a-zA-Z]+")) {
+                    serverWrite(Protocol.NB_GAME_MAX_UPDATE + Protocol.CMD_SEPARATOR + (Integer) maxGame.getValue());
+                    dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+                }
+            }
+        }
+
     }
 }

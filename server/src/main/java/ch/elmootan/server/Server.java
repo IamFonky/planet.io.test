@@ -1,5 +1,6 @@
 package ch.elmootan.server;
 
+import ch.elmootan.core.database.dbCore.DBStructure;
 import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.serverCore.ServerMulticast;
@@ -16,7 +17,21 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.lang.Thread.sleep;
+
 public class Server implements Observer {
+
+    public static void main(String... args) {
+        Server server = new Server();
+        try {
+            sleep(10000);
+            while (server.isRunning()) {
+                sleep(10000);
+            }
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        }
+    }
 
     //! Logger.
     final static Logger LOG = Logger.getLogger(Server.class.getName());
@@ -60,6 +75,8 @@ public class Server implements Observer {
 //        GamesManager.getSharedManager(serverMulticast);
         Lobby.getSharedInstance().setNbGamesMax(7);
         Lobby.getSharedInstance().setMulticastServer(serverMulticast);
+
+        Lobby.getSharedInstance().showUI();
 
         serverSocket = new ServerSocket();
         serverSocket.setReuseAddress(true);
@@ -120,6 +137,7 @@ public class Server implements Observer {
         for (ClientWorker clientWorker : clientWorkers) {
             clientWorker.notifyServerShutdown();
         }
+        DBStructure.resetPlanetIODatabase();
     }
 
     /**
