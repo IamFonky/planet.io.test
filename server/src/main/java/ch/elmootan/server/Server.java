@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -154,17 +155,21 @@ public class Server implements Observer {
 
     public void update(Observable o, Object obj) {
         ObjectMapper mapper = new ObjectMapper();
-        String gameJson = "";
+
+
+        ArrayList<Game> gameList = Lobby.getSharedInstance().getGamesList();
+        System.out.println("Update SERVER");
+        System.out.println(gameList);
+        String serializedData = null;
         try {
-            gameJson = mapper.writeValueAsString((Game) obj);
+            serializedData = mapper.writeValueAsString(gameList);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
         String command = Protocol.LOBBY_UPDATED + "\n" +
-                gameJson + "\n" +
+                serializedData + "\n" +
                 Protocol.END_OF_COMMAND;
         serverMulticast.send(command);
-
     }
 }

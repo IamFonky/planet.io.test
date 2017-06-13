@@ -81,6 +81,13 @@ public class Game implements Serializable {
         this.nbPlaylersCurrent = nbPlaylersCurrent;
     }
 
+    public void addPlayer() {
+        nbPlaylersCurrent ++;
+    }
+
+    public void removePlayer() {
+        nbPlaylersCurrent --;
+    }
 
     public int getGameId() {
         return gameId;

@@ -129,8 +129,10 @@ public class GUniverse extends JFrame {
         setVisible(true);
         addWindowListener(new WindowAdapter() {
                               public void windowClosing(WindowEvent e) {
+                                  wr.println(Protocol.PLANET_IO_LEAVING_GAME + Protocol.CMD_SEPARATOR + gameId);
+                                  wr.flush();
                                   dispose();
-                                  System.exit(0);
+                                  //System.exit(0);
                               }
                           }
         );
@@ -209,6 +211,20 @@ public class GUniverse extends JFrame {
 
         setVisible(true);
 
+        /*setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                exitProcedure();
+            }
+        });*/
+
+    }
+
+    public void exitProcedure() {
+        wr.write(Protocol.PLANET_IO_LEAVING_GAME + Protocol.CMD_SEPARATOR + gameId);
+        wr.flush();
+        setVisible(false);
     }
 
     public void showUI() {

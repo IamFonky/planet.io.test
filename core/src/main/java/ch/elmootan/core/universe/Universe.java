@@ -181,8 +181,8 @@ public class Universe extends JFrame {
             }
         };
 
-        javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
-        displayTimer.start();
+        //javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
+        //displayTimer.start();
 
         rootPane.setBackground(Color.BLACK);
 

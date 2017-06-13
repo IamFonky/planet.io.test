@@ -123,6 +123,7 @@ public class ClientHandler {
                                 if (idGame >= 0 && idGame < lobby.getGamesList().size()) {
                                     writer.println(Protocol.PLANET_IO_SUCCESS);
                                     writer.flush();
+                                    lobby.addAPlayerToGame(idGame);
                                     Planet userPlanet = mapper.readValue(reader.readLine(), Planet.class);
                                     userPlanet = lobby.getEngineList().get(idGame).generateUserPlanet(userPlanet);
                                     writer.println(mapper.writeValueAsString(userPlanet));
@@ -135,6 +136,11 @@ public class ClientHandler {
                                 writer.println(Protocol.PLANET_IO_FAILURE);
                                 writer.flush();
                             }
+                            break;
+                        }
+
+                        case Protocol.PLANET_IO_LEAVING_GAME: {
+                            lobby.removeAPlayerToGame((Integer.parseInt(cmdAndArgs[1])));
                             break;
                         }
 
@@ -220,6 +226,7 @@ public class ClientHandler {
                         case Protocol.NB_GAME_MAX_UPDATE: {
                             lobby.setNbGamesMax(Integer.parseInt(cmdAndArgs[1]));
                             LOG.info("New max nb games: " + lobby.getNbGamesMax());
+                            break;
 
                         }
                         // Client wants to unclick the control planet.

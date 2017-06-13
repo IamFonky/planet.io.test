@@ -177,12 +177,24 @@ public class ClientMulticast implements Runnable {
 
             switch (command) {
                 case Protocol.LOBBY_UPDATED:
-                    try {
+                    /*try {
                         Game newGame = mapper.readValue(args.get(0), Game.class);
                         Client.addGameToLobby(newGame);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    }*/
+
+                    System.out.println("UPDATE CLIENT");
+                    String gameListJSON = args.get(0);
+                    try {
+                        ArrayList<Game> newGameList = mapper.readValue(gameListJSON, new TypeReference<ArrayList<Game>>() {
+                        });
+                        //System.out.println(newGameList);
+                        Client.lobby.refreshGameList(newGameList);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+
                     break;
 
                 case Protocol.GAME_UPDATE:

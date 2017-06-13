@@ -61,19 +61,16 @@ public class PlanetIO {
         public void actionPerformed(ActionEvent e) {
 
             Object id = e.getSource();
+            this.dispose();
             if (id == clientChoiceButton) {
                 this.dispose();
                 new Client();
 
                 //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             } else if (id == serverChoiceButton) {
-                clientChoiceButton.setEnabled(false);
                 Server server = new Server();
                 Lobby.getSharedInstance().addServerObserver(server);
-
-
                 try {
-                    serverChoiceButton.setEnabled(false);
                     server.startServer();
                 } catch (IOException e1) {
                     e1.printStackTrace();

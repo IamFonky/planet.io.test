@@ -395,6 +395,7 @@ public class Client implements Runnable {
                     if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
                         serverWrite(mapper.writeValueAsString(null));
                         serverRead();
+
                         gui = new GUniverse(
                                 out,
                                 in,
@@ -495,6 +496,7 @@ public class Client implements Runnable {
 
                 if (!maxGame.getText().matches("[a-zA-Z]+")) {
                     serverWrite(Protocol.NB_GAME_MAX_UPDATE + Protocol.CMD_SEPARATOR + (Integer) maxGame.getValue());
+
                     dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                 }
             }
