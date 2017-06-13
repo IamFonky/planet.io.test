@@ -42,8 +42,5 @@ public final class Protocol {
 
     public static final String IP_MULTICAST = "239.192.0.2";
 
-//    public static final String IP_SERVER = "192.168.1.5";
-//    public static final String IP_SERVER = "10.192.18.38";
-//    public static final String IP_SERVER = "10.192.115.91";
     public static final String IP_SERVER = "localhost";
 }

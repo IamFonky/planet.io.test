@@ -72,8 +72,8 @@ public class GUniverse extends JFrame {
 
         try {
             for (int i = 1; i <= 8; i++)
-                planets.add(ImageIO.read(GUniverse.class.getResource("../skins/planet" + i + "_32x32.png")));
-            invisible = ImageIO.read(GUniverse.class.getResource("../skins/invisible_64x64.png"));
+                planets.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_32x32.png")));
+            invisible = ImageIO.read(getClass().getResourceAsStream("/skins/invisible_64x64.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -345,7 +345,7 @@ public class GUniverse extends JFrame {
             public void run() {
                 new JFXPanel();
                 System.out.println(System.getProperty("user.dir"));
-                String bip = "sounds/" + sound + ".mp3";
+                String bip = "/sounds/" + sound + ".mp3";
 
 //         File file = new File(bip);
 
