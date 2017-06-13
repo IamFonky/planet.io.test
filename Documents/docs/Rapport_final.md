@@ -232,3 +232,198 @@ Le tableau ci-dessous liste les différentes commandes du protocole et leur rôl
 | `END_OF_COMMAND` | Signal de fin de commande. |
 
 Les échanges multicast se font à l'adresse `239.192.0.2`, sur le port `9898`. Les échanges unicast se font sur le port `8585`.
+
+## Diagrammes de classes
+
+# Implémentation du projet
+
+## Technologies utilisées
+
+Planet.io a été développé en Java 8 pour le client comme pour le serveur.
+
+Maven a été utilisé pour la gestion de modules, l'exécution des tests unitaires et la compilation.
+
+Notre base de données s'appuie sur SQLite3.
+
+Pour la sérialisation/désarialisation des données, nous avons utilisé Jackson.
+
+# Gestion du projet
+
+## Rôles
+
+- Pierre-Benjamin Monaco
+    Chef de projet, responsable des normes et procédures, responsable des tests, développeur.
+
+- Lucas Elisei
+    Architecte, concepteur en chef, développeur.
+
+- David Truan
+    Représentant des utilisateur, développeur.
+
+- Gaëtan Othenin-Girard
+    Responsable de la configuration, développeur.
+
+## Plan d'itération initial
+
+### Itération 1
+
+#### Objectifs
+
+Modélisation des schémas UML du client et serveur et prototype :
+
+ - Schéma UML du client.
+ - Schéma UML du serveur.
+ - Schéma UML des modules externes.
+ - Création d'un prototype simple de client.
+
+#### Temps escompté
+
+ - 2 semaines (12.04 au 27.04).
+
+#### Rôles et effort escompté
+
+ - P-B. Monaco : Mise en place de JUnit et implémentation des tests du prototype, 2h.
+ - Lucas Elisei : Développement du schéma UML du serveur, 2h.
+ - David Truan : Développement du schéma UML du client, 2h.
+ - Gaëtan Othenin-Girard : Mise en place du projet Maven, du système de contrôle de version et mise en place du système d'intégration continue, 2h.
+ - Tout le monde : Développement du prototype (travail collaboratif : bonne technique pour être opérationnel avec git le moment venu).
+
+### Itération 2
+
+#### Objectifs
+
+Système de jeu fonctionnel en standalone :
+
+ - Création partie.
+ - Contrôle d'une planète.
+ - Gestion des évènements (collisions, changements d'états).
+ - Design graphique (simple).
+
+#### Temps escompté
+
+ - 1 semaine (27.04 au 04.05).
+
+#### Rôles et effort escompté
+
+ - P-B. Monaco : Tests unitaires et revue de code, 4h.
+ - Lucas Elisei : Gestion des propriétés physiques, 6h.
+ - David Truan : Design graphique, validation du design auprès d'utilisateurs alpha, 5h.
+ - Gaëtan Othenin-Girard : Gestion évènementielle, 6h.
+
+### Itération 3
+
+#### Objectifs
+
+L'objectif de cette itération est l'amélioration de l'application créée lors de la première itération mais en fonctionnant de manière client/serveur. Sur cette version, le serveur contiendra les informations concernant les objets du jeu qu'il enverra au client. Le client va uniquement afficher les objets aux coordonnées reçues.
+
+#### Temps escompté
+
+- 1 semaine (04.05 au 11.05).
+
+#### Rôles et efforts escomptés
+
+- P-B. Monaco : Tests unitaires et revue de code, 2h.
+- Lucas Elisei : Conception et implémentation de l'API, 3h.
+- David Truan : Interface client générale (différentes zones du GUI), 3h.
+- Gaëtan Othenin-Girard : Création et gestion de la connexion au serveur, 3h.
+
+### Itération 4
+
+#### Objectifs
+
+Implémentation du concept de joueurs avec la création de comptes stockés dans la base de données et connexion au serveur via l'interface du client.
+
+#### Temps escompté
+
+- 1 semaine (11.05 au 18.05).
+
+#### Rôles et efforts escomptés
+
+- P-B. Monaco : Création de la base de données et ajout de la partie compte utilisateur, 3h.
+- Lucas Elisei : Connexion à la base de données et affichage du pseudo sur la planète, 3h.
+- David Truan : Analyse et recherche des besoins au niveau sécuritaire et tests unitaires, 2h.
+- Responsable de configuration (Gaëtan Othenin-Girard) : Interface de connexion au compte utilisateur sur le client, 4h.
+
+### Itération 5
+
+#### Objectifs
+
+Management du serveur :
+
+ - Implémentation du système de score.
+ - Étude des échanges entre client et serveur (adaptation de la taille et du type de données partagées).
+ - Étude des flux entre les threads du serveur et optimisation.
+ - Tests unitiares de l'intéraction client/serveur.
+
+#### Temps escompté
+
+ - 1 semaine (18.05 au 25.05).
+
+#### Rôles et effort escompté
+
+ - P-B. Monaco : Implémentation des scores dans l'application, 3h.
+ - Lucas Elisei : Tests unitaires, test de fonctionnement et revue de code, 4h.
+ - David Truan : Étude et optimisation des flux entre client et serveur, validation auprès des utilisateurs alpha, 4h.
+ - Gaëtan Othenin-Girard : Implémentation du système de score dans la base de données, 3h.
+
+
+### Itération 6
+
+#### Objectifs
+
+Management du serveur :
+
+ - Implémentation des fonctions de contrôle des joueurs (ban kick, allow, etc...).
+ - Essais d'attaques depuis le client, vérification qu'il n'est pas possible de contrer un bannisement.
+ - Études des différentes techniques de triches qui pourraient être utilisées (glitches et exploits).
+
+#### Temps escompté
+
+ - 1 semaine (25.05 au 01.06).
+
+#### Rôles et effort escompté
+
+ - P-B. Monaco : Implémentation des fonctions d'administration, 3h.
+ - Lucas Elisei : Étude des problèmes/risques de sécurité. Écriture d'un rapport de sécurité, 3h.
+ - David Truan : Étude des problèmes/risques de sécurité. Écriture d'un rapport de sécurité, 3h.
+ - Gaëtan Othenin-Girard : Test unitaires, vérification et validation du fonctionnement et revue de code, 2h.
+
+### Itération 7
+
+#### Objectifs
+
+Implémentation des modifications administrateurs en pleine partie avec l'ajout de compte "modérateur". Par exemple :
+
+- Ajout de bonus à un endroit.
+- Explosion d'une planète sélectionnée.
+- Application instantanée d'un bonus sur un joueur.
+- Déplacement d'un joueur en drag and drop.
+- Mettre la partie en pause.
+
+#### Temps escompté
+
+- 1 semaine (01.06 au 08.06).
+
+#### Rôles et efforts escomptés
+
+- P-B. Monaco : Apparition d'objets aux endroits sélectionnés et tests unitaires, 3h.
+- Lucas Elisei : Implémentation du compte spécial "modérateur" sur la base de données et en jeu, 3h.
+- David Truan : Intéraction directe avec la planète du joueur (déplacement et explosion), 3h.
+- Gaëtan Othenin-Girard : Interface de sélection de la liste des joueurs et ajout de bonus sur le joueur sélectionné, 3h.
+
+### Itération 8
+
+#### Objectifs
+
+- Finalisation du projet, récupération du retard.
+
+#### Temps escompté
+
+- 1 semaine (08.06 au 15.06).
+
+#### Rôles et efforts escomptés
+
+- P-B. Monaco : Finalisation, revue de code en profondeur, 2h.
+- Lucas Elisei : Finalisation, revue de code en profondeur, 2h.
+- David Truan : Finalisation, revue de code en profondeur, 2h.
+- Gaëtan Othenin-Girard : Finalisation, revue de code en profondeur, 2h.
