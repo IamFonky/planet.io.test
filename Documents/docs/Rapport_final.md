@@ -37,8 +37,8 @@ header-includes:
     # 'fancyhdr' settings.
     - \pagestyle{fancy}
     - \fancyhead[CO,CE]{}
-    - \fancyhead[LO,LE]{Commusica}
-    - \fancyhead[RO,RE]{HEIG-VD - PRO 2017}
+    - \fancyhead[LO,LE]{planet.io}
+    - \fancyhead[RO,RE]{HEIG-VD - GEN 2017}
 
     # Redefine TOC style.
     - \setcounter{tocdepth}{2}
@@ -209,7 +209,7 @@ Le tableau ci-dessous liste les différentes commandes du protocole et leur rôl
 | `CMD_CREATE_GAME` | Le client crée une partie. |
 | `CMD_JOIN_GAME` | Le client rejoint une partie. |
 | `CMD_DISCONNECT` | Le client se déconnecte. |
-| `CMD_SEPARATOR` | Séparateur <argument>:<commande> |
+| `CMD_SEPARATOR` | Séparateur \<argument\>:\<commande\> |
 | `PLANET_IO_LEAVING_GAME` | Le client quitte la partie. |
 | `END_OF_COMMAND` | Signal de fin de commande. |
 
@@ -235,16 +235,16 @@ Un dépôt Git a été ouvert sur Bitbucket afin que tout le monde puisse travai
 
 ## Rôles
 
-- Pierre-Benjamin Monaco
+- Pierre-Benjamin Monaco  
     Chef de projet, responsable des normes et procédures, responsable des tests, développeur.
 
-- Lucas Elisei
+- Lucas Elisei  
     Architecte, concepteur en chef, développeur.
 
-- David Truan
+- David Truan  
     Représentant des utilisateur, développeur.
 
-- Gaëtan Othenin-Girard
+- Gaëtan Othenin-Girard  
     Responsable de la configuration, développeur.
 
 ## Plan d'itération initial
