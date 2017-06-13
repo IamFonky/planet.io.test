@@ -88,7 +88,7 @@ public class Client implements Runnable {
 
         noGUI = debug;
         try {
-            clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
+            clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("10.192.91.145"));
 
             new Thread(clientMulticast).start();
         } catch (UnknownHostException e) {

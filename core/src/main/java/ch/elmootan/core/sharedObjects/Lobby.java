@@ -142,8 +142,9 @@ public class Lobby extends JFrame implements ActionListener {
         refreshGameList(gamesList);
     }
 
-    public void removeAPlayerToGame(int idGame) {
+    public void removeAPlayerToGame(int idGame, String playerName) {
         gamesList.get(idGame).removePlayer();
+        engineList.get(idGame).removeAUserByName(playerName);
         //lobbyChanged.notifyObservers();
         refreshGameList(gamesList);
     }

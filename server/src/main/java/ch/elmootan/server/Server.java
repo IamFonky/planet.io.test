@@ -63,7 +63,7 @@ public class Server implements Observer {
      */
     public Server() {
         try {
-            serverMulticast = new ServerMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
+            serverMulticast = new ServerMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("10.192.91.145"));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

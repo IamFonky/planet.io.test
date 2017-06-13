@@ -129,7 +129,7 @@ public class GUniverse extends JFrame {
         setVisible(true);
         addWindowListener(new WindowAdapter() {
                               public void windowClosing(WindowEvent e) {
-                                  wr.println(Protocol.PLANET_IO_LEAVING_GAME + Protocol.CMD_SEPARATOR + gameId);
+                                  wr.println(Protocol.PLANET_IO_LEAVING_GAME + Protocol.CMD_SEPARATOR + gameId + Protocol.CMD_SEPARATOR + myPlanet.getName());
                                   wr.flush();
                                   dispose();
                                   //System.exit(0);
@@ -221,11 +221,6 @@ public class GUniverse extends JFrame {
 
     }
 
-    public void exitProcedure() {
-        wr.write(Protocol.PLANET_IO_LEAVING_GAME + Protocol.CMD_SEPARATOR + gameId);
-        wr.flush();
-        setVisible(false);
-    }
 
     public void showUI() {
         setVisible(true);

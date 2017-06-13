@@ -140,7 +140,10 @@ public class ClientHandler {
                         }
 
                         case Protocol.PLANET_IO_LEAVING_GAME: {
-                            lobby.removeAPlayerToGame((Integer.parseInt(cmdAndArgs[1])));
+                            int idGame = Integer.parseInt(cmdAndArgs[1]);
+                            String playerName = cmdAndArgs[2];
+                            lobby.removeAPlayerToGame(idGame, playerName);
+
                             break;
                         }
 
