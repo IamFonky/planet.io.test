@@ -247,6 +247,8 @@ Notre base de données s'appuie sur SQLite3.
 
 Pour la sérialisation/désarialisation des données, nous avons utilisé Jackson.
 
+Un dépôt Git a été ouvert sur Bitbucket afin que tout le monde puisse travailler de son côté. L'outil Travis a été ajouté au dépôt afin que chaque push ne casse pas la compilation du projet.
+
 # Gestion du projet
 
 ## Rôles
@@ -427,3 +429,133 @@ Implémentation des modifications administrateurs en pleine partie avec l'ajout 
 - Lucas Elisei : Finalisation, revue de code en profondeur, 2h.
 - David Truan : Finalisation, revue de code en profondeur, 2h.
 - Gaëtan Othenin-Girard : Finalisation, revue de code en profondeur, 2h.
+
+## Suivi du projet
+
+### Itération 1
+
+#### Bilan
+
+> Tout bon! Revoir simplement les cas d'utilisation et compléter les itérations 3 à 8.
+
+#### Problèmes rencontrés
+
+Aucun.
+
+#### Replanification
+
+Non.
+
+### Itération 2
+
+#### Bilan
+
+> Revoir la description avec la notion de gestion, infra et UC (fait partiellement ou complétement). Faire de même après en dessous avec puces. Sinon pour tout le reste, c'est ok.
+> Gestion de la planète à compléter. Manque lorsque la souris bouge. Mettre une description plus complète pour expliquer ce que "gérer" veut dire.
+
+#### Problèmes rencontrés
+
+Aucun.
+
+#### Replanification
+
+Non.
+
+### Itération 3
+
+#### Bilan
+
+> Faire une séparation entre le scénario principale et échec. Mettre le/les scénarios au niveau de checkbox. Reprendre dans la description les points qui sont traités et dire dans le cas d'un point "orange", qu'est ce qui est visible dans l'ensemble.
+
+#### Problèmes rencontrés
+
+Aucun.
+
+#### Replanification
+
+Non.
+
+### Itération 4
+
+#### Bilan
+
+> Revoir la présentation du partage de travail, compléter les itérations jusqu'à la fin. Faire la distinction entre Gestion, fonctionnalité et infrastructure. A faire d'ici lundi 22 soir.s
+> Créer une BDD pour répondre au cahier des charges.
+
+#### Problèmes rencontrés
+
+Aucun.
+
+#### Replanification
+
+Non.
+
+### Itération 5
+
+#### Bilan
+
+> Planification à faire pour rattraper le retard.
+
+#### Problèmes rencontrés
+
+Aucun.
+
+#### Replanification
+
+Le temps par les autres matières étant trop conséquent, nous avons préféré mettre cette itération de côté afin de pouvoir tenir la cadence. Le retard sera rattrapé les semaines suivantes.
+
+### Itération 6
+
+#### Bilan
+
+> UC Actions sur une partie à re-planifier. Pour le reste tout est ok. A planifier aussi les points qui sont faits partiellement. Rattrapage du retard pris sur l'itération précédente.
+
+#### Problèmes rencontrés
+
+Aucun.
+
+#### Replanification
+
+Non.
+
+### Itération 7
+
+#### Bilan
+
+- La création de bonus est presque terminée.
+- Reste quelques bugs au niveau de la communication client/serveur pour les calculs mais la séparation est bien mieux définie maintenant.
+- Les fonctionnalités admin ont été revues : plus de possibilité de ban. Un admin ne peut pour l'instant que modifier le nombre max de parties dans un lobby et accéder aux parties en tant que spectateur en voyant tous les joueurs plutôt que le top 5.
+- La base de donnée est presque implémentée.
+
+#### Problèmes rencontrés
+
+Problème de communication multicast.
+
+#### Replanification
+
+Non.
+
+### Itération 8
+
+#### Bilan
+
+- Correction de bugs majeurs.
+- Rédaction du rapport.
+
+#### Problèmes rencontrés
+
+Le fait que nous ayons été mis au courant au dernier moment qu'un rapport était à rédiger, une charge de travail conséquente est venue s'ajouter à celle déjà existante mais la replanification est cette fois-ci impossible.
+
+#### Replanification
+
+Malheureusement non.
+
+## Stratégie de tests
+
+Les tests ont été effectués par toute l'équipe, dans la mesure du possible. Ces derniers ont été réalisés dans leur intégralité grâce à la libraire JUnit. Quant aux résultats des tests, tous ont été validés par Travis lors du push sur les différentes branches.
+
+## Stratégie d'intégration
+
+Comme expliqué précédemment, Git a été utilisé pour intégrer le travail de chacun des membres du groupe. Chaque membre avait sa propre branche. Le merge d'une branche sur *master* était fait à chaque fois qu'une nouvelle fonctionnalité était implémentée et fonctionnelle. Travis nous permettait de savoir si le merge allait casser la compilation de la branche principale, au quel cas nous résolvions les conflits avant de merge.
+
+# État des lieux
