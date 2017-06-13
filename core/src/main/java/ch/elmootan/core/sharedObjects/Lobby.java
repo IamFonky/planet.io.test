@@ -122,10 +122,9 @@ public class Lobby extends JFrame implements ActionListener {
 
 
     public int addGame(Game game) {
-        //DefaultTableModel model = (DefaultTableModel) table.getModel();
-        //model.addRow(new Object[]{game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
         engineList.add(new Engine(multicastServer, gamesList.size() - 1));
+        game.setGameId(gamesList.size() - 1);
         //lobbyChanged.notifyObservers(game);
         refreshGameList(gamesList);
         return gamesList.size();
@@ -154,31 +153,17 @@ public class Lobby extends JFrame implements ActionListener {
 
         DefaultTableModel model = (DefaultTableModel) table.getModel();
 
-        System.out.println("Model size before refresh " + model.getRowCount());
-
-        /*for (int i = 0; i < model.getRowCount(); ++i) {
-            ((DefaultTableModel) table.getModel()).removeRow(i);
-        }*/
-
         model.setRowCount(0);
-
-        System.out.println("Model size after removing rows " + model.getRowCount());
 
         gamesList = newGameList;
 
-        System.out.println("Gamelist size: " + gamesList.size());
-        System.out.println("Gamelist " + gamesList);
-
         for (int i = 0; i < gamesList.size(); ++i) {
-            ((DefaultTableModel) table.getModel()).addRow(new Object[]{gamesList.get(i).getName(), gamesList.get(i).getNbPlaylersCurrent() + "/" + gamesList.get(i).getNbPlayersMax()});
+            model.addRow(new Object[]{gamesList.get(i).getName(), gamesList.get(i).getNbPlaylersCurrent() + "/" + gamesList.get(i).getNbPlayersMax()});
         }
 
-
-        System.out.println("Model size after refresh " + model.getRowCount());
         lobbyChanged.notifyObservers();
 
     }
-
 
     public ArrayList<Game> getGamesList() {
         return gamesList;
@@ -187,7 +172,6 @@ public class Lobby extends JFrame implements ActionListener {
     public ArrayList<Engine> getEngineList() {
         return engineList;
     }
-
 
     public void setNbGamesMax(int nbGamesMax) {
         this.nbGamesMax = nbGamesMax;

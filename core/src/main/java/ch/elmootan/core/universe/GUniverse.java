@@ -172,7 +172,7 @@ public class GUniverse extends JFrame {
                     int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
                     int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
 
-                    if (body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
+                    if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
                         g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
                     } else if (body.getClass() == Planet.class) {
                         g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);

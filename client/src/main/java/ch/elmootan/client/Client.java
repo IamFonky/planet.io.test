@@ -170,7 +170,7 @@ public class Client implements Runnable {
         }
     }
 
-    public void joinServer(int skin) {
+    public void joinGame(int skin) {
         synchronized (lobby) {
             try {
                 serverWrite(Protocol.CMD_JOIN_GAME
@@ -253,7 +253,7 @@ public class Client implements Runnable {
                                 System.out.println(idSkin);
                                 chooseStatus = true;
                                 currentGame = gamesList.get(indexGame);
-                                joinServer(idSkin);
+                                joinGame(idSkin);
                                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                             }
 

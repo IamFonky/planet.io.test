@@ -201,12 +201,11 @@ public class ClientMulticast implements Runnable {
                     if (args.size() > 1) {
                         if (Client.currentGame != null && Integer.parseInt(args.get(0)) == Client.currentGame.getGameId()) {
                             try {
-                                ArrayList<Body> bodies = mapper.readValue(args.get(1), new TypeReference<List<Body>>(){});
+                                ArrayList<Body> bodies = mapper.readValue(args.get(1), new TypeReference<List<Body>>() {
+                                });
 
                                 Client.updateGUniverse(bodies);
-                            }
-                            catch (IOException ioe)
-                            {
+                            } catch (IOException ioe) {
                                 ioe.printStackTrace();
                             }
                         }
@@ -215,4 +214,3 @@ public class ClientMulticast implements Runnable {
         }
     }
 }
-
