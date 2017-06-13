@@ -79,7 +79,7 @@ public class Client implements Runnable {
         cPrompt = new CredentialsPrompt();
 
         try {
-            connect("localhost", Protocol.PORT);
+            connect(Protocol.IP_SERVER, Protocol.PORT);
 
 
         } catch (Exception e) {

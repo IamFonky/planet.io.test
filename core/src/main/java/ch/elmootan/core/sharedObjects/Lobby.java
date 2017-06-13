@@ -172,7 +172,13 @@ protected class SkinChooser extends JFrame implements ActionListener {
 
         try {
             for (int i = 1; i <= 8; i++)
-                skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet" + i + "_64x64.png")));
+            {
+                System.out.println(getClass().getResource(""));
+                skins.add(ImageIO.read(new File(getClass().getResource("../core/skins/planet" + i + "_64x64.png").getPath())));
+            }
+//            skins.add(ImageIO.read(new File("../skins/planet" + i + "_64x64.png")));
+//                skins.add(ImageIO.read(new File(Lobby.class.getClass().
+//                      getClassLoader().getResource("../skins/planet" + i + "_64x64.png").getFile())));
         } catch (IOException e) {
             e.printStackTrace();
         }
