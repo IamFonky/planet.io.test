@@ -44,9 +44,6 @@ public class Client implements Runnable {
 
     boolean isAdmin;
 
-    //débug
-    boolean noGUI = false;
-
     static protected Lobby lobby = null;
 
     // Current game
@@ -67,28 +64,27 @@ public class Client implements Runnable {
     }
 
 
-    public Client() {
-        createClient(player, false);
+    public Client(String serverIP, String interfaceIP) {
+        createClient(player, serverIP, interfaceIP);
     }
 
 
-    private void createClient(Player player, boolean debug) {
+    private void createClient(Player player, String serverIP, String interfaceIP) {
 
         tcpSocket = new Socket();
 
         cPrompt = new CredentialsPrompt();
 
         try {
-            connect(Protocol.IP_SERVER, Protocol.PORT);
+            connect(serverIP, Protocol.PORT);
 
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        noGUI = debug;
         try {
-            clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
+            clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName(interfaceIP));
 
             new Thread(clientMulticast).start();
         } catch (UnknownHostException e) {
@@ -198,10 +194,8 @@ public class Client implements Runnable {
 
     public void exit() {
         try {
-            if (!noGUI) {
-                lobby.dispose();
-                disconnect();
-            }
+            lobby.dispose();
+            disconnect();
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -355,9 +349,8 @@ public class Client implements Runnable {
                                 });
 
                                 System.out.println(gameListJSON);
-                                if (!noGUI) {
-                                    lobby.addGameList(initialGameList);
-                                }
+
+                                lobby.addGameList(initialGameList);
                             }
 
                             lobby.showUI();
