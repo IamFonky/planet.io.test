@@ -155,24 +155,6 @@ Le but de notre jeu étant de proposer une mini-simulation de gravité, en plus 
 
 Il n'y a pas de victoire à proprement parler, ni de fin de partie. Les joueurs ont un score qui correspond à la masse de leur planète et leur partie se termine lorsqu'ils se font manger par un autre joueur.
 
-### Fonctionnalités disponibles
-
-- Déplacement de la planète grâce à la souris: lorsque le joueur fait un geste de frottement à l'aide de sa souris, cela génère une forte gravité par rapport à la planète du joueur.
-- Score se basant sur la masse de la planète du joueur. Mise à jour en temps réel du score des 5 meilleurs joueurs, visible par chaque joueur.
-- **Sauvegarde des scores des joueurs dans une base de données**.
-- Bonus offrant des pouvoirs:
-    - Lune amassant des fragments pour nous.
-    - Atmosphère protectrice.
-- Zoom/De-zoom avec les touches **A** et **D** .
-- **Déplacement de la caméra avec les flèches directionnelles.**
-- Administration. Au niveau du serveur, un administrateur doit pouvoir effectuer certaines tâches :
-    - **Vider la base de données (reset des scores par utilisateur ou pour tout le monde)**
-    - Gérer le nombre de parties max du lobby.
-    - Être spectateur d'une partie en ayant la visibilité sur tous les joueurs.
-- Choix d'une texture visuelle de la planète contrôlée.
-- Gestion concurrente du maximum de joueurs possibles (si possible, pas de limite).
-- Sons.
-
 ## Partage des responsabilités client-serveur
 
 Une des contraintes de ce projet étant de faire une application de type client-serveur, il nous a fallu réfléchir aux différentes responsabilités que l'une ou l'autre des parties devaient avoir.
@@ -559,3 +541,45 @@ Les tests ont été effectués par toute l'équipe, dans la mesure du possible. 
 Comme expliqué précédemment, Git a été utilisé pour intégrer le travail de chacun des membres du groupe. Chaque membre avait sa propre branche. Le merge d'une branche sur *master* était fait à chaque fois qu'une nouvelle fonctionnalité était implémentée et fonctionnelle. Travis nous permettait de savoir si le merge allait casser la compilation de la branche principale, au quel cas nous résolvions les conflits avant de merge.
 
 # État des lieux
+
+## Ce qui fonctionne
+
+- Déplacement de la planète grâce à la souris: lorsque le joueur fait un geste de frottement à l'aide de sa souris, cela génère une forte gravité par rapport à la planète du joueur.
+- Score se basant sur la masse de la planète du joueur. Mise à jour en temps réel du score des 5 meilleurs joueurs, visible par chaque joueur.
+- **Sauvegarde des scores des joueurs dans une base de données**.
+- Bonus offrant des pouvoirs:
+    - Lune amassant des fragments pour nous.
+    - Atmosphère protectrice.
+- Zoom/De-zoom avec les touches **A** et **D** .
+- **Déplacement de la caméra avec les flèches directionnelles.**
+- Administration. Au niveau du serveur, un administrateur doit pouvoir effectuer certaines tâches :
+    - **Vider la base de données (reset des scores par utilisateur ou pour tout le monde)**
+    - Gérer le nombre de parties max du lobby.
+    - Être spectateur d'une partie en ayant la visibilité sur tous les joueurs.
+- Choix d'une texture visuelle de la planète contrôlée.
+- Gestion concurrente du maximum de joueurs possibles (si possible, pas de limite).
+- Sons.
+
+## Développement futur
+
+- Correction des bugs
+- Ajout de bonus/malus
+- Amélioration de l'interface graphique
+
+# Auto-critique
+
+## Solution technique
+
+Du point de vue technique, nous aurions sûrement dû réfléchir un peu plus longuement sur l'architecture de l'application. Notre solution actuelle fonctionne mais l'implémentation n'est pas vraiment propre. La gestion de la communication réseau est aussi à revoir. Nous avons eu plusieurs problèmes concernant la communication multicast qui n'auraient pas lieu d'être si une autre approche avait été utilisée dès le départ.
+
+## Gestion du projet
+
+La gestion du projet s'est très bien déroulée. Les deadlines ont été respectées dans la quasi-totalité des cas. Le chef de projet avait plus le rôle de leader que de chef ce qui fait qu'aucun sentiment de hiérarchie n'a été ressenti. Chacun a effectué son travail correctement.
+
+## Plan d'itérations
+
+Notre plan d'itérations initial a dans l'ensemble été respecté malgré quelques réajustements qui ont été nécessaires en cours de route.
+
+## Améliorations
+
+# Conclusion
