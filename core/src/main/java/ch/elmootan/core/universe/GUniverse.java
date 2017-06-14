@@ -48,6 +48,13 @@ public class GUniverse extends JFrame {
     private ArrayList<BufferedImage> planets = new ArrayList<>();
     private BufferedImage invisible;
 
+    private BufferedImage atmospher;
+    private  BufferedImage bonus;
+
+    private MediaPlayer mediaPlayer;
+
+    private float bonusCounter = 0;
+
     private BufferedReader rd;
     private PrintWriter wr;
 
@@ -72,8 +79,10 @@ public class GUniverse extends JFrame {
 
         try {
             for (int i = 1; i <= 8; i++)
-                planets.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_32x32.png")));
+                planets.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_64x64.png")));
             invisible = ImageIO.read(getClass().getResourceAsStream("/skins/invisible_64x64.png"));
+            atmospher = ImageIO.read(getClass().getResourceAsStream("/skins/atmospher.png"));
+            bonus = ImageIO.read(getClass().getResourceAsStream("/skins/bonus.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -180,10 +189,15 @@ public class GUniverse extends JFrame {
                     Collections.reverse(allThings);
                     int nbScores = allThings.size() > 5 ? 5 : allThings.size();
                     g2d.drawString("Top 5:", 0, 10);
-                    for (int i = 0; i < nbScores; i++) {
-                        if (allThings.get(i).getClass() == Planet.class) {
-                            g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
+                    int i = 0, j = 1;
+                    while (i != nbScores) {
+                        if (allThings.get(i) instanceof Planet && !(allThings.get(i) instanceof InvisiblePlanet)) {
+                            g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
+                        } else if (allThings.size() > 5) {
+                            nbScores++;
                         }
+                        if (++i >= allThings.size())
+                            break;
                     }
                 }
 
@@ -196,9 +210,33 @@ public class GUniverse extends JFrame {
 
                     if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
                         g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
-                    } else if (body.getClass() == Planet.class) {
-                        g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
-                        g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
+                    }
+                    else if (Bonus.class.isInstance(body))
+                        {
+                            g2d.drawImage(bonus.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
+                        }
+                        else if (Planet.class.isInstance(body))
+                        {
+                            g2d.drawString(body.getName(), x-(body.getName().length()/2)*5+radius/2, y-10);
+                            g2d.drawImage(planets.get(((Planet)body).getIdSkin()).getScaledInstance(radius, radius, 0),x,y,this);
+
+                            switch (((Planet) body).getActiveBonus()) {
+                                case Bonus.MOON:
+                                    Double xB = new Double(x+radius/4+(radius*(Math.cos(Math.toRadians(bonusCounter)))));
+                                    Double yB = new Double(y+radius/4+(radius*(Math.sin(Math.toRadians(bonusCounter)))));
+                                    int xp = xB.intValue();
+                                    int yp = yB.intValue();
+
+                                    g.drawOval(xp,yp, radius/5, radius/5);
+
+                                    bonusCounter += 0.1f;
+                                    if (bonusCounter > 360)
+                                        bonusCounter = 0;
+                                    break;
+                                case Bonus.ATMOSPHER:
+                                    g2d.drawImage(atmospher.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
+                                    break;
+                            }
                     } else if (body.getClass() == Fragment.class) {
                         g.drawRect(x, y, radius, radius);
                     }

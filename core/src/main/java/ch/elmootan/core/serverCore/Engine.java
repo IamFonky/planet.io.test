@@ -29,17 +29,30 @@ public class Engine {
     private ServerMulticast multicastServer;
     private int engineId;
 
-    public Engine(ServerMulticast udpServer, int serverId) {
-        engineId = serverId;
-        multicastServer = udpServer;
-        ActionListener repaintLol = evt -> calculateBodies();
-        javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
-        displayTimer.start();
-    }
+   private Random randomBonus;
+   private int nextBonusTime;
+   private int bonusTime;
+
+   public Engine(ServerMulticast udpServer,int serverId) {
+      engineId = serverId;
+      multicastServer = udpServer;
+      ActionListener repaintLol = evt -> calculateBodies();
+      javax.swing.Timer displayTimer = new javax.swing.Timer(2, repaintLol);
+      displayTimer.start();
+      randomBonus = new Random();
+      nextBonusTime = randomBonus.nextInt(20000) + 5000;
+   }
 
     private void calculateBodies() {
         for (int i = 0; i < allThings.size(); ++i) {
             Body body = allThings.get(i);
+            if (body instanceof Bonus) {
+                long timeAlive = System.currentTimeMillis() - ((Bonus)body).getCreationTime();
+                if (timeAlive >= 10000) {
+                    removeBody(body);
+                    continue;
+                }
+            }
             if (body != null) {
                 for (int j = i + 1; j < allThings.size(); ++j) {
                     Body surrounding = allThings.get(j);
@@ -59,31 +72,36 @@ public class Engine {
 
                         }
 
-                        if (gTgDistance < 0) //Collision!
+                  if (gTgDistance < 0) //Collision!
+                  {
+                     // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
+                     // (on évite ainsi les valeurs limites).
+                     if (body.getId() == surrounding.getId()) {
+                        if(InvisiblePlanet.class.isInstance(body))
                         {
-                            // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
-                            // (on évite ainsi les valeurs limites).
-                            if (body.getId() == surrounding.getId()) {
-                                if (InvisiblePlanet.class.isInstance(body)) {
-                                    removeBody(body);
-                                } else if (InvisiblePlanet.class.isInstance(surrounding)) {
-                                    removeBody(surrounding);
-                                }
-                            }
-                            // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
-                            // est invisible et n'interragit pas avec celle des autres joueurs.
-                            else if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
-                                continue;
-                            } else {
-                                BodyState eatState;
-                                synchronized (allThings) {
-                                    if (body.getMass() > surrounding.getMass()) {
-                                        allThings.remove(surrounding);
-                                        eatState = body.eat(surrounding);
-                                    } else {
-                                        allThings.remove(body);
-                                        eatState = surrounding.eat(body);
-                                    }
+                           removeBody(body);
+                        }
+                        else if(InvisiblePlanet.class.isInstance(surrounding))
+                        {
+                           removeBody(surrounding);
+                        }
+                     }
+                     // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
+                     // est invisible et n'interragit pas avec celle des autres joueurs.
+                     else if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
+                        continue;
+                     } else {
+                        BodyState eatState;
+                        synchronized (allThings) {
+                           if (isProtected(body) || isProtected(surrounding))
+                              continue;
+                           if (body.getMass() > surrounding.getMass()) {
+                              eatState = body.eat(surrounding);
+                              allThings.remove(surrounding);
+                           } else {
+                              eatState = surrounding.eat(body);
+                              allThings.remove(body);
+                           }
 
                                     switch (eatState) {
                                         case EXPLODE:
@@ -148,14 +166,36 @@ public class Engine {
             // body.speed.x -= 0.005 * body.speed.x;
             // body.speed.y -= 0.005 * body.speed.y;
 
-            sendInfos();
-        }
-    }
+         bonusTime++;
 
-    public void explode(Body body) {
-        Random rand = new Random();
-        double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
-        double oldMass = body.getMass();
+         if (bonusTime == nextBonusTime) {
+            generateBonus();
+            bonusTime = 0;
+            nextBonusTime = randomBonus.nextInt(20000) + 5000;
+         }
+
+         sendInfos();
+      }
+   }
+
+   private boolean isProtected(Body body) {
+      if (!(body instanceof Planet))
+         return false;
+
+      switch (((Planet)body).getActiveBonus()) {
+         case Bonus.ATMOSPHER:
+            return true;
+         case Bonus.MOON:
+            ((Planet) body).setActiveBonus(Bonus.NONE);
+            return true;
+      }
+      return false;
+   }
+
+   public void explode(Body body) {
+      Random rand = new Random();
+      double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
+      double oldMass = body.getMass();
 
 
         while (body.getMass() > 0) {
@@ -277,9 +317,24 @@ public class Engine {
         userPlanets.remove(idPlanet);
     }
 
-    public synchronized ArrayList<Body> getAllThings() {
-        return allThings;
-    }
+   private void generateBonus() {
+      Random rand = new Random();
+      Bonus bonus = new Bonus(
+              "CENA" + rand.nextDouble() * 10000,
+              new Position(rand.nextDouble() * 400000 + -200000,
+                      rand.nextDouble() * 400000 + -200000),
+              1,
+              6666,
+              Color.WHITE,
+              1,
+              System.currentTimeMillis()
+      );
+      allThings.add(bonus);
+   }
+
+   public synchronized ArrayList<Body> getAllThings() {
+      return allThings;
+   }
 
     public synchronized Body getBodyById(Body body) {
         for (Body listBody : allThings) {
