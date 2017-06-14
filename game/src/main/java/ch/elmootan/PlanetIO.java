@@ -1,16 +1,15 @@
 package ch.elmootan;
 
 
+import ch.elmootan.client.Client;
+import ch.elmootan.core.sharedObjects.Lobby;
+import ch.elmootan.server.Server;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
-import ch.elmootan.core.sharedObjects.Lobby;
-import ch.elmootan.core.universe.Universe;
-import ch.elmootan.server.Server;
-import ch.elmootan.client.Client;
 
 public class PlanetIO {
 
@@ -38,7 +37,7 @@ public class PlanetIO {
             whoAreYou.setHorizontalAlignment(JLabel.CENTER);
             add(whoAreYou);
 
-            JPanel addressPanel = new JPanel(new GridLayout(2,2));
+            JPanel addressPanel = new JPanel(new GridLayout(2, 2));
             JLabel serverIPLabel = new JLabel("Server IP");
             serverIPField = new JTextField();
             serverIPField.setToolTipText("Adresse IP du serveur");
@@ -80,33 +79,27 @@ public class PlanetIO {
 
             Object id = e.getSource();
 
+
             //Settings addresses
             String interfaceIP = interfaceIPField.getText();
             String serverIP = serverIPField.getText();
 
-            if(interfaceIP.equals(""))
-            {
+            if (interfaceIP.equals("")) {
                 interfaceIP = "localhost";
             }
-            if(serverIP.equals(""))
-            {
+            if (serverIP.equals("")) {
                 serverIP = "localhost";
             }
 
-
             if (id == clientChoiceButton) {
                 this.dispose();
-                new Client(serverIP,interfaceIP);
+                new Client(serverIP, interfaceIP);
 
                 //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             } else if (id == serverChoiceButton) {
-                clientChoiceButton.setEnabled(false);
                 Server server = new Server(interfaceIP);
                 Lobby.getSharedInstance().addServerObserver(server);
-
-
                 try {
-                    serverChoiceButton.setEnabled(false);
                     server.startServer();
                 } catch (IOException e1) {
                     e1.printStackTrace();

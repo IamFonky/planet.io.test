@@ -159,8 +159,10 @@ public class GUniverse extends JFrame {
         setVisible(true);
         addWindowListener(new WindowAdapter() {
                               public void windowClosing(WindowEvent e) {
+                                  wr.println(Protocol.PLANET_IO_LEAVING_GAME + Protocol.CMD_SEPARATOR + gameId + Protocol.CMD_SEPARATOR + myPlanet.getName());
+                                  wr.flush();
                                   dispose();
-                                  System.exit(0);
+                                  //System.exit(0);
                               }
                           }
         );
@@ -194,7 +196,8 @@ public class GUniverse extends JFrame {
                         } else if (allThings.size() > 5) {
                             nbScores++;
                         }
-                        i++;
+                        if (++i >= allThings.size())
+                            break;
                     }
                 }
 
@@ -205,7 +208,7 @@ public class GUniverse extends JFrame {
                     int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
                     int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
 
-                    if (body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
+                    if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
                         g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
                     }
                     else if (Bonus.class.isInstance(body))
@@ -268,7 +271,16 @@ public class GUniverse extends JFrame {
 
         setVisible(true);
 
+        /*setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                exitProcedure();
+            }
+        });*/
+
     }
+
 
     public void showUI() {
         setVisible(true);

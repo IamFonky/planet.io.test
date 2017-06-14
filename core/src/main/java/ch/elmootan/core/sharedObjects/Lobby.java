@@ -121,11 +121,11 @@ public class Lobby extends JFrame implements ActionListener {
 
 
     public int addGame(Game game) {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.addRow(new Object[]{game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
         engineList.add(new Engine(multicastServer, gamesList.size() - 1));
-        lobbyChanged.notifyObservers(game);
+        game.setGameId(gamesList.size() - 1);
+        //lobbyChanged.notifyObservers(game);
+        refreshGameList(gamesList);
         return gamesList.size();
     }
 
@@ -133,6 +133,36 @@ public class Lobby extends JFrame implements ActionListener {
         for (Game game : gameList) {
             addGame(game);
         }
+    }
+
+    public void addAPlayerToGame(int idGame) {
+        gamesList.get(idGame).addPlayer();
+        //lobbyChanged.notifyObservers();
+        refreshGameList(gamesList);
+    }
+
+    public void removeAPlayerToGame(int idGame, String playerName) {
+        gamesList.get(idGame).removePlayer();
+        engineList.get(idGame).removeAUserByName(playerName);
+        //lobbyChanged.notifyObservers();
+        refreshGameList(gamesList);
+    }
+
+
+    public void refreshGameList(ArrayList<Game> newGameList) {
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+        model.setRowCount(0);
+
+        gamesList = newGameList;
+
+        for (int i = 0; i < gamesList.size(); ++i) {
+            model.addRow(new Object[]{gamesList.get(i).getName(), gamesList.get(i).getNbPlaylersCurrent() + "/" + gamesList.get(i).getNbPlayersMax()});
+        }
+
+        lobbyChanged.notifyObservers();
+
     }
 
     public ArrayList<Game> getGamesList() {
@@ -143,7 +173,6 @@ public class Lobby extends JFrame implements ActionListener {
         return engineList;
     }
 
-
     public void setNbGamesMax(int nbGamesMax) {
         this.nbGamesMax = nbGamesMax;
     }
@@ -152,74 +181,75 @@ public class Lobby extends JFrame implements ActionListener {
         return nbGamesMax;
     }
 
-protected class SkinChooser extends JFrame implements ActionListener {
-    protected JButton btnNext = new JButton(">");
-    protected JButton btnPrev = new JButton("<");
 
-    protected JButton btnChoose = new JButton("GO!");
+    protected class SkinChooser extends JFrame implements ActionListener {
+        protected JButton btnNext = new JButton(">");
+        protected JButton btnPrev = new JButton("<");
 
-    protected ArrayList<BufferedImage> skins = new ArrayList<>();
-    protected JLabel imgSkin;
-    protected int idSkin = 0;
+        protected JButton btnChoose = new JButton("GO!");
 
-    protected boolean chooseStatus = false;
+        protected ArrayList<BufferedImage> skins = new ArrayList<>();
+        protected JLabel imgSkin;
+        protected int idSkin = 0;
 
-    public SkinChooser() {
-        JPanel imgPanel = new JPanel(new FlowLayout());
-        JPanel goPanel = new JPanel();
+        protected boolean chooseStatus = false;
 
-        try {
-            for (int i = 1; i <= 8; i++)
-            {
-                skins.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_64x64.png")));
+        public SkinChooser() {
+            JPanel imgPanel = new JPanel(new FlowLayout());
+            JPanel goPanel = new JPanel();
+
+            try {
+                for (int i = 1; i <= 8; i++) {
+                    skins.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_64x64.png")));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            imgSkin = new JLabel(new ImageIcon(skins.get(idSkin)));
+            imgPanel.add(btnPrev);
+            btnPrev.addActionListener(this);
+            imgPanel.add(imgSkin);
+            btnNext.addActionListener(this);
+            imgPanel.add(btnNext);
+
+            goPanel.add(btnChoose);
+            btnChoose.addActionListener(this);
+
+            getContentPane().add(imgPanel, BorderLayout.CENTER);
+            getContentPane().add(goPanel, BorderLayout.PAGE_END);
+            setTitle("Choix du skin");
+            setResizable(false);
+            setSize(200, 150);
+            setVisible(true);
+
         }
 
-        imgSkin = new JLabel(new ImageIcon(skins.get(idSkin)));
-        imgPanel.add(btnPrev);
-        btnPrev.addActionListener(this);
-        imgPanel.add(imgSkin);
-        btnNext.addActionListener(this);
-        imgPanel.add(btnNext);
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == btnChoose) {
+                System.out.println(idSkin);
+                chooseStatus = true;
+                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+            }
 
-        goPanel.add(btnChoose);
-        btnChoose.addActionListener(this);
+            if (e.getSource() == btnNext) {
+                idSkin = idSkin + 1 > 7 ? 0 : ++idSkin;
+            }
+            if (e.getSource() == btnPrev) {
+                idSkin = idSkin - 1 < 0 ? 7 : --idSkin;
+            }
 
-        getContentPane().add(imgPanel, BorderLayout.CENTER);
-        getContentPane().add(goPanel, BorderLayout.PAGE_END);
-        setTitle("Choix du skin");
-        setResizable(false);
-        setSize(200, 150);
-        setVisible(true);
+            imgSkin.setIcon(new ImageIcon(skins.get(idSkin)));
+            revalidate();
+            repaint();
+        }
+
+
+        public boolean skinChoosed() {
+            return chooseStatus;
+        }
+
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == btnChoose) {
-            System.out.println(idSkin);
-            chooseStatus = true;
-            dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-        }
-
-        if (e.getSource() == btnNext) {
-            idSkin = idSkin + 1 > 7 ? 0 : ++idSkin;
-        }
-        if (e.getSource() == btnPrev) {
-            idSkin = idSkin - 1 < 0 ? 7 : --idSkin;
-        }
-
-        imgSkin.setIcon(new ImageIcon(skins.get(idSkin)));
-        revalidate();
-        repaint();
-    }
-
-    public boolean skinChoosed() {
-        return chooseStatus;
-    }
-
-}
 
     public static void main(String... args) {
         new Lobby();

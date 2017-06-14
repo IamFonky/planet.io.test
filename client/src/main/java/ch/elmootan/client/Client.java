@@ -84,7 +84,9 @@ public class Client implements Runnable {
         }
 
         try {
+
             clientMulticast = new ClientMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName(interfaceIP));
+
 
             new Thread(clientMulticast).start();
         } catch (UnknownHostException e) {
@@ -166,7 +168,7 @@ public class Client implements Runnable {
         }
     }
 
-    public void joinServer(int skin) {
+    public void joinGame(int skin) {
         synchronized (lobby) {
             try {
                 serverWrite(Protocol.CMD_JOIN_GAME
@@ -247,7 +249,7 @@ public class Client implements Runnable {
                                 System.out.println(idSkin);
                                 chooseStatus = true;
                                 currentGame = gamesList.get(indexGame);
-                                joinServer(idSkin);
+                                joinGame(idSkin);
                                 dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                             }
 
@@ -388,6 +390,7 @@ public class Client implements Runnable {
                     if (serverRead().equals(Protocol.PLANET_IO_SUCCESS)) {
                         serverWrite(mapper.writeValueAsString(null));
                         serverRead();
+
                         gui = new GUniverse(
                                 out,
                                 in,
@@ -488,6 +491,7 @@ public class Client implements Runnable {
 
                 if (!maxGame.getText().matches("[a-zA-Z]+")) {
                     serverWrite(Protocol.NB_GAME_MAX_UPDATE + Protocol.CMD_SEPARATOR + (Integer) maxGame.getValue());
+
                     dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                 }
             }

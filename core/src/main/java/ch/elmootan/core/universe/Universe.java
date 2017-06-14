@@ -1,4 +1,4 @@
-package ch.elmootan.core.universe;
+/*package ch.elmootan.core.universe;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -338,6 +338,138 @@ public class Universe extends JFrame {
                   }
                }
             }
+<<<<<<< HEAD
+        };
+
+        //ScorePane scorePane = new ScorePane();
+        // rootPane.add(scorePane);
+
+        ActionListener repaintLol = new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                //scorePane.setScores();
+                drawBodies();
+                rootPane.repaint();
+            }
+        };
+
+        //javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
+        //displayTimer.start();
+
+        rootPane.setBackground(Color.BLACK);
+
+        add(rootPane);
+
+        setSize(1000, 1000);
+        //setVisible(true);
+    }
+
+    public void showUI() {
+        setVisible(true);
+    }
+
+    private void drawBodies() {
+        for (int i = 0; i < allThings.size(); ++i) {
+            Body body = allThings.get(i);
+            if (body != null) {
+                for (int j = i + 1; j < allThings.size(); ++j) {
+                    Body surrounding = allThings.get(j);
+                    if (surrounding != null) {
+                        double gTgDistance = 0;
+                        double sqDistance = 0;
+                        double dX = 0;
+                        double dY = 0;
+                        //On calcule les distances x et y et la distance au carré
+                        synchronized (body) {
+                            dX = surrounding.getPosition().getX() - body.getPosition().getX();
+                            dY = surrounding.getPosition().getY() - body.getPosition().getY();
+                            sqDistance = dX * dX + dY * dY;
+
+                            //On calcule la distance réelle (Ground to ground)
+                            gTgDistance = Math.sqrt(sqDistance) - body.getRadius() / 2 - surrounding.getRadius() / 2;
+                        }
+
+                        if (gTgDistance < 0) //Collision!
+                        {
+                            // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
+                            // (on évite ainsi les valeurs limites).
+                            if (body.getId() == surrounding.getId()) {
+                                removePlanet(clickedPlanet);
+                            }
+                            // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
+                            // est invisible et n'interragit pas avec celle des autres joueurs.
+                            else if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
+                                continue;
+                            } else {
+                                BodyState eatState;
+                                synchronized (allThings) {
+                                    if (body.getMass() > surrounding.getMass()) {
+                                        eatState = body.eat(surrounding);
+                                        allThings.remove(surrounding);
+                                    } else {
+                                        eatState = surrounding.eat(body);
+                                        allThings.remove(body);
+                                    }
+
+                                    switch (eatState) {
+                                        case EXPLODE:
+                                            explode(body);
+                                            break;
+                                        //On peut imaginer ici un case SUN ou BLACKHOLE
+                                    }
+                                }
+                            }
+                        }
+                        // On applique la gravité et la physique uniquement dans 2 cas :
+                        //   - Si c'est la planète cliquée et la planète du joueur.
+                        //   - Si aucune des deux planète n'est une planète cliquée.
+                        else if ((!(body instanceof InvisiblePlanet) && !(surrounding instanceof InvisiblePlanet)) ||
+                                (body.getId() == surrounding.getId())) {
+                            //On calcule le ratio des composantes de distance x et y (règle de 3, Thalès)
+                            double rDX = dX / Math.sqrt(sqDistance);
+                            double rDY = dY / Math.sqrt(sqDistance);
+
+                            //Loi de gravité : F [N] = G [N*m2*kg-2] * mA [kg] * mB [kg] / d2 [m2]
+                            //un Newton = 1 [kg*m*s-2]. Plus simplement [kg*a] ou a est l'accélération
+                            //donc G [kg*m*s-2*m2*kg-2] ==> G [m3*s-2*kg-1]
+                            //On peut donc calculer simplement l'accélération aN sur chaque corps avec :
+                            //aA [m*s-2] = G [m3*s-2*kg-1] * mB [kg] / d2 [m2]
+                            double bodyA = Constants.GRAVITATION.valeur * surrounding.getMass() / sqDistance;
+                            //A cette étape nous avons un vecteur d'accélération mais pas de direction
+                            //Il décomposer en deux composantes x et y
+                            double bodyAX = bodyA * rDX;
+                            double bodyAY = bodyA * rDY;
+
+                            //Même chose pour les deuxième corps
+                            double surrA = Constants.GRAVITATION.valeur * body.getMass() / sqDistance;
+                            double surrAX = surrA * -rDX;
+                            double surrAY = surrA * -rDY;
+
+                            //Il faut maintenant appliquer accélérations x et y aux vitesses x et y
+                            //Pour le moment la cadence du processeur règle la vitesse du programme
+                            synchronized (body) {
+                                body.getSpeed().setX(body.getSpeed().getX() + bodyAX);
+                                body.getSpeed().setY(body.getSpeed().getY() + bodyAY);
+
+                                surrounding.getSpeed().setX(surrounding.getSpeed().getX() + surrAX);
+                                surrounding.getSpeed().setY(surrounding.getSpeed().getY() + surrAY);
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            synchronized (body) {
+                body.getPosition().setX(body.getPosition().getX() + body.getSpeed().getX());
+                body.getPosition().setY(body.getPosition().getY() + body.getSpeed().getY());
+            }
+
+            // Freinage des corps
+            // body.speed.x -= 0.005 * body.speed.x;
+            // body.speed.y -= 0.005 * body.speed.y;
+        }
+    }
+=======
          }
 
          synchronized (body) {
@@ -365,6 +497,7 @@ public class Universe extends JFrame {
       return false;
    }
    //-------------------------------------------
+>>>>>>> ae385bd38f8a51fe58258de2f3b8bc2dea662165
 
     public void explode(Body body) {
         Random rand = new Random();
@@ -539,3 +672,4 @@ public class Universe extends JFrame {
         return allThings;
     }
 }
+*/
