@@ -23,4 +23,9 @@ public class InvisiblePlanet extends Planet {
     {
         return BodyState.DEFAULT;
     }
+
+    public void setIdSkin(int idSkin) {
+        this.idSkin = idSkin;
+    }
+
 }

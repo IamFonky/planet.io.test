@@ -33,10 +33,6 @@ public class Engine {
    private int nextBonusTime;
    private int bonusTime;
 
-   private Random randomBonus;
-   private int nextBonusTime;
-   private int bonusTime;
-
    public Engine(ServerMulticast udpServer,int serverId) {
       engineId = serverId;
       multicastServer = udpServer;

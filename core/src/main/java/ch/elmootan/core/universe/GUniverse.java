@@ -47,7 +47,8 @@ public class GUniverse extends JFrame {
     private boolean mousePressed = false;
 
     private ArrayList<BufferedImage> planets = new ArrayList<>();
-    private BufferedImage invisible;
+    private ArrayList<BufferedImage> invisibles = new ArrayList<>();
+//    private BufferedImage invisible;
 
     private BufferedImage atmospher;
     private  BufferedImage bonus;
@@ -95,7 +96,10 @@ public class GUniverse extends JFrame {
         try {
             for (int i = 1; i <= 8; i++)
                 planets.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_64x64.png")));
-            invisible = ImageIO.read(getClass().getResourceAsStream("/skins/invisible_64x64.png"));
+            for (int i = 1; i <= 4; i++)
+                invisibles.add(ImageIO.read(getClass().getResourceAsStream("/skins/invisible" + i + "_64x64.png")));
+
+//            invisible = ImageIO.read(getClass().getResourceAsStream("/skins/invisible_64x64.png"));
             atmospher = ImageIO.read(getClass().getResourceAsStream("/skins/atmospher.png"));
             bonus = ImageIO.read(getClass().getResourceAsStream("/skins/bonus.png"));
         } catch (IOException e) {
@@ -252,7 +256,7 @@ public class GUniverse extends JFrame {
                         int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
 
                     if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
-                        g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
+                        g2d.drawImage(invisibles.get(((InvisiblePlanet)body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
                     }
                     else if (body.getClass() == Bonus.class)
                         {
@@ -342,12 +346,16 @@ public class GUniverse extends JFrame {
 
     private int getControlForce(MouseEvent e) {
         if (e.isShiftDown() && e.isControlDown()) {
+            clickedPlanet.setIdSkin(3);
             return 10;
         } else if (e.isShiftDown()) {
+            clickedPlanet.setIdSkin(2);
             return 2;
         } else if (e.isControlDown()) {
+            clickedPlanet.setIdSkin(1);
             return 3;
         } else {
+            clickedPlanet.setIdSkin(0);
             return 1;
         }
     }
