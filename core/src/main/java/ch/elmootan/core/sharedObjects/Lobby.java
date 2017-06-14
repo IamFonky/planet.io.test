@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -110,11 +109,11 @@ public class Lobby extends JFrame implements ActionListener {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == createGame) {
-                    Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
-                    addGame(newGame);
-                    dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-                }
+                    if (e.getSource() == createGame) {
+                        Game newGame = new Game(gameName.getText(), null, Integer.parseInt(playerMax.getText()));
+                        addGame(newGame);
+                        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+                    }
                 }
             };
         }
@@ -200,12 +199,12 @@ public class Lobby extends JFrame implements ActionListener {
             JPanel goPanel = new JPanel();
 
             try {
-                for (int i = 1; i <= 8; i++)
-                    skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet" + i + "_64x64.png")));
+                for (int i = 1; i <= 8; i++) {
+                    skins.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_64x64.png")));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             imgSkin = new JLabel(new ImageIcon(skins.get(idSkin)));
             imgPanel.add(btnPrev);
             btnPrev.addActionListener(this);
@@ -222,6 +221,7 @@ public class Lobby extends JFrame implements ActionListener {
             setResizable(false);
             setSize(200, 150);
             setVisible(true);
+
         }
 
         @Override
@@ -243,6 +243,7 @@ public class Lobby extends JFrame implements ActionListener {
             revalidate();
             repaint();
         }
+
 
         public boolean skinChoosed() {
             return chooseStatus;

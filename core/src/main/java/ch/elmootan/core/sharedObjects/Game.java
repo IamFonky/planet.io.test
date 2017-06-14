@@ -1,7 +1,7 @@
 package ch.elmootan.core.sharedObjects;
 
 import ch.elmootan.core.universe.Bonus;
-import ch.elmootan.core.universe.Universe;
+//import ch.elmootan.core.universe.Universe;
 
 import java.io.Serializable;
 import java.util.ArrayList;

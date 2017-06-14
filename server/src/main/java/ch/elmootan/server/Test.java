@@ -8,7 +8,7 @@ public class Test {
     private static final Logger LOG = Logger.getLogger(Test.class.getSimpleName());
 
     public static void main(String... args) {
-        Server server = new Server();
+        Server server = new Server("localhost");
 
         try {
             server.startServer();

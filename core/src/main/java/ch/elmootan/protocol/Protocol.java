@@ -39,7 +39,9 @@ public final class Protocol {
 
     public static final int PORT = 8585;
 
-    public static final int PORT_UDP = 9898;
+    public static final int PORT_UDP = 9999;
 
     public static final String IP_MULTICAST = "239.192.0.2";
+
+    public static final String IP_SERVER = "localhost";
 }

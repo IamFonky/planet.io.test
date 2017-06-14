@@ -1,9 +1,7 @@
 package ch.elmootan.core.serverCore;
 
 import ch.elmootan.core.physics.*;
-import ch.elmootan.core.universe.Fragment;
-import ch.elmootan.core.universe.InvisiblePlanet;
-import ch.elmootan.core.universe.Planet;
+import ch.elmootan.core.universe.*;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +22,7 @@ import java.util.stream.Collectors;
 import static java.lang.Math.*;
 
 public class Engine {
+
 
     private final ArrayList<Body> allThings = new ArrayList<>();
     private final ArrayList<Body> userPlanets = new ArrayList<>();
@@ -57,6 +56,7 @@ public class Engine {
 
                             //On calcule la distance réelle (Ground to ground)
                             gTgDistance = Math.sqrt(sqDistance) - body.getRadius() / 2 - surrounding.getRadius() / 2;
+
                         }
 
                         if (gTgDistance < 0) //Collision!
@@ -94,6 +94,7 @@ public class Engine {
                                 }
                             }
                         }
+
                         // On applique la gravité et la physique uniquement dans 2 cas :
                         //   - Si c'est la planète cliquée et la planète du joueur.
                         //   - Si aucune des deux planète n'est une planète cliquée.
@@ -140,6 +141,7 @@ public class Engine {
 
                 //Débug
 //            System.out.print(body);
+
             }
 
             // Freinage des corps
@@ -304,6 +306,7 @@ public class Engine {
                     allThings.remove(i);
                     return true;
                 }
+
             }
             return false;
         } catch (NullPointerException npe) {
@@ -311,5 +314,4 @@ public class Engine {
             return false;
         }
     }
-
 }
