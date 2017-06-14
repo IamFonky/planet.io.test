@@ -498,4 +498,8 @@ public class Client implements Runnable {
         }
 
     }
+
+    public static void playMusic(String songName) {
+        gui.hollySong(songName, 1.0);
+    }
 }

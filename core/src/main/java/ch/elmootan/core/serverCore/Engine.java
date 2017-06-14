@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 import static java.lang.Math.*;
 
 public class Engine {
-
-
     private final ArrayList<Body> allThings = new ArrayList<>();
     private final ArrayList<Body> userPlanets = new ArrayList<>();
     private ServerMulticast multicastServer;
@@ -33,22 +31,26 @@ public class Engine {
     private int nextBonusTime;
     private int bonusTime;
 
-    public Engine(ServerMulticast udpServer,int serverId) {
-        engineId = serverId;
-        multicastServer = udpServer;
-        ActionListener repaintLol = evt -> calculateBodies();
-        javax.swing.Timer displayTimer = new javax.swing.Timer(2, repaintLol);
-        displayTimer.start();
-        randomBonus = new Random();
-        nextBonusTime = randomBonus.nextInt(20000) + 5000;
-    }
+   private static final long TIME_BONUS_STAY = 21000;
+    private static final int MIN_TIME_BONUS_APPEARS = 20000;
+   private static final int MAX_TIME_BONUS_APPEARS = 60000;
+
+   public Engine(ServerMulticast udpServer,int serverId) {
+      engineId = serverId;
+      multicastServer = udpServer;
+      ActionListener repaintLol = evt -> calculateBodies();
+      javax.swing.Timer displayTimer = new javax.swing.Timer(2, repaintLol);
+      displayTimer.start();
+      randomBonus = new Random();
+      nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
+   }
 
     private void calculateBodies() {
         for (int i = 0; i < allThings.size(); ++i) {
             Body body = allThings.get(i);
             if (body instanceof Bonus) {
                 long timeAlive = System.currentTimeMillis() - ((Bonus)body).getCreationTime();
-                if (timeAlive >= 10000) {
+                if (timeAlive >= TIME_BONUS_STAY) {
                     removeBody(body);
                     continue;
                 }
@@ -168,11 +170,11 @@ public class Engine {
 
             bonusTime++;
 
-            if (bonusTime == nextBonusTime) {
-                generateBonus();
-                bonusTime = 0;
-                nextBonusTime = randomBonus.nextInt(20000) + 5000;
-            }
+         if (bonusTime == nextBonusTime) {
+            generateBonus();
+            bonusTime = 0;
+            nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
+         }
 
             sendInfos();
         }
@@ -317,20 +319,28 @@ public class Engine {
         userPlanets.remove(idPlanet);
     }
 
-    private void generateBonus() {
-        Random rand = new Random();
-        Bonus bonus = new Bonus(
-                "CENA" + rand.nextDouble() * 10000,
-                new Position(rand.nextDouble() * 400000 + -200000,
-                        rand.nextDouble() * 400000 + -200000),
-                1,
-                6666,
-                Color.WHITE,
-                1,
-                System.currentTimeMillis()
-        );
-        allThings.add(bonus);
-    }
+   private void generateBonus() {
+      Random rand = new Random();
+      Bonus bonus = new Bonus(
+              "CENA" + rand.nextDouble() * 10000,
+              new Position(rand.nextDouble() * 400000 + -200000,
+                      rand.nextDouble() * 400000 + -200000),
+              1,
+              6666,
+              Color.WHITE,
+              1,
+              System.currentTimeMillis()
+      );
+      allThings.add(bonus);
+
+      sendPlayMusic();
+   }
+
+   private void sendPlayMusic() {
+       if (multicastServer != null) {
+           multicastServer.send(Protocol.PLAY_MUSIC + '\n' + Protocol.END_OF_COMMAND);
+       }
+   }
 
     public synchronized ArrayList<Body> getAllThings() {
         return allThings;
