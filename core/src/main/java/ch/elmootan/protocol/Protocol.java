@@ -30,6 +30,7 @@ public final class Protocol {
     public static final String CMD_JOIN_GAME = "JOINGAME";
     public static final String CMD_DISCONNECT = "DISCONECT";
     public static final String CMD_SEPARATOR = ":";
+    public static final String PLANET_IO_LEAVING_GAME = "PLANET_IO_LEAVING_GAME";
     public static final String CMD_BLABLA = "blablabla";
 
 

@@ -1,7 +1,7 @@
 package ch.elmootan.core.sharedObjects;
 
 import ch.elmootan.core.universe.Bonus;
-import ch.elmootan.core.universe.Universe;
+//import ch.elmootan.core.universe.Universe;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -81,6 +81,13 @@ public class Game implements Serializable {
         this.nbPlaylersCurrent = nbPlaylersCurrent;
     }
 
+    public void addPlayer() {
+        nbPlaylersCurrent ++;
+    }
+
+    public void removePlayer() {
+        nbPlaylersCurrent --;
+    }
 
     public int getGameId() {
         return gameId;
