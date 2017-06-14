@@ -1,20 +1,29 @@
 package ch.elmootan;
 
 
+import ch.elmootan.client.Client;
+import ch.elmootan.core.sharedObjects.Lobby;
+import ch.elmootan.server.Server;
+import ch.elmootan.utils.Network;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
-import ch.elmootan.core.sharedObjects.Lobby;
-import ch.elmootan.core.universe.Universe;
-import ch.elmootan.server.Server;
-import ch.elmootan.client.Client;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.TreeMap;
 
 public class PlanetIO {
 
     public static void main(String... args) {
+
 
         new IdentityChooser();
 
@@ -27,10 +36,16 @@ public class PlanetIO {
         JButton serverChoiceButton;
         JButton clientChoiceButton;
 
+        JComboBox<Network.InterfaceIP> interfacesComboBox;
+
         JTextField serverIPField;
         JTextField interfaceIPField;
 
+        String serverIP = "";
+        String interfaceIP = "";
+
         public IdentityChooser() {
+
             setLayout(new GridLayout(3, 1));
 
             JLabel whoAreYou = new JLabel("Who are you");
@@ -45,11 +60,15 @@ public class PlanetIO {
             addressPanel.add(serverIPLabel);
             addressPanel.add(serverIPField);
 
+            interfacesComboBox = new JComboBox<>(Network.getInterfaceIPForComboBox());
+
+            interfacesComboBox.addActionListener(this);
+
             JLabel interfaceIPLabel = new JLabel("Interface IP");
             interfaceIPField = new JTextField();
             interfaceIPField.setToolTipText("Adresse IP de l'interface");
             addressPanel.add(interfaceIPLabel);
-            addressPanel.add(interfaceIPField);
+            addressPanel.add(interfacesComboBox);
             add(addressPanel);
 
 
@@ -67,7 +86,7 @@ public class PlanetIO {
 
             add(buttonsPanel);
 
-            setSize(267, 150);
+            pack();
 
             setLocationRelativeTo(null);
 
@@ -76,21 +95,29 @@ public class PlanetIO {
 
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
 
             Object id = e.getSource();
 
             //Settings addresses
-            String interfaceIP = interfaceIPField.getText();
-            String serverIP = serverIPField.getText();
+            //String interfaceIP = interfaceIPField.getText();
+            serverIP = serverIPField.getText();
+
+
+
+            if (id == interfacesComboBox) {
+                interfaceIP = interfacesComboBox.getItemAt(interfacesComboBox.getSelectedIndex()).getIpAddress();
+                return;
+            }
 
             if (interfaceIP.equals("")) {
-                interfaceIP = "localhost";
+                interfaceIP = interfacesComboBox.getItemAt(0).getIpAddress();;
+
             }
             if (serverIP.equals("")) {
                 serverIP = "localhost";
             }
-
 
             if (id == clientChoiceButton) {
                 this.dispose();
@@ -98,18 +125,32 @@ public class PlanetIO {
 
                 //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             } else if (id == serverChoiceButton) {
-                clientChoiceButton.setEnabled(false);
                 Server server = new Server(interfaceIP);
                 Lobby.getSharedInstance().addServerObserver(server);
-
-
                 try {
-                    serverChoiceButton.setEnabled(false);
                     server.startServer();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
             }
         }
+
+        /*
+        private class InterfaceIPComboBoxModel extends DefaultComboBoxModel<Network.InterfaceIP>{
+            public InterfaceIPComboBoxModel(Network.InterfaceIP[] items) {
+                super(items);
+            }
+
+            @Override
+            public Job getSelectedItem() {
+                Job selectedJob = (Job) super.getSelectedItem();
+
+                // do something with this job before returning...
+
+                return selectedJob;
+            }
+        }*/
+
+
     }
 }

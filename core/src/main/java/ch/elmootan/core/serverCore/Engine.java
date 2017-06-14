@@ -16,27 +16,43 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 
 public class Engine {
+
 
     private final ArrayList<Body> allThings = new ArrayList<>();
     private final ArrayList<Body> userPlanets = new ArrayList<>();
     private ServerMulticast multicastServer;
     private int engineId;
 
-    public Engine(ServerMulticast udpServer, int serverId) {
+    private Random randomBonus;
+    private int nextBonusTime;
+    private int bonusTime;
+
+    public Engine(ServerMulticast udpServer,int serverId) {
         engineId = serverId;
         multicastServer = udpServer;
         ActionListener repaintLol = evt -> calculateBodies();
         javax.swing.Timer displayTimer = new javax.swing.Timer(2, repaintLol);
         displayTimer.start();
+        randomBonus = new Random();
+        nextBonusTime = randomBonus.nextInt(20000) + 5000;
     }
 
     private void calculateBodies() {
         for (int i = 0; i < allThings.size(); ++i) {
             Body body = allThings.get(i);
+            if (body instanceof Bonus) {
+                long timeAlive = System.currentTimeMillis() - ((Bonus)body).getCreationTime();
+                if (timeAlive >= 10000) {
+                    removeBody(body);
+                    continue;
+                }
+            }
             if (body != null) {
                 for (int j = i + 1; j < allThings.size(); ++j) {
                     Body surrounding = allThings.get(j);
@@ -53,6 +69,7 @@ public class Engine {
 
                             //On calcule la distance réelle (Ground to ground)
                             gTgDistance = Math.sqrt(sqDistance) - body.getRadius() / 2 - surrounding.getRadius() / 2;
+
                         }
 
                         if (gTgDistance < 0) //Collision!
@@ -60,9 +77,12 @@ public class Engine {
                             // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
                             // (on évite ainsi les valeurs limites).
                             if (body.getId() == surrounding.getId()) {
-                                if (InvisiblePlanet.class.isInstance(body)) {
+                                if(InvisiblePlanet.class.isInstance(body))
+                                {
                                     removeBody(body);
-                                } else if (InvisiblePlanet.class.isInstance(surrounding)) {
+                                }
+                                else if(InvisiblePlanet.class.isInstance(surrounding))
+                                {
                                     removeBody(surrounding);
                                 }
                             }
@@ -73,6 +93,8 @@ public class Engine {
                             } else {
                                 BodyState eatState;
                                 synchronized (allThings) {
+                                    if (isProtected(body) || isProtected(surrounding))
+                                        continue;
                                     if (body.getMass() > surrounding.getMass()) {
                                         eatState = body.eat(surrounding);
                                         allThings.remove(surrounding);
@@ -90,6 +112,7 @@ public class Engine {
                                 }
                             }
                         }
+
                         // On applique la gravité et la physique uniquement dans 2 cas :
                         //   - Si c'est la planète cliquée et la planète du joueur.
                         //   - Si aucune des deux planète n'est une planète cliquée.
@@ -136,11 +159,20 @@ public class Engine {
 
                 //Débug
 //            System.out.print(body);
+
             }
 
             // Freinage des corps
             // body.speed.x -= 0.005 * body.speed.x;
             // body.speed.y -= 0.005 * body.speed.y;
+
+            bonusTime++;
+
+            if (bonusTime == nextBonusTime) {
+                generateBonus();
+                bonusTime = 0;
+                nextBonusTime = randomBonus.nextInt(20000) + 5000;
+            }
 
             sendInfos();
         }
@@ -150,7 +182,7 @@ public class Engine {
         if (!(body instanceof Planet))
             return false;
 
-        switch (((Planet) body).getActiveBonus()) {
+        switch (((Planet)body).getActiveBonus()) {
             case Bonus.ATMOSPHER:
                 return true;
             case Bonus.MOON:
@@ -170,6 +202,7 @@ public class Engine {
             double fragMass = oldMass * rand.nextDouble() / 2;
             double fragRadius = sqrt(fragMass / (dThis * PI));
             Body frag = addNewFragment(
+                    body.getId(),
                     "FRAG" + body.getName(),
                     body.getPosition().getX() + rand.nextDouble() * body.getRadius() * 10 - 5,
                     body.getPosition().getY() + rand.nextDouble() * body.getRadius() * 10 - 5,
@@ -215,7 +248,9 @@ public class Engine {
 
             String infosJson = "";
             try {
-                infosJson = mapper.writeValueAsString(allThings);
+                synchronized (allThings) {
+                    infosJson = mapper.writeValueAsString(allThings);
+                }
                 String command = Protocol.GAME_UPDATE + "\n" +
                         engineId + "\n" +
                         infosJson + "\n" +
@@ -249,8 +284,14 @@ public class Engine {
         allThings.remove(body);
     }
 
-    private Fragment addNewFragment(String name, double x, double y, double mass, double radius, Color couleur) {
+    public void removeAUserByName(String name) {
+        Body bodyToRemove = allThings.stream().filter(b -> b.getName().equals(name)).collect(Collectors.toList()).get(0);
+        allThings.remove(bodyToRemove);
+    }
+
+    private Fragment addNewFragment(int id, String name, double x, double y, double mass, double radius, Color couleur) {
         Fragment newP = new Fragment(name, new Position(x, y), mass, radius, couleur);
+        newP.setId(id);
         allThings.add(newP);
         return newP;
     }
@@ -279,13 +320,14 @@ public class Engine {
     private void generateBonus() {
         Random rand = new Random();
         Bonus bonus = new Bonus(
-                "",
+                "CENA" + rand.nextDouble() * 10000,
                 new Position(rand.nextDouble() * 400000 + -200000,
                         rand.nextDouble() * 400000 + -200000),
                 1,
                 6666,
                 Color.WHITE,
-                1
+                1,
+                System.currentTimeMillis()
         );
         allThings.add(bonus);
     }
@@ -319,6 +361,7 @@ public class Engine {
                     allThings.remove(i);
                     return true;
                 }
+
             }
             return false;
         } catch (NullPointerException npe) {
@@ -326,5 +369,4 @@ public class Engine {
             return false;
         }
     }
-
 }

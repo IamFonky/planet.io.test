@@ -121,11 +121,11 @@ public class Lobby extends JFrame implements ActionListener {
 
 
     public int addGame(Game game) {
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.addRow(new Object[]{game.getName(), game.getNbPlaylersCurrent() + "/" + game.getNbPlayersMax()});
         gamesList.add(game);
         engineList.add(new Engine(multicastServer, gamesList.size() - 1));
-        lobbyChanged.notifyObservers(game);
+        game.setGameId(gamesList.size() - 1);
+        //lobbyChanged.notifyObservers(game);
+        refreshGameList(gamesList);
         return gamesList.size();
     }
 
@@ -135,6 +135,36 @@ public class Lobby extends JFrame implements ActionListener {
         }
     }
 
+    public void addAPlayerToGame(int idGame) {
+        gamesList.get(idGame).addPlayer();
+        //lobbyChanged.notifyObservers();
+        refreshGameList(gamesList);
+    }
+
+    public void removeAPlayerToGame(int idGame, String playerName) {
+        gamesList.get(idGame).removePlayer();
+        engineList.get(idGame).removeAUserByName(playerName);
+        //lobbyChanged.notifyObservers();
+        refreshGameList(gamesList);
+    }
+
+
+    public void refreshGameList(ArrayList<Game> newGameList) {
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+        model.setRowCount(0);
+
+        gamesList = newGameList;
+
+        for (int i = 0; i < gamesList.size(); ++i) {
+            model.addRow(new Object[]{gamesList.get(i).getName(), gamesList.get(i).getNbPlaylersCurrent() + "/" + gamesList.get(i).getNbPlayersMax()});
+        }
+
+        lobbyChanged.notifyObservers();
+
+    }
+
     public ArrayList<Game> getGamesList() {
         return gamesList;
     }
@@ -142,7 +172,6 @@ public class Lobby extends JFrame implements ActionListener {
     public ArrayList<Engine> getEngineList() {
         return engineList;
     }
-
 
     public void setNbGamesMax(int nbGamesMax) {
         this.nbGamesMax = nbGamesMax;
@@ -192,6 +221,7 @@ public class Lobby extends JFrame implements ActionListener {
             setResizable(false);
             setSize(200, 150);
             setVisible(true);
+
         }
 
         @Override
@@ -213,6 +243,7 @@ public class Lobby extends JFrame implements ActionListener {
             revalidate();
             repaint();
         }
+
 
         public boolean skinChoosed() {
             return chooseStatus;

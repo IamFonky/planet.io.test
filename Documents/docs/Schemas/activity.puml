@@ -1,0 +1,28 @@
+@startuml
+
+start
+
+if (serveur ?) then (oui)
+    :création du lobby;
+    :crée une partie>
+    while (partie finie ?) is (non)
+        :calcul de l'univers;
+    endwhile (oui)
+else (non)
+    :choisit un pseudo;
+    while (pseudo déjà pris ?) is (oui)
+        :choisit un pseudo;
+    endwhile (non)
+    :se connecte;
+    split
+        :crée une partie<
+    split again
+        :rejoint une partie déjà existante;
+    endsplit
+    :choisit une planète;
+    :conquiert l'univers;
+endif
+
+stop
+
+@enduml

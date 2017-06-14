@@ -98,7 +98,6 @@ header-includes:
 }
 \makeatother
 
-
 \title{Planet.io}
 
 \date{HEIG-VD - Semestre d'été 2017}
@@ -121,6 +120,7 @@ header-includes:
 \newpage
 
 # Introduction
+
 Ce projet a été développé dans le cadre du cours de Génie Logiciel lors du 4ème semestre à la HEIG-VD. Il s'agit d'un jeu sous la forme d'une application client-serveur.  
 Le but principal du projet était de nous familiariser avec la gestion et le suivi de projet en appliquant la méthode UP. Il s'agissait aussi d'entrainer le travail en groupe et de faire face aux problèmes qui peuvent en découler.
 
@@ -162,6 +162,12 @@ Une des contraintes de ce projet étant de faire une application de type client-
 Nous sommes partis du principe que les calculs devaient se faire du côté serveur et que les clients n'auraient qu'à mettre à jour leur affichage avec les données envoyées par le serveur.
 
 ### Diagramme d'activité
+
+\begin{minipage}{\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{Schemas/activity.png}
+    \captionof{figure}{Diagramme d'activité}
+\end{minipage}
 
 ### Cas d'utilisation
 
@@ -461,7 +467,7 @@ Non.
 
 #### Bilan
 
-> Revoir la présentation du partage de travail, compléter les itérations jusqu'à la fin. Faire la distinction entre Gestion, fonctionnalité et infrastructure. A faire d'ici lundi 22 soir.s
+> Revoir la présentation du partage de travail, compléter les itérations jusqu'à la fin. Faire la distinction entre Gestion, fonctionnalité et infrastructure.
 > Créer une BDD pour répondre au cahier des charges.
 
 #### Problèmes rencontrés
