@@ -22,7 +22,7 @@ import static java.lang.Thread.sleep;
 public class Server implements Observer {
 
     public static void main(String... args) {
-        Server server = new Server();
+        Server server = new Server("localhost");
         try {
             sleep(10000);
             while (server.isRunning()) {
@@ -60,9 +60,9 @@ public class Server implements Observer {
      * Constructor used to create a server that will accept connections on a known
      * TCP port
      */
-    public Server() {
+    public Server(String interfaceIP) {
         try {
-            serverMulticast = new ServerMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName("localhost"));
+            serverMulticast = new ServerMulticast(Protocol.IP_MULTICAST, Protocol.PORT_UDP, InetAddress.getByName(interfaceIP));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

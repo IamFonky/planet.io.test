@@ -16,19 +16,27 @@
     </properties>
     <name>core</name>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.zenjava</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>8.8.3</version>
-                <configuration>
+    <!--<build>-->
+            <!--<resources>-->
+                <!--<resource>-->
+                    <!--<directory>src/main</directory>-->
+                    <!--<includes>-->
+                        <!--<include>src/main/ressources/*</include>-->
+                    <!--</includes>-->
+                <!--</resource>-->
+            <!--</resources>-->
+        <!--<plugins>-->
+            <!--<plugin>-->
+                <!--<groupId>com.zenjava</groupId>-->
+                <!--<artifactId>javafx-maven-plugin</artifactId>-->
+                <!--<version>8.8.3</version>-->
+                <!--<configuration>-->
 
-                    <mainClass>ch.elmootan.core.Game</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+                    <!--<mainClass>ch.elmootan.core.Game</mainClass>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+        <!--</plugins>-->
+    <!--</build>-->
 
     <dependencies>
         <dependency>

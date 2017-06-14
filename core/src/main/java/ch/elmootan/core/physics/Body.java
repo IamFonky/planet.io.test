@@ -1,9 +1,6 @@
 package ch.elmootan.core.physics;
 
-import ch.elmootan.core.universe.Bonus;
-import ch.elmootan.core.universe.Fragment;
-import ch.elmootan.core.universe.InvisiblePlanet;
-import ch.elmootan.core.universe.Planet;
+import ch.elmootan.core.universe.*;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -118,6 +115,11 @@ public abstract class Body {
     public BodyState eat(Body meal) {
         if (this instanceof Fragment)
             return BodyState.DEFAULT;
+        else if (meal instanceof Bonus && this instanceof Planet) {
+            ((Planet)this).setActiveBonus(((Bonus) meal).getType());
+            return BodyState.EAT_MEAL;
+        }
+
         boolean explode = (abs(mass - meal.mass) < mass * fragmentationRatio);
 
         double newMass = mass + meal.mass;

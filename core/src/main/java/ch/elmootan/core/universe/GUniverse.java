@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import oracle.jrockit.jfr.JFR;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -30,7 +29,10 @@ import static java.lang.Math.*;
 public class GUniverse extends JFrame {
 
     private final ArrayList<Body> allThings = new ArrayList<>();
+
     private double zoom = 500.0;
+    private int dx = 0;
+    private int dy = 0;
 
 
     private boolean asAdmin;
@@ -70,8 +72,8 @@ public class GUniverse extends JFrame {
 
         try {
             for (int i = 1; i <= 8; i++)
-                planets.add(ImageIO.read(GUniverse.class.getResource("../skins/planet" + i + "_32x32.png")));
-            invisible = ImageIO.read(GUniverse.class.getResource("../skins/invisible_64x64.png"));
+                planets.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_32x32.png")));
+            invisible = ImageIO.read(getClass().getResourceAsStream("/skins/invisible_64x64.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,17 +108,36 @@ public class GUniverse extends JFrame {
 
         addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                switch (e.getKeyChar()) {
-                    case 's':
-                        hollySong("starwars", 0.025);
-                        break;
-                    case 'a':
-                        zoom += zoom * 0.1;
-                        break;
-                    case 'd':
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_ADD:
+                    case KeyEvent.VK_PLUS:
+                    case KeyEvent.VK_Q:
                         zoom -= zoom * 0.1;
                         break;
+                    case KeyEvent.VK_MINUS:
+                    case KeyEvent.VK_SUBTRACT:
+                    case KeyEvent.VK_E:
+                        zoom += zoom * 0.1;
+                        break;
+
+                    case KeyEvent.VK_LEFT:
+                    case KeyEvent.VK_A:
+                        dx -= Math.sqrt(zoom);
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                    case KeyEvent.VK_D:
+                        dx += Math.sqrt(zoom);
+                        break;
+                    case KeyEvent.VK_UP:
+                    case KeyEvent.VK_W:
+                        dy -= Math.sqrt(zoom);
+                        break;
+                    case KeyEvent.VK_DOWN:
+                    case KeyEvent.VK_S:
+                        dy += Math.sqrt(zoom);
+                        break;
+
                     default:
                         break;
                 }
@@ -167,8 +188,9 @@ public class GUniverse extends JFrame {
 
                 for (Body body : allThings) {
                     int radius = (int) (body.getRadius() / zoom);
-                    int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom));
-                    int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom));
+                    radius = radius > 0 ? radius : 1;
+                    int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
+                    int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
 
                     if (body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
                         g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
@@ -299,8 +321,8 @@ public class GUniverse extends JFrame {
     }
 
     private Position convertXYToPosition(double x, double y) {
-        double bodyX = ((x - (getWidth() / 2)) * zoom);
-        double bodyY = ((y - (getHeight() / 2)) * zoom);
+        double bodyX = ((x  - (getWidth() / 2) - dx) * zoom);
+        double bodyY = ((y  - (getHeight() / 2) - dy) * zoom);
         return new Position(bodyX, bodyY);
     }
 
@@ -323,7 +345,7 @@ public class GUniverse extends JFrame {
             public void run() {
                 new JFXPanel();
                 System.out.println(System.getProperty("user.dir"));
-                String bip = "sounds/" + sound + ".mp3";
+                String bip = "/sounds/" + sound + ".mp3";
 
 //         File file = new File(bip);
 
