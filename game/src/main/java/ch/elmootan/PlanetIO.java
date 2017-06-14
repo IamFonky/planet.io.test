@@ -38,7 +38,7 @@ public class PlanetIO {
             whoAreYou.setHorizontalAlignment(JLabel.CENTER);
             add(whoAreYou);
 
-            JPanel addressPanel = new JPanel(new GridLayout(2,2));
+            JPanel addressPanel = new JPanel(new GridLayout(2, 2));
             JLabel serverIPLabel = new JLabel("Server IP");
             serverIPField = new JTextField();
             serverIPField.setToolTipText("Adresse IP du serveur");
@@ -84,19 +84,17 @@ public class PlanetIO {
             String interfaceIP = interfaceIPField.getText();
             String serverIP = serverIPField.getText();
 
-            if(interfaceIP.equals(""))
-            {
+            if (interfaceIP.equals("")) {
                 interfaceIP = "localhost";
             }
-            if(serverIP.equals(""))
-            {
+            if (serverIP.equals("")) {
                 serverIP = "localhost";
             }
 
 
             if (id == clientChoiceButton) {
                 this.dispose();
-                new Client(serverIP,interfaceIP);
+                new Client(serverIP, interfaceIP);
 
                 //dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
             } else if (id == serverChoiceButton) {

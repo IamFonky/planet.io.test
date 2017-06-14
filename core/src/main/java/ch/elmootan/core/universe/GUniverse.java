@@ -159,49 +159,49 @@ public class GUniverse extends JFrame {
         rootPane = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g;
-            g.setColor(Color.WHITE);
-            synchronized (allThings) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g.setColor(Color.WHITE);
+                synchronized (allThings) {
 
 
-                if (GUniverse.this.asAdmin) {
-                    g2d.drawString("Player List:", 0, 10);
-                    for (int i = 0; i < allThings.size(); i++) {
-                        if (allThings.get(i).getClass() == Planet.class) {
-                            g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
+                    if (GUniverse.this.asAdmin) {
+                        g2d.drawString("Player List:", 0, 10);
+                        for (int i = 0; i < allThings.size(); i++) {
+                            if (allThings.get(i).getClass() == Planet.class) {
+                                g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
+                            }
+                        }
+
+                    } else {
+                        allThings.sort(Comparator.comparingDouble(Body::getRadius));
+                        Collections.reverse(allThings);
+                        int nbScores = allThings.size() > 5 ? 5 : allThings.size();
+                        g2d.drawString("Top 5:", 0, 10);
+                        for (int i = 0; i < nbScores; i++) {
+                            if (allThings.get(i).getClass() == Planet.class) {
+                                g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
+                            }
                         }
                     }
 
-                } else {
-                    allThings.sort(Comparator.comparingDouble(Body::getRadius));
-                    Collections.reverse(allThings);
-                    int nbScores = allThings.size() > 5 ? 5 : allThings.size();
-                    g2d.drawString("Top 5:", 0, 10);
-                    for (int i = 0; i < nbScores; i++) {
-                        if (allThings.get(i).getClass() == Planet.class) {
-                            g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
+
+                    for (Body body : allThings) {
+                        int radius = (int) (body.getRadius() / zoom);
+                        radius = radius > 0 ? radius : 1;
+                        int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
+                        int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
+
+                        if (body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
+                            g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
+                        } else if (body.getClass() == Planet.class) {
+                            g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
+                            g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
+                        } else if (body.getClass() == Fragment.class) {
+                            g.drawRect(x, y, radius, radius);
                         }
                     }
                 }
-
-
-                for (Body body : allThings) {
-                    int radius = (int) (body.getRadius() / zoom);
-                    radius = radius > 0 ? radius : 1;
-                    int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
-                    int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
-
-                    if (body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
-                        g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
-                    } else if (body.getClass() == Planet.class) {
-                        g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
-                        g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
-                    } else if (body.getClass() == Fragment.class) {
-                        g.drawRect(x, y, radius, radius);
-                    }
-                }
-            }
             }
 
         };
@@ -321,8 +321,8 @@ public class GUniverse extends JFrame {
     }
 
     private Position convertXYToPosition(double x, double y) {
-        double bodyX = ((x  - (getWidth() / 2) - dx) * zoom);
-        double bodyY = ((y  - (getHeight() / 2) - dy) * zoom);
+        double bodyX = ((x - (getWidth() / 2) - dx) * zoom);
+        double bodyY = ((y - (getHeight() / 2) - dy) * zoom);
         return new Position(bodyX, bodyY);
     }
 
