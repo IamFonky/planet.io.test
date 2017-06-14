@@ -99,6 +99,20 @@ public class GUniverse extends JFrame {
             e.printStackTrace();
         }
 
+        addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if(e.getWheelRotation() == 1)
+                {
+                    zoom += zoom * 0.1;
+                }
+                else if(e.getWheelRotation() == -1)
+                {
+                    zoom -= zoom * 0.1;
+                }
+            }
+        });
+
         addMouseMotionListener(new MouseMotionAdapter() {
 
             @Override
@@ -246,17 +260,13 @@ public class GUniverse extends JFrame {
                             int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
                             int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
 
-                    if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
-                        g2d.drawImage(invisibles.get(((InvisiblePlanet)body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
-                    }
-                    else if (body.getClass() == Bonus.class)
-                        {
-                            g2d.drawImage(bonus.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
-                        }
-                        else if (body.getClass() == Planet.class)
-                        {
-                            g2d.drawString(body.getName(), x-(body.getName().length()/2)*5+radius/2, y-10);
-                            g2d.drawImage(planets.get(((Planet)body).getIdSkin()).getScaledInstance(radius, radius, 0),x,y,this);
+                            if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
+                                g2d.drawImage(invisibles.get(((InvisiblePlanet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
+                            } else if (body.getClass() == Bonus.class) {
+                                g2d.drawImage(bonus.getScaledInstance(radius + radius, radius + radius, 0), x - radius / 2, y - radius / 2, this);
+                            } else if (body.getClass() == Planet.class) {
+                                g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
+                                g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
 
                                 switch (((Planet) body).getActiveBonus()) {
                                     case Bonus.MOON:

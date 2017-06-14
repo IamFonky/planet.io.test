@@ -503,6 +503,8 @@ public class Client implements Runnable {
     }
 
     public static void playMusic(String songName) {
-        gui.hollySong(songName, 1.0);
+        if (gui != null) {
+            gui.hollySong(songName, 1.0);
+        }
     }
 }

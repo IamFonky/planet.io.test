@@ -14,9 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
@@ -27,29 +25,41 @@ public class Engine {
     private ServerMulticast multicastServer;
     private int engineId;
 
-    private Random randomBonus;
-    private int nextBonusTime;
-    private int bonusTime;
+    private Random randomGenerator;
 
-   private static final long TIME_BONUS_STAY = 21000;
-    private static final int MIN_TIME_BONUS_APPEARS = 20000;
-   private static final int MAX_TIME_BONUS_APPEARS = 60000;
+    private int nextBonusTime = 0;
+    private int bonusTime = 0;
 
-   public Engine(ServerMulticast udpServer,int serverId) {
-      engineId = serverId;
-      multicastServer = udpServer;
-      ActionListener repaintLol = evt -> calculateBodies();
-      javax.swing.Timer displayTimer = new javax.swing.Timer(20, repaintLol);
-      displayTimer.start();
-      randomBonus = new Random();
-      nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
-   }
+    private int nextMoonTime = 0;
+    private int moonTime = 0;
+
+
+    private static final long TIME_BONUS_STAY = 21000;
+    private static final int MIN_TIME_BONUS_APPEARS = 100000;
+    private static final int MAX_TIME_BONUS_APPEARS = 2000000;
+
+    private static final int MIN_TIME_MOON_APPEARS = 5000;
+    private static final int MAX_TIME_MOON_APPEARS = 15000;
+    private static final int MAX_BODIES = 100;
+
+    //Server speed in milliseconds
+    private static final int SERVER_SPEED = 20;
+
+    public Engine(ServerMulticast udpServer, int serverId) {
+        engineId = serverId;
+        multicastServer = udpServer;
+        ActionListener repaintLol = evt -> calculateBodies();
+        javax.swing.Timer displayTimer = new javax.swing.Timer(SERVER_SPEED, repaintLol);
+        displayTimer.start();
+        randomGenerator = new Random();
+        nextBonusTime = randomGenerator.nextInt(MAX_TIME_BONUS_APPEARS/SERVER_SPEED) + MIN_TIME_BONUS_APPEARS/SERVER_SPEED;
+    }
 
     private void calculateBodies() {
         for (int i = 0; i < allThings.size(); ++i) {
             Body body = allThings.get(i);
             if (body instanceof Bonus) {
-                long timeAlive = System.currentTimeMillis() - ((Bonus)body).getCreationTime();
+                long timeAlive = System.currentTimeMillis() - ((Bonus) body).getCreationTime();
                 if (timeAlive >= TIME_BONUS_STAY) {
                     removeBody(body);
                     continue;
@@ -79,12 +89,9 @@ public class Engine {
                             // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
                             // (on évite ainsi les valeurs limites).
                             if (body.getId() == surrounding.getId()) {
-                                if(InvisiblePlanet.class.isInstance(body))
-                                {
+                                if (InvisiblePlanet.class.isInstance(body)) {
                                     removeBody(body);
-                                }
-                                else if(InvisiblePlanet.class.isInstance(surrounding))
-                                {
+                                } else if (InvisiblePlanet.class.isInstance(surrounding)) {
                                     removeBody(surrounding);
                                 }
                             }
@@ -149,7 +156,6 @@ public class Engine {
                                 surrounding.getSpeed().setX(surrounding.getSpeed().getX() + surrAX);
                                 surrounding.getSpeed().setY(surrounding.getSpeed().getY() + surrAY);
                             }
-
                         }
                     }
                 }
@@ -176,11 +182,20 @@ public class Engine {
 
             bonusTime++;
 
-         if (bonusTime == nextBonusTime) {
-            generateBonus();
-            bonusTime = 0;
-            nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
-         }
+            if (bonusTime >= nextBonusTime) {
+                generateBonus();
+                bonusTime = 0;
+                nextBonusTime = randomGenerator.nextInt(MAX_TIME_BONUS_APPEARS/SERVER_SPEED) + MIN_TIME_BONUS_APPEARS/SERVER_SPEED;
+            }
+
+            moonTime++;
+
+            if (moonTime >= nextMoonTime && allThings.size() < MAX_BODIES) {
+                generateMoon();
+                moonTime = 0;
+                nextMoonTime = randomGenerator.nextInt(MIN_TIME_MOON_APPEARS/SERVER_SPEED) + MAX_TIME_MOON_APPEARS/SERVER_SPEED;
+            }
+
 
             sendInfos();
         }
@@ -190,7 +205,7 @@ public class Engine {
         if (!(body instanceof Planet))
             return false;
 
-        switch (((Planet)body).getActiveBonus()) {
+        switch (((Planet) body).getActiveBonus()) {
             case Bonus.ATMOSPHER:
                 return true;
             case Bonus.MOON:
@@ -256,9 +271,13 @@ public class Engine {
 
             String infosJson = "";
             try {
+                ArrayList<Body> toSend;
                 synchronized (allThings) {
-                    infosJson = mapper.writeValueAsString(allThings);
+                    toSend = (ArrayList<Body>) allThings.clone();
                 }
+
+                infosJson = mapper.writeValueAsString(toSend);
+
                 String command = Protocol.GAME_UPDATE + "\n" +
                         engineId + "\n" +
                         infosJson + "\n" +
@@ -325,28 +344,42 @@ public class Engine {
         userPlanets.remove(idPlanet);
     }
 
-   private void generateBonus() {
-      Random rand = new Random();
-      Bonus bonus = new Bonus(
-              "CENA" + rand.nextDouble() * 10000,
-              new Position(rand.nextDouble() * 400000 + -200000,
-                      rand.nextDouble() * 400000 + -200000),
-              1,
-              6666,
-              Color.WHITE,
-              1,
-              System.currentTimeMillis()
-      );
-      allThings.add(bonus);
+    private void generateBonus() {
+        Random rand = new Random();
+        Bonus bonus = new Bonus(
+                "CENA" + rand.nextDouble() * 10000,
+                new Position(rand.nextDouble() * 400000 + -200000,
+                        rand.nextDouble() * 400000 + -200000),
+                1,
+                6666,
+                Color.WHITE,
+                1,
+                System.currentTimeMillis()
+        );
+        allThings.add(bonus);
 
-      sendPlayMusic();
-   }
+        sendPlayMusic();
+    }
 
-   private void sendPlayMusic() {
-       if (multicastServer != null) {
-           multicastServer.send(Protocol.PLAY_MUSIC + '\n' + Protocol.END_OF_COMMAND);
-       }
-   }
+    private void generateMoon() {
+            Planet moon = new Planet(
+                "MOON" + randomGenerator.nextDouble() * 10000,
+                    new Position(
+                        randomGenerator.nextDouble() * 400000 + -200000,
+                        randomGenerator.nextDouble() * 400000 + -200000),
+                    randomGenerator.nextDouble() * 1E+21 + 1E+20,
+                    randomGenerator.nextDouble() * 4000 + 500,
+                7,
+                    allThings.size()
+            );
+        allThings.add(moon);
+    }
+
+    private void sendPlayMusic() {
+        if (multicastServer != null) {
+            multicastServer.send(Protocol.PLAY_MUSIC + '\n' + Protocol.END_OF_COMMAND);
+        }
+    }
 
     public synchronized ArrayList<Body> getAllThings() {
         return allThings;
