@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 import static java.lang.Math.*;
 
 public class Engine {
-
-
     private final ArrayList<Body> allThings = new ArrayList<>();
     private final ArrayList<Body> userPlanets = new ArrayList<>();
     private ServerMulticast multicastServer;
@@ -33,9 +31,9 @@ public class Engine {
    private int nextBonusTime;
    private int bonusTime;
 
-   private Random randomBonus;
-   private int nextBonusTime;
-   private int bonusTime;
+   private static final long TIME_BONUS_STAY = 21000;
+    private static final int MIN_TIME_BONUS_APPEARS = 20000;
+   private static final int MAX_TIME_BONUS_APPEARS = 60000;
 
    public Engine(ServerMulticast udpServer,int serverId) {
       engineId = serverId;
@@ -44,7 +42,7 @@ public class Engine {
       javax.swing.Timer displayTimer = new javax.swing.Timer(2, repaintLol);
       displayTimer.start();
       randomBonus = new Random();
-      nextBonusTime = randomBonus.nextInt(20000) + 5000;
+      nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
    }
 
     private void calculateBodies() {
@@ -52,7 +50,7 @@ public class Engine {
             Body body = allThings.get(i);
             if (body instanceof Bonus) {
                 long timeAlive = System.currentTimeMillis() - ((Bonus)body).getCreationTime();
-                if (timeAlive >= 10000) {
+                if (timeAlive >= TIME_BONUS_STAY) {
                     removeBody(body);
                     continue;
                 }
@@ -175,15 +173,7 @@ public class Engine {
          if (bonusTime == nextBonusTime) {
             generateBonus();
             bonusTime = 0;
-            nextBonusTime = randomBonus.nextInt(20000) + 5000;
-         }
-
-         bonusTime++;
-
-         if (bonusTime == nextBonusTime) {
-            generateBonus();
-            bonusTime = 0;
-            nextBonusTime = randomBonus.nextInt(20000) + 5000;
+            nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
          }
 
          sendInfos();
@@ -342,6 +332,14 @@ public class Engine {
               System.currentTimeMillis()
       );
       allThings.add(bonus);
+
+      sendPlayMusic();
+   }
+
+   private void sendPlayMusic() {
+       if (multicastServer != null) {
+           multicastServer.send(Protocol.PLAY_MUSIC + '\n' + Protocol.END_OF_COMMAND);
+       }
    }
 
    public synchronized ArrayList<Body> getAllThings() {

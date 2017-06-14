@@ -210,6 +210,10 @@ public class ClientMulticast implements Runnable {
                             }
                         }
                     }
+                    break;
+                case Protocol.PLAY_MUSIC:
+                    Client.playMusic("JOHNCENA.wav");
+                    break;
             }
         }
     }

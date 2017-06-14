@@ -34,7 +34,6 @@ public class GUniverse extends JFrame {
     private int dx = 0;
     private int dy = 0;
 
-
     private boolean asAdmin;
 
     private TheEndFrame theEndFrame = new TheEndFrame();
@@ -64,9 +63,6 @@ public class GUniverse extends JFrame {
     private boolean playerWantQuit = false;
 
     private final ObjectMapper mapper = new ObjectMapper();
-
-//   private boolean tadaam = false;
-
 
     public GUniverse(PrintWriter wr, BufferedReader rd, MulticastSocket udpSocket, int gameId, Planet myPlanet, boolean asAdmin) {
 
@@ -385,26 +381,17 @@ public class GUniverse extends JFrame {
                 myPlanet.getId());
     }
 
-    private void hollySong(String soundFile, double intiVolume) {
-        final String sound = soundFile;
-        final double volume = intiVolume;
+    public void hollySong(String soundFile, double volume) {
+        new JFXPanel();
 
-        (new Runnable() {
-            @Override
-            public void run() {
-                new JFXPanel();
-                System.out.println(System.getProperty("user.dir"));
-                String bip = "/sounds/" + sound + ".mp3";
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
 
-//         File file = new File(bip);
-
-                Media hit = new Media(GameCreator.class.getResource(bip).toString());
-                MediaPlayer mediaPlayer = new MediaPlayer(hit);
-                mediaPlayer.setVolume(volume);
-                mediaPlayer.play();
-            }
-        }).run();
-
+        Media hit = new Media(getClass().getResource("/sounds/" + soundFile).toString());
+        mediaPlayer = new MediaPlayer(hit);
+        mediaPlayer.setVolume(volume);
+        mediaPlayer.play();
     }
 
     public synchronized ArrayList<Body> getAllThings() {
