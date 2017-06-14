@@ -55,11 +55,10 @@ public class Universe extends JFrame {
 
       try {
          for (int i = 1; i <= 8; i++)
-            planets.add(ImageIO.read(Universe.class.getResource("../skins/planet" + i + "_32x32.png")));
-         invisible = ImageIO.read(Universe.class.getResource("../skins/invisible_64x64.png"));
-         // MODIF BONUS -------------------------------------
-         atmospher = ImageIO.read(Universe.class.getResource("../skins/atmospher.png"));
-         bonus = ImageIO.read(Universe.class.getResource("../skins/bonus.png"));
+             planets.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_64x64.png")));
+          invisible = ImageIO.read(getClass().getResourceAsStream("/skins/invisible_64x64.png"));
+          atmospher = ImageIO.read(getClass().getResourceAsStream("/skins/atmospher.png"));
+          bonus = ImageIO.read(getClass().getResourceAsStream("/skins/bonus.png"));;
          //--------------------------------------------------
       } catch (IOException e) {
          e.printStackTrace();
@@ -207,7 +206,7 @@ public class Universe extends JFrame {
                int nbScores = allThings.size() > 5 ? 5 : allThings.size();
                int i = 0, j = 1;
                while (i != nbScores) {
-                  if (!(allThings.get(i) instanceof InvisiblePlanet)) {
+                  if (allThings.get(i) instanceof Planet && !(allThings.get(i) instanceof InvisiblePlanet)) {
                      g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
                   } else if (allThings.size() > 5) {
                      nbScores++;

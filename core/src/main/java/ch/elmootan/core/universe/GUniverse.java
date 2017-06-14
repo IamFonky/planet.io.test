@@ -187,10 +187,14 @@ public class GUniverse extends JFrame {
                     Collections.reverse(allThings);
                     int nbScores = allThings.size() > 5 ? 5 : allThings.size();
                     g2d.drawString("Top 5:", 0, 10);
-                    for (int i = 0; i < nbScores; i++) {
-                        if (allThings.get(i).getClass() == Planet.class) {
-                            g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
+                    int i = 0, j = 1;
+                    while (i != nbScores) {
+                        if (allThings.get(i) instanceof Planet && !(allThings.get(i) instanceof InvisiblePlanet)) {
+                            g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
+                        } else if (allThings.size() > 5) {
+                            nbScores++;
                         }
+                        i++;
                     }
                 }
 
