@@ -163,6 +163,12 @@ Nous sommes partis du principe que les calculs devaient se faire du côté serve
 
 ### Diagramme d'activité
 
+\begin{minipage}{\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{Schemas/activity.png}
+    \captionof{figure}{Diagramme d'activité}
+\end{minipage}
+
 ### Cas d'utilisation
 
 ### Modèles de domaine
@@ -461,7 +467,7 @@ Non.
 
 #### Bilan
 
-> Revoir la présentation du partage de travail, compléter les itérations jusqu'à la fin. Faire la distinction entre Gestion, fonctionnalité et infrastructure. A faire d'ici lundi 22 soir.s
+> Revoir la présentation du partage de travail, compléter les itérations jusqu'à la fin. Faire la distinction entre Gestion, fonctionnalité et infrastructure.
 > Créer une BDD pour répondre au cahier des charges.
 
 #### Problèmes rencontrés
