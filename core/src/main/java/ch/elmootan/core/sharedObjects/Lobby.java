@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -153,7 +152,6 @@ public class Lobby extends JFrame implements ActionListener {
         return nbGamesMax;
     }
 
-
 protected class SkinChooser extends JFrame implements ActionListener {
     protected JButton btnNext = new JButton(">");
     protected JButton btnPrev = new JButton("<");
@@ -172,7 +170,9 @@ protected class SkinChooser extends JFrame implements ActionListener {
 
         try {
             for (int i = 1; i <= 8; i++)
-                skins.add(ImageIO.read(new File("core/src/main/resources/ch/elmootan/core/skins/planet" + i + "_64x64.png")));
+            {
+                skins.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_64x64.png")));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
