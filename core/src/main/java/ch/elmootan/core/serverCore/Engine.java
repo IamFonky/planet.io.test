@@ -27,9 +27,9 @@ public class Engine {
     private ServerMulticast multicastServer;
     private int engineId;
 
-   private Random randomBonus;
-   private int nextBonusTime;
-   private int bonusTime;
+    private Random randomBonus;
+    private int nextBonusTime;
+    private int bonusTime;
 
    private static final long TIME_BONUS_STAY = 21000;
     private static final int MIN_TIME_BONUS_APPEARS = 20000;
@@ -74,36 +74,36 @@ public class Engine {
 
                         }
 
-                  if (gTgDistance < 0) //Collision!
-                  {
-                     // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
-                     // (on évite ainsi les valeurs limites).
-                     if (body.getId() == surrounding.getId()) {
-                        if(InvisiblePlanet.class.isInstance(body))
+                        if (gTgDistance < 0) //Collision!
                         {
-                           removeBody(body);
-                        }
-                        else if(InvisiblePlanet.class.isInstance(surrounding))
-                        {
-                           removeBody(surrounding);
-                        }
-                     }
-                     // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
-                     // est invisible et n'interragit pas avec celle des autres joueurs.
-                     else if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
-                        continue;
-                     } else {
-                        BodyState eatState;
-                        synchronized (allThings) {
-                           if (isProtected(body) || isProtected(surrounding))
-                              continue;
-                           if (body.getMass() > surrounding.getMass()) {
-                              eatState = body.eat(surrounding);
-                              allThings.remove(surrounding);
-                           } else {
-                              eatState = surrounding.eat(body);
-                              allThings.remove(body);
-                           }
+                            // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
+                            // (on évite ainsi les valeurs limites).
+                            if (body.getId() == surrounding.getId()) {
+                                if(InvisiblePlanet.class.isInstance(body))
+                                {
+                                    removeBody(body);
+                                }
+                                else if(InvisiblePlanet.class.isInstance(surrounding))
+                                {
+                                    removeBody(surrounding);
+                                }
+                            }
+                            // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
+                            // est invisible et n'interragit pas avec celle des autres joueurs.
+                            else if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
+                                continue;
+                            } else {
+                                BodyState eatState;
+                                synchronized (allThings) {
+                                    if (isProtected(body) || isProtected(surrounding))
+                                        continue;
+                                    if (body.getMass() > surrounding.getMass()) {
+                                        eatState = body.eat(surrounding);
+                                        allThings.remove(surrounding);
+                                    } else {
+                                        eatState = surrounding.eat(body);
+                                        allThings.remove(body);
+                                    }
 
                                     switch (eatState) {
                                         case EXPLODE:
@@ -168,7 +168,7 @@ public class Engine {
             // body.speed.x -= 0.005 * body.speed.x;
             // body.speed.y -= 0.005 * body.speed.y;
 
-         bonusTime++;
+            bonusTime++;
 
          if (bonusTime == nextBonusTime) {
             generateBonus();
@@ -176,28 +176,28 @@ public class Engine {
             nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
          }
 
-         sendInfos();
-      }
-   }
+            sendInfos();
+        }
+    }
 
-   private boolean isProtected(Body body) {
-      if (!(body instanceof Planet))
-         return false;
+    private boolean isProtected(Body body) {
+        if (!(body instanceof Planet))
+            return false;
 
-      switch (((Planet)body).getActiveBonus()) {
-         case Bonus.ATMOSPHER:
-            return true;
-         case Bonus.MOON:
-            ((Planet) body).setActiveBonus(Bonus.NONE);
-            return true;
-      }
-      return false;
-   }
+        switch (((Planet)body).getActiveBonus()) {
+            case Bonus.ATMOSPHER:
+                return true;
+            case Bonus.MOON:
+                ((Planet) body).setActiveBonus(Bonus.NONE);
+                return true;
+        }
+        return false;
+    }
 
-   public void explode(Body body) {
-      Random rand = new Random();
-      double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
-      double oldMass = body.getMass();
+    public void explode(Body body) {
+        Random rand = new Random();
+        double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
+        double oldMass = body.getMass();
 
 
         while (body.getMass() > 0) {
@@ -342,9 +342,9 @@ public class Engine {
        }
    }
 
-   public synchronized ArrayList<Body> getAllThings() {
-      return allThings;
-   }
+    public synchronized ArrayList<Body> getAllThings() {
+        return allThings;
+    }
 
     public synchronized Body getBodyById(Body body) {
         for (Body listBody : allThings) {

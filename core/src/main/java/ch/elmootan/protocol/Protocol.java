@@ -35,7 +35,6 @@ public final class Protocol {
     public static final String CMD_BLABLA = "blablabla";
 
 
-
     public static final String END_OF_COMMAND = "COMMAND_DONE_MA_BOI";
 
     public static final int PORT = 8585;

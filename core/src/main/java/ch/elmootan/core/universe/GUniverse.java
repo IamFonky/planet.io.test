@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MulticastSocket;
@@ -33,6 +34,7 @@ public class GUniverse extends JFrame {
     private double zoom = 500.0;
     private int dx = 0;
     private int dy = 0;
+    private boolean followMode = false;
 
     private boolean asAdmin;
 
@@ -41,14 +43,13 @@ public class GUniverse extends JFrame {
     private final double controlPlanetMass = 1E+24;
     private InvisiblePlanet clickedPlanet;
     private Planet myPlanet;
-    private double myPlanetInitMass;
     private boolean mousePressed = false;
 
     private ArrayList<BufferedImage> planets = new ArrayList<>();
     private BufferedImage invisible;
 
     private BufferedImage atmospher;
-    private  BufferedImage bonus;
+    private BufferedImage bonus;
 
     private MediaPlayer mediaPlayer;
 
@@ -64,6 +65,10 @@ public class GUniverse extends JFrame {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    private BufferedImage backgroundImage;
+    private TexturePaint backgroundTexture;
+
+
     public GUniverse(PrintWriter wr, BufferedReader rd, MulticastSocket udpSocket, int gameId, Planet myPlanet, boolean asAdmin) {
 
         super("Mon univers");
@@ -72,6 +77,16 @@ public class GUniverse extends JFrame {
         this.gameId = gameId;
         this.myPlanet = myPlanet;
         this.asAdmin = asAdmin;
+
+        try {
+            backgroundImage = ImageIO.read(getClass().getResourceAsStream("/skins/universe.jpg"));
+            backgroundTexture = new TexturePaint(
+                    backgroundImage,
+                    new Rectangle(0, 0, backgroundImage.getWidth(), backgroundImage.getHeight())
+            );
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
 
         try {
             for (int i = 1; i <= 8; i++)
@@ -128,19 +143,33 @@ public class GUniverse extends JFrame {
 
                     case KeyEvent.VK_LEFT:
                     case KeyEvent.VK_A:
-                        dx -= Math.sqrt(zoom);
+                        followMode = false;
+                        dx += Math.sqrt(zoom);
                         break;
                     case KeyEvent.VK_RIGHT:
                     case KeyEvent.VK_D:
-                        dx += Math.sqrt(zoom);
+                        followMode = false;
+                        dx -= Math.sqrt(zoom);
                         break;
                     case KeyEvent.VK_UP:
                     case KeyEvent.VK_W:
-                        dy -= Math.sqrt(zoom);
+                        followMode = false;
+                        dy += Math.sqrt(zoom);
                         break;
                     case KeyEvent.VK_DOWN:
                     case KeyEvent.VK_S:
-                        dy += Math.sqrt(zoom);
+                        followMode = false;
+                        dy -= Math.sqrt(zoom);
+                        break;
+
+                    case KeyEvent.VK_SPACE:
+                        followMode = !followMode;
+                        break;
+
+                    case KeyEvent.VK_ENTER:
+                        followMode = false;
+                        dx = 0;
+                        dy = 0;
                         break;
 
                     default:
@@ -163,85 +192,105 @@ public class GUniverse extends JFrame {
                           }
         );
 
+
         rootPane = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g;
-            g.setColor(Color.WHITE);
-            synchronized (allThings) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+
+                backgroundTexture = new TexturePaint(
+                        backgroundImage,
+                        new Rectangle(dx, dy, backgroundImage.getWidth(), backgroundImage.getHeight())
+                );
+
+                g2d.setPaint(backgroundTexture);
+                g2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+
+                g.setColor(Color.WHITE);
+
+                synchronized (allThings) {
 
 
-                if (GUniverse.this.asAdmin) {
-                    g2d.drawString("Player List:", 0, 10);
-                    for (int i = 0; i < allThings.size(); i++) {
-                        if (allThings.get(i).getClass() == Planet.class) {
-                            g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
-                        }
-                    }
-
-                } else {
-                    allThings.sort(Comparator.comparingDouble(Body::getRadius));
-                    Collections.reverse(allThings);
-                    int nbScores = allThings.size() > 5 ? 5 : allThings.size();
-                    g2d.drawString("Top 5:", 0, 10);
-                    int i = 0, j = 1;
-                    while (i != nbScores) {
-                        if (allThings.get(i) instanceof Planet && !(allThings.get(i) instanceof InvisiblePlanet)) {
-                            g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
-                        } else if (allThings.size() > 5) {
-                            nbScores++;
-                        }
-                        if (++i >= allThings.size())
-                            break;
-                    }
-                }
-
-
-                for (Body body : allThings) {
-                    int radius = (int) (body.getRadius() / zoom);
-                    radius = radius > 0 ? radius : 1;
-                    int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
-                    int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
-
-                    if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
-                        g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
-                    }
-                    else if (Bonus.class.isInstance(body))
-                        {
-                            g2d.drawImage(bonus.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
-                        }
-                        else if (Planet.class.isInstance(body))
-                        {
-                            g2d.drawString(body.getName(), x-(body.getName().length()/2)*5+radius/2, y-10);
-                            g2d.drawImage(planets.get(((Planet)body).getIdSkin()).getScaledInstance(radius, radius, 0),x,y,this);
-
-                            switch (((Planet) body).getActiveBonus()) {
-                                case Bonus.MOON:
-                                    Double xB = new Double(x+radius/4+(radius*(Math.cos(Math.toRadians(bonusCounter)))));
-                                    Double yB = new Double(y+radius/4+(radius*(Math.sin(Math.toRadians(bonusCounter)))));
-                                    int xp = xB.intValue();
-                                    int yp = yB.intValue();
-
-                                    g.drawOval(xp,yp, radius/5, radius/5);
-
-                                    bonusCounter += 0.1f;
-                                    if (bonusCounter > 360)
-                                        bonusCounter = 0;
-                                    break;
-                                case Bonus.ATMOSPHER:
-                                    g2d.drawImage(atmospher.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
-                                    break;
+                    if (GUniverse.this.asAdmin) {
+                        g2d.drawString("Player List:", 0, 10);
+                        for (int i = 0; i < allThings.size(); i++) {
+                            if (allThings.get(i).getClass() == Planet.class) {
+                                g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
                             }
-                    } else if (body.getClass() == Fragment.class) {
-                        g.drawRect(x, y, radius, radius);
+                        }
+
+                    } else {
+                        allThings.sort(Comparator.comparingDouble(Body::getRadius));
+                        Collections.reverse(allThings);
+                        int nbScores = allThings.size() > 5 ? 5 : allThings.size();
+                        g2d.drawString("Top 5:", 0, 10);
+                        int i = 0, j = 1;
+                        while (i != nbScores) {
+                            if (allThings.get(i) instanceof Planet && !(allThings.get(i) instanceof InvisiblePlanet)) {
+                                g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
+                            } else if (allThings.size() > 5) {
+                                nbScores++;
+                            }
+                            if (++i >= allThings.size())
+                                break;
+                        }
+
+
+                        for (Body body : allThings) {
+                            int radius = (int) (body.getRadius() / zoom);
+                            radius = radius > 0 ? radius : 1;
+
+
+                            int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
+                            int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
+
+                            if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
+                                g2d.drawImage(invisible.getScaledInstance(radius, radius, 0), x, y, this);
+                            } else if (body.getClass() == Bonus.class) {
+                                g2d.drawImage(bonus.getScaledInstance(radius + radius, radius + radius, 0), x - radius / 2, y - radius / 2, this);
+                            } else if (body.getClass() == Planet.class) {
+                                g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
+                                g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
+
+                                switch (((Planet) body).getActiveBonus()) {
+                                    case Bonus.MOON:
+                                        Double xB = new Double(x + radius / 4 + (radius * (Math.cos(Math.toRadians(bonusCounter)))));
+                                        Double yB = new Double(y + radius / 4 + (radius * (Math.sin(Math.toRadians(bonusCounter)))));
+                                        int xp = xB.intValue();
+                                        int yp = yB.intValue();
+
+                                        g.drawOval(xp, yp, radius / 5, radius / 5);
+
+                                        bonusCounter += 0.1f;
+                                        if (bonusCounter > 360)
+                                            bonusCounter = 0;
+                                        break;
+                                    case Bonus.ATMOSPHER:
+                                        g2d.drawImage(atmospher.getScaledInstance(radius + radius, radius + radius, 0), x - radius / 2, y - radius / 2, this);
+                                        break;
+                                }
+                            } else if (body.getClass() == Fragment.class) {
+                                g.drawRect(x, y, radius, radius);
+
+                            }
+
+                            if (body.equals(myPlanet)) {
+                                myPlanet.setPosition(body.getPosition());
+                                if (followMode) {
+                                    dx = (int) -((myPlanet.getPosition().getX() - (body.getRadius() / 2)) / zoom);
+                                    dy = (int) -((myPlanet.getPosition().getY() - (body.getRadius() / 2)) / zoom);
+
+                                }
+                            }
+
+                        }
                     }
                 }
-            }
+
             }
 
         };
-
 
         //ScorePane scorePane = new ScorePane();
         // rootPane.add(scorePane);
@@ -254,10 +303,9 @@ public class GUniverse extends JFrame {
             }
         };
 
+
         javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
         displayTimer.start();
-
-        rootPane.setBackground(Color.BLACK);
 
         add(rootPane);
 
@@ -267,13 +315,6 @@ public class GUniverse extends JFrame {
 
         setVisible(true);
 
-        /*setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent event) {
-                exitProcedure();
-            }
-        });*/
 
     }
 
@@ -366,8 +407,8 @@ public class GUniverse extends JFrame {
     }
 
     private Position convertXYToPosition(double x, double y) {
-        double bodyX = ((x  - (getWidth() / 2) - dx) * zoom);
-        double bodyY = ((y  - (getHeight() / 2) - dy) * zoom);
+        double bodyX = ((x - (getWidth() / 2) - dx) * zoom);
+        double bodyY = ((y - (getHeight() / 2) - dy) * zoom);
         return new Position(bodyX, bodyY);
     }
 
