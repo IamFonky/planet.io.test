@@ -92,13 +92,19 @@ public class ClientHandler {
                             if (cmdAndArgs.length > 1) {
                                 int idGame = Integer.parseInt(cmdAndArgs[1]);
                                 if (idGame >= 0 && idGame < lobby.getGamesList().size()) {
-                                    writer.println(Protocol.PLANET_IO_SUCCESS);
-                                    writer.flush();
-                                    lobby.addAPlayerToGame(idGame);
-                                    Planet userPlanet = mapper.readValue(reader.readLine(), Planet.class);
-                                    userPlanet = lobby.getEngineList().get(idGame).generateUserPlanet(userPlanet);
-                                    writer.println(mapper.writeValueAsString(userPlanet));
-                                    writer.flush();
+                                    Game gameToJoin = lobby.getGamesList().get(idGame);
+                                    if (gameToJoin.getNbPlaylersCurrent() + 1 > gameToJoin.getNbPlayersMax()) {
+                                        writer.println(Protocol.PLANET_IO_FAILURE);
+                                        writer.flush();
+                                    } else {
+                                        writer.println(Protocol.PLANET_IO_SUCCESS);
+                                        writer.flush();
+                                        lobby.addAPlayerToGame(idGame);
+                                        Planet userPlanet = mapper.readValue(reader.readLine(), Planet.class);
+                                        userPlanet = lobby.getEngineList().get(idGame).generateUserPlanet(userPlanet);
+                                        writer.println(mapper.writeValueAsString(userPlanet));
+                                        writer.flush();
+                                    }
                                 } else {
                                     writer.println(Protocol.PLANET_IO_FAILURE);
                                     writer.flush();

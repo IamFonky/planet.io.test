@@ -215,6 +215,8 @@ public class Lobby extends JFrame implements ActionListener {
             goPanel.add(btnChoose);
             btnChoose.addActionListener(this);
 
+            setLocationRelativeTo(null);
+
             getContentPane().add(imgPanel, BorderLayout.CENTER);
             getContentPane().add(goPanel, BorderLayout.PAGE_END);
             setTitle("Choix du skin");
