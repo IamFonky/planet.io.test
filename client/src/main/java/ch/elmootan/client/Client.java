@@ -185,6 +185,7 @@ public class Client implements Runnable {
                             initialPlanet, false);
                     gui.showUI();
                 } else {
+                    currentGame = null;
                     System.out.println("Error, this game is not reachable");
                 }
             } catch (Exception e) {
@@ -400,6 +401,8 @@ public class Client implements Runnable {
                         gui.showUI();
                     } else {
                         System.out.println("Error, this game is not reachable");
+
+                        currentGame = null;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

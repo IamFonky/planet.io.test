@@ -72,6 +72,8 @@ public class GameCreator extends JFrame implements ActionListener {
 
         getRootPane().setDefaultButton(createGame);
 
+        setLocationRelativeTo(null);
+
         pack();
 
         this.setResizable(false);
