@@ -35,14 +35,14 @@ public class Engine {
 
 
     private static final long TIME_BONUS_STAY = 21000;
-    private static final int MIN_TIME_BONUS_APPEARS = 20000;
-    private static final int MAX_TIME_BONUS_APPEARS = 60000;
+    private static final int MIN_TIME_BONUS_APPEARS = 100000;
+    private static final int MAX_TIME_BONUS_APPEARS = 2000000;
 
     private static final int MIN_TIME_MOON_APPEARS = 5000;
     private static final int MAX_TIME_MOON_APPEARS = 15000;
-    private static final int MAX_BODIES = 50;
+    private static final int MAX_BODIES = 100;
 
-
+    //Server speed in milliseconds
     private static final int SERVER_SPEED = 20;
 
     public Engine(ServerMulticast udpServer, int serverId) {
@@ -271,9 +271,13 @@ public class Engine {
 
             String infosJson = "";
             try {
+                ArrayList<Body> toSend;
                 synchronized (allThings) {
-                    infosJson = mapper.writeValueAsString(allThings);
+                    toSend = (ArrayList<Body>) allThings.clone();
                 }
+
+                infosJson = mapper.writeValueAsString(toSend);
+
                 String command = Protocol.GAME_UPDATE + "\n" +
                         engineId + "\n" +
                         infosJson + "\n" +

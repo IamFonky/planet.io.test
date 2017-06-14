@@ -99,6 +99,20 @@ public class GUniverse extends JFrame {
             e.printStackTrace();
         }
 
+        addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if(e.getWheelRotation() == 1)
+                {
+                    zoom += zoom * 0.1;
+                }
+                else if(e.getWheelRotation() == -1)
+                {
+                    zoom -= zoom * 0.1;
+                }
+            }
+        });
+
         addMouseMotionListener(new MouseMotionAdapter() {
 
             @Override

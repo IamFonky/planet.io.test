@@ -132,7 +132,7 @@ public class ClientMulticast implements Runnable {
         running = true;
 
         // Get the response
-        byte[] reponse = new byte[8192];
+        byte[] reponse = new byte[35000];
         DatagramPacket in = new DatagramPacket(reponse, reponse.length);
 
         String command;
