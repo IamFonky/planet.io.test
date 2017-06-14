@@ -181,7 +181,6 @@ public class Lobby extends JFrame implements ActionListener {
         return nbGamesMax;
     }
 
-
     protected class SkinChooser extends JFrame implements ActionListener {
         protected JButton btnNext = new JButton(">");
         protected JButton btnPrev = new JButton("<");
@@ -205,6 +204,7 @@ public class Lobby extends JFrame implements ActionListener {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             imgSkin = new JLabel(new ImageIcon(skins.get(idSkin)));
             imgPanel.add(btnPrev);
             btnPrev.addActionListener(this);

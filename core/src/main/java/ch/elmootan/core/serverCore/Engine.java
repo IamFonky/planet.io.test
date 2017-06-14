@@ -22,16 +22,18 @@ import java.util.stream.Collectors;
 import static java.lang.Math.*;
 
 public class Engine {
-
-
     private final ArrayList<Body> allThings = new ArrayList<>();
     private final ArrayList<Body> userPlanets = new ArrayList<>();
     private ServerMulticast multicastServer;
     private int engineId;
 
-   private Random randomBonus;
-   private int nextBonusTime;
-   private int bonusTime;
+    private Random randomBonus;
+    private int nextBonusTime;
+    private int bonusTime;
+
+   private static final long TIME_BONUS_STAY = 21000;
+    private static final int MIN_TIME_BONUS_APPEARS = 20000;
+   private static final int MAX_TIME_BONUS_APPEARS = 60000;
 
    public Engine(ServerMulticast udpServer,int serverId) {
       engineId = serverId;
@@ -40,7 +42,7 @@ public class Engine {
       javax.swing.Timer displayTimer = new javax.swing.Timer(20, repaintLol);
       displayTimer.start();
       randomBonus = new Random();
-      nextBonusTime = randomBonus.nextInt(20000) + 5000;
+      nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
    }
 
     private void calculateBodies() {
@@ -48,7 +50,7 @@ public class Engine {
             Body body = allThings.get(i);
             if (body instanceof Bonus) {
                 long timeAlive = System.currentTimeMillis() - ((Bonus)body).getCreationTime();
-                if (timeAlive >= 10000) {
+                if (timeAlive >= TIME_BONUS_STAY) {
                     removeBody(body);
                     continue;
                 }
@@ -72,36 +74,36 @@ public class Engine {
 
                         }
 
-                  if (gTgDistance < 0) //Collision!
-                  {
-                     // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
-                     // (on évite ainsi les valeurs limites).
-                     if (body.getId() == surrounding.getId()) {
-                        if(InvisiblePlanet.class.isInstance(body))
+                        if (gTgDistance < 0) //Collision!
                         {
-                           removeBody(body);
-                        }
-                        else if(InvisiblePlanet.class.isInstance(surrounding))
-                        {
-                           removeBody(surrounding);
-                        }
-                     }
-                     // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
-                     // est invisible et n'interragit pas avec celle des autres joueurs.
-                     else if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
-                        continue;
-                     } else {
-                        BodyState eatState;
-                        synchronized (allThings) {
-                           if (isProtected(body) || isProtected(surrounding))
-                              continue;
-                           if (body.getMass() > surrounding.getMass()) {
-                              eatState = body.eat(surrounding);
-                              allThings.remove(surrounding);
-                           } else {
-                              eatState = surrounding.eat(body);
-                              allThings.remove(body);
-                           }
+                            // Si la planète du joueur et la planète cliquée rentrent en collision, la planète cliquée disparait
+                            // (on évite ainsi les valeurs limites).
+                            if (body.getId() == surrounding.getId()) {
+                                if(InvisiblePlanet.class.isInstance(body))
+                                {
+                                    removeBody(body);
+                                }
+                                else if(InvisiblePlanet.class.isInstance(surrounding))
+                                {
+                                    removeBody(surrounding);
+                                }
+                            }
+                            // Sinon, si une des deux planète est une planète cliquée, saute cette comparaison car la planète
+                            // est invisible et n'interragit pas avec celle des autres joueurs.
+                            else if ((body instanceof InvisiblePlanet) || (surrounding instanceof InvisiblePlanet)) {
+                                continue;
+                            } else {
+                                BodyState eatState;
+                                synchronized (allThings) {
+                                    if (isProtected(body) || isProtected(surrounding))
+                                        continue;
+                                    if (body.getMass() > surrounding.getMass()) {
+                                        eatState = body.eat(surrounding);
+                                        allThings.remove(surrounding);
+                                    } else {
+                                        eatState = surrounding.eat(body);
+                                        allThings.remove(body);
+                                    }
 
                                     switch (eatState) {
                                         case EXPLODE:
@@ -166,44 +168,36 @@ public class Engine {
             // body.speed.x -= 0.005 * body.speed.x;
             // body.speed.y -= 0.005 * body.speed.y;
 
-         bonusTime++;
+            bonusTime++;
 
          if (bonusTime == nextBonusTime) {
             generateBonus();
             bonusTime = 0;
-            nextBonusTime = randomBonus.nextInt(20000) + 5000;
+            nextBonusTime = randomBonus.nextInt(MAX_TIME_BONUS_APPEARS) + MIN_TIME_BONUS_APPEARS;
          }
 
-         bonusTime++;
+            sendInfos();
+        }
+    }
 
-         if (bonusTime == nextBonusTime) {
-            generateBonus();
-            bonusTime = 0;
-            nextBonusTime = randomBonus.nextInt(20000) + 5000;
-         }
+    private boolean isProtected(Body body) {
+        if (!(body instanceof Planet))
+            return false;
 
-         sendInfos();
-      }
-   }
+        switch (((Planet)body).getActiveBonus()) {
+            case Bonus.ATMOSPHER:
+                return true;
+            case Bonus.MOON:
+                ((Planet) body).setActiveBonus(Bonus.NONE);
+                return true;
+        }
+        return false;
+    }
 
-   private boolean isProtected(Body body) {
-      if (!(body instanceof Planet))
-         return false;
-
-      switch (((Planet)body).getActiveBonus()) {
-         case Bonus.ATMOSPHER:
-            return true;
-         case Bonus.MOON:
-            ((Planet) body).setActiveBonus(Bonus.NONE);
-            return true;
-      }
-      return false;
-   }
-
-   public void explode(Body body) {
-      Random rand = new Random();
-      double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
-      double oldMass = body.getMass();
+    public void explode(Body body) {
+        Random rand = new Random();
+        double dThis = body.getMass() / (body.getRadius() * body.getRadius() * PI);
+        double oldMass = body.getMass();
 
 
         while (body.getMass() > 0) {
@@ -338,11 +332,19 @@ public class Engine {
               System.currentTimeMillis()
       );
       allThings.add(bonus);
+
+      sendPlayMusic();
    }
 
-   public synchronized ArrayList<Body> getAllThings() {
-      return allThings;
+   private void sendPlayMusic() {
+       if (multicastServer != null) {
+           multicastServer.send(Protocol.PLAY_MUSIC + '\n' + Protocol.END_OF_COMMAND);
+       }
    }
+
+    public synchronized ArrayList<Body> getAllThings() {
+        return allThings;
+    }
 
     public synchronized Body getBodyById(Body body) {
         for (Body listBody : allThings) {

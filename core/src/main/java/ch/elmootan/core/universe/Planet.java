@@ -19,6 +19,8 @@ public class Planet extends Body
     private int bonusDuration;
 
     protected int idSkin = 1;
+    // Durée en secondes
+    private static final int MAX_BONUS_DURATION = 15;
 
     public Planet(){}
 
@@ -66,7 +68,7 @@ public class Planet extends Body
 
     ActionListener setBonusTime = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
-            if (++bonusDuration == 10)
+            if (++bonusDuration == MAX_BONUS_DURATION)
                 setActiveBonus(Bonus.NONE);
         }
     };

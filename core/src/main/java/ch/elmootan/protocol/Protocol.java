@@ -10,6 +10,7 @@ public final class Protocol {
     public static final String GAME_UPDATE = "OHBOITHEGAMEISUPDATED!";
     public static final String PLANET_IO_LOBBY_JOINED = "LOBBY_JOINED";
 
+    public static final String PLAY_MUSIC = "ANDHISNAMEISJOHNCENA";
 
     // Commandes envoyées par le client.
     public static final String PLANET_IO_HELLO = "HELLOPELO";
@@ -32,7 +33,6 @@ public final class Protocol {
     public static final String CMD_SEPARATOR = ":";
     public static final String PLANET_IO_LEAVING_GAME = "PLANET_IO_LEAVING_GAME";
     public static final String CMD_BLABLA = "blablabla";
-
 
 
     public static final String END_OF_COMMAND = "COMMAND_DONE_MA_BOI";

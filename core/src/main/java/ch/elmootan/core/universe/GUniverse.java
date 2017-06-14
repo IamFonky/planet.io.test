@@ -36,7 +36,6 @@ public class GUniverse extends JFrame {
     private int dy = 0;
     private boolean followMode = false;
 
-
     private boolean asAdmin;
 
     private TheEndFrame theEndFrame = new TheEndFrame();
@@ -48,10 +47,9 @@ public class GUniverse extends JFrame {
 
     private ArrayList<BufferedImage> planets = new ArrayList<>();
     private ArrayList<BufferedImage> invisibles = new ArrayList<>();
-//    private BufferedImage invisible;
 
     private BufferedImage atmospher;
-    private  BufferedImage bonus;
+    private BufferedImage bonus;
 
     private MediaPlayer mediaPlayer;
 
@@ -80,16 +78,13 @@ public class GUniverse extends JFrame {
         this.myPlanet = myPlanet;
         this.asAdmin = asAdmin;
 
-        try
-        {
+        try {
             backgroundImage = ImageIO.read(getClass().getResourceAsStream("/skins/universe.jpg"));
             backgroundTexture = new TexturePaint(
                     backgroundImage,
                     new Rectangle(0, 0, backgroundImage.getWidth(), backgroundImage.getHeight())
             );
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             ioe.printStackTrace();
         }
 
@@ -98,8 +93,6 @@ public class GUniverse extends JFrame {
                 planets.add(ImageIO.read(getClass().getResourceAsStream("/skins/planet" + i + "_64x64.png")));
             for (int i = 1; i <= 4; i++)
                 invisibles.add(ImageIO.read(getClass().getResourceAsStream("/skins/invisible" + i + "_64x64.png")));
-
-//            invisible = ImageIO.read(getClass().getResourceAsStream("/skins/invisible_64x64.png"));
             atmospher = ImageIO.read(getClass().getResourceAsStream("/skins/atmospher.png"));
             bonus = ImageIO.read(getClass().getResourceAsStream("/skins/bonus.png"));
         } catch (IOException e) {
@@ -217,8 +210,6 @@ public class GUniverse extends JFrame {
 
                 g.setColor(Color.WHITE);
 
-
-
                 synchronized (allThings) {
 
 
@@ -230,30 +221,30 @@ public class GUniverse extends JFrame {
                             }
                         }
 
-                } else {
-                    allThings.sort(Comparator.comparingDouble(Body::getRadius));
-                    Collections.reverse(allThings);
-                    int nbScores = allThings.size() > 5 ? 5 : allThings.size();
-                    g2d.drawString("Top 5:", 0, 10);
-                    int i = 0, j = 1;
-                    while (i != nbScores) {
-                        if (allThings.get(i) instanceof Planet && !(allThings.get(i) instanceof InvisiblePlanet)) {
-                            g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
-                        } else if (allThings.size() > 5) {
-                            nbScores++;
+                    } else {
+                        allThings.sort(Comparator.comparingDouble(Body::getRadius));
+                        Collections.reverse(allThings);
+                        int nbScores = allThings.size() > 5 ? 5 : allThings.size();
+                        g2d.drawString("Top 5:", 0, 10);
+                        int i = 0, j = 1;
+                        while (i != nbScores) {
+                            if (allThings.get(i) instanceof Planet && !(allThings.get(i) instanceof InvisiblePlanet)) {
+                                g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
+                            } else if (allThings.size() > 5) {
+                                nbScores++;
+                            }
+                            if (++i >= allThings.size())
+                                break;
                         }
-                        if (++i >= allThings.size())
-                            break;
-                    }
-                }
 
 
-                    for (Body body : allThings) {
-                        int radius = (int) (body.getRadius() / zoom);
-                        radius = radius > 0 ? radius : 1;
+                        for (Body body : allThings) {
+                            int radius = (int) (body.getRadius() / zoom);
+                            radius = radius > 0 ? radius : 1;
 
-                        int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
-                        int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
+
+                            int x = (getWidth() / 2) + ((int) ((body.getPosition().getX() - (body.getRadius() / 2)) / zoom)) + dx;
+                            int y = (getHeight() / 2) + ((int) ((body.getPosition().getY() - (body.getRadius() / 2)) / zoom)) + dy;
 
                     if (!asAdmin && body.getClass() == InvisiblePlanet.class && body.getId() == myPlanet.getId()) {
                         g2d.drawImage(invisibles.get(((InvisiblePlanet)body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
@@ -267,38 +258,41 @@ public class GUniverse extends JFrame {
                             g2d.drawString(body.getName(), x-(body.getName().length()/2)*5+radius/2, y-10);
                             g2d.drawImage(planets.get(((Planet)body).getIdSkin()).getScaledInstance(radius, radius, 0),x,y,this);
 
-                            switch (((Planet) body).getActiveBonus()) {
-                                case Bonus.MOON:
-                                    Double xB = new Double(x+radius/4+(radius*(Math.cos(Math.toRadians(bonusCounter)))));
-                                    Double yB = new Double(y+radius/4+(radius*(Math.sin(Math.toRadians(bonusCounter)))));
-                                    int xp = xB.intValue();
-                                    int yp = yB.intValue();
+                                switch (((Planet) body).getActiveBonus()) {
+                                    case Bonus.MOON:
+                                        Double xB = new Double(x + radius / 4 + (radius * (Math.cos(Math.toRadians(bonusCounter)))));
+                                        Double yB = new Double(y + radius / 4 + (radius * (Math.sin(Math.toRadians(bonusCounter)))));
+                                        int xp = xB.intValue();
+                                        int yp = yB.intValue();
 
-                                    g.drawOval(xp,yp, radius/5, radius/5);
+                                        g.drawOval(xp, yp, radius / 5, radius / 5);
 
-                                    bonusCounter += 0.1f;
-                                    if (bonusCounter > 360)
-                                        bonusCounter = 0;
-                                    break;
-                                case Bonus.ATMOSPHER:
-                                    g2d.drawImage(atmospher.getScaledInstance(radius + radius, radius + radius, 0),x-radius/2,y-radius/2,this);
-                                    break;
-                            }
-                    } else if (body.getClass() == Fragment.class) {
-                        g.drawRect(x, y, radius, radius);
-                    }
-
-                        if (body.equals(myPlanet)) {
-                            myPlanet.setPosition(body.getPosition());
-                            if (followMode) {
-                                dx = (int) -((myPlanet.getPosition().getX() - (body.getRadius() / 2)) / zoom);
-                                dy = (int) -((myPlanet.getPosition().getY() - (body.getRadius() / 2)) / zoom);
+                                        bonusCounter += 0.1f;
+                                        if (bonusCounter > 360)
+                                            bonusCounter = 0;
+                                        break;
+                                    case Bonus.ATMOSPHER:
+                                        g2d.drawImage(atmospher.getScaledInstance(radius + radius, radius + radius, 0), x - radius / 2, y - radius / 2, this);
+                                        break;
+                                }
+                            } else if (body.getClass() == Fragment.class) {
+                                g.drawRect(x, y, radius, radius);
 
                             }
+
+                            if (body.equals(myPlanet)) {
+                                myPlanet.setPosition(body.getPosition());
+                                if (followMode) {
+                                    dx = (int) -((myPlanet.getPosition().getX() - (body.getRadius() / 2)) / zoom);
+                                    dy = (int) -((myPlanet.getPosition().getY() - (body.getRadius() / 2)) / zoom);
+
+                                }
+                            }
+
                         }
-
                     }
                 }
+
             }
 
         };
@@ -313,6 +307,7 @@ public class GUniverse extends JFrame {
                 rootPane.repaint();
             }
         };
+
 
         javax.swing.Timer displayTimer = new javax.swing.Timer(10, repaintLol);
         displayTimer.start();
@@ -443,26 +438,17 @@ public class GUniverse extends JFrame {
                 myPlanet.getId());
     }
 
-    private void hollySong(String soundFile, double intiVolume) {
-        final String sound = soundFile;
-        final double volume = intiVolume;
+    public void hollySong(String soundFile, double volume) {
+        new JFXPanel();
 
-        (new Runnable() {
-            @Override
-            public void run() {
-                new JFXPanel();
-                System.out.println(System.getProperty("user.dir"));
-                String bip = "/sounds/" + sound + ".mp3";
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
 
-//         File file = new File(bip);
-
-                Media hit = new Media(GameCreator.class.getResource(bip).toString());
-                MediaPlayer mediaPlayer = new MediaPlayer(hit);
-                mediaPlayer.setVolume(volume);
-                mediaPlayer.play();
-            }
-        }).run();
-
+        Media hit = new Media(getClass().getResource("/sounds/" + soundFile).toString());
+        mediaPlayer = new MediaPlayer(hit);
+        mediaPlayer.setVolume(volume);
+        mediaPlayer.play();
     }
 
     public synchronized ArrayList<Body> getAllThings() {
