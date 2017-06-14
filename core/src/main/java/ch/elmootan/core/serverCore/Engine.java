@@ -33,6 +33,10 @@ public class Engine {
    private int nextBonusTime;
    private int bonusTime;
 
+   private Random randomBonus;
+   private int nextBonusTime;
+   private int bonusTime;
+
    public Engine(ServerMulticast udpServer,int serverId) {
       engineId = serverId;
       multicastServer = udpServer;
@@ -165,6 +169,14 @@ public class Engine {
             // Freinage des corps
             // body.speed.x -= 0.005 * body.speed.x;
             // body.speed.y -= 0.005 * body.speed.y;
+
+         bonusTime++;
+
+         if (bonusTime == nextBonusTime) {
+            generateBonus();
+            bonusTime = 0;
+            nextBonusTime = randomBonus.nextInt(20000) + 5000;
+         }
 
          bonusTime++;
 
