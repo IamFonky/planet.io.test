@@ -156,8 +156,14 @@ public class Engine {
             }
 
             synchronized (body) {
-                body.getPosition().setX(body.getPosition().getX() + body.getSpeed().getX());
-                body.getPosition().setY(body.getPosition().getY() + body.getSpeed().getY());
+                double newX = body.getPosition().getX() + body.getSpeed().getX();
+                newX = (newX > 0) ? min(newX, 10e5) : max(newX, -10e5);
+
+                double newY = body.getPosition().getY() + body.getSpeed().getY();
+                newY = (newY > 0) ? min(newY, 10e5) : max(newY, -10e5);
+
+                body.getPosition().setX(newX);
+                body.getPosition().setY(newY);
 
                 //Débug
 //            System.out.print(body);
