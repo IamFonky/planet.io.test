@@ -8,16 +8,12 @@ import ch.elmootan.core.sharedObjects.Game;
 import ch.elmootan.core.sharedObjects.Lobby;
 import ch.elmootan.core.universe.InvisiblePlanet;
 import ch.elmootan.core.universe.Planet;
-import ch.elmootan.core.universe.Universe;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,31 +51,6 @@ public class ClientHandler {
                     }
 
                     switch (command) {
-
-/*<<<<<<< HEAD
-                        // Client wants to create a game.
-                        case Protocol.CMD_CREATE_GAME: {
-                            if (lobby.getGamesList().size() + 1 > lobby.getNbGamesMax()) {
-                                writer.println(Protocol.PLANET_IO_FAILURE);
-                                writer.flush();
-                            } else {
-                                writer.println(Protocol.PLANET_IO_SUCCESS);
-                                writer.flush();
-                                try {
-                                    Game newGame = mapper.readValue(reader.readLine(), Game.class);
-                                    int newGameID = lobby.addGame(newGame);
-                                    writer.println(Protocol.PLANET_IO_SUCCESS
-                                            + Protocol.CMD_SEPARATOR
-                                            + newGameID);
-                                    writer.flush();
-                                } catch (JsonProcessingException jpe) {
-                                    writer.println(Protocol.PLANET_IO_FAILURE);
-                                    writer.flush();
-                                }
-                            }
-                            break;
-                        }
-=======*/
                         // Client wants to click.
                         case Protocol.PLANET_IO_LOGIN: {
                             User newUser = mapper.readValue(reader.readLine(), User.class);
@@ -123,6 +94,7 @@ public class ClientHandler {
                                 if (idGame >= 0 && idGame < lobby.getGamesList().size()) {
                                     writer.println(Protocol.PLANET_IO_SUCCESS);
                                     writer.flush();
+                                    lobby.addAPlayerToGame(idGame);
                                     Planet userPlanet = mapper.readValue(reader.readLine(), Planet.class);
                                     userPlanet = lobby.getEngineList().get(idGame).generateUserPlanet(userPlanet);
                                     writer.println(mapper.writeValueAsString(userPlanet));
@@ -135,6 +107,14 @@ public class ClientHandler {
                                 writer.println(Protocol.PLANET_IO_FAILURE);
                                 writer.flush();
                             }
+                            break;
+                        }
+
+                        case Protocol.PLANET_IO_LEAVING_GAME: {
+                            int idGame = Integer.parseInt(cmdAndArgs[1]);
+                            String playerName = cmdAndArgs[2];
+                            lobby.removeAPlayerToGame(idGame, playerName);
+
                             break;
                         }
 
@@ -220,6 +200,7 @@ public class ClientHandler {
                         case Protocol.NB_GAME_MAX_UPDATE: {
                             lobby.setNbGamesMax(Integer.parseInt(cmdAndArgs[1]));
                             LOG.info("New max nb games: " + lobby.getNbGamesMax());
+                            break;
 
                         }
                         // Client wants to unclick the control planet.
