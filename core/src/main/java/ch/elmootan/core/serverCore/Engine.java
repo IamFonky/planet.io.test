@@ -37,7 +37,7 @@ public class Engine {
       engineId = serverId;
       multicastServer = udpServer;
       ActionListener repaintLol = evt -> calculateBodies();
-      javax.swing.Timer displayTimer = new javax.swing.Timer(2, repaintLol);
+      javax.swing.Timer displayTimer = new javax.swing.Timer(20, repaintLol);
       displayTimer.start();
       randomBonus = new Random();
       nextBonusTime = randomBonus.nextInt(20000) + 5000;
