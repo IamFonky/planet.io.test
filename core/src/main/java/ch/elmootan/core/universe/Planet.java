@@ -18,10 +18,9 @@ public class Planet extends Body
     private Timer bonusTimer;
     private int bonusDuration;
 
+    protected int idSkin = 1;
     // Durée en secondes
     private static final int MAX_BONUS_DURATION = 15;
-
-    private int idSkin = 1;
 
     public Planet(){}
 

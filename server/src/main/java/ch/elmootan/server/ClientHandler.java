@@ -177,6 +177,7 @@ public class ClientHandler {
                                     InvisiblePlanet userPlanet = mapper.readValue(reader.readLine(), InvisiblePlanet.class);
                                     try {
                                         Body engineBody = lobby.getEngineList().get(idGame).getBodyByName(userPlanet);
+                                        ((InvisiblePlanet)engineBody).setIdSkin(userPlanet.getIdSkin());
                                         engineBody.setMass(userPlanet.getMass());
                                         engineBody.setPosition(userPlanet.getPosition());
                                         writer.println(Protocol.PLANET_IO_SUCCESS);
