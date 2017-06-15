@@ -45,6 +45,10 @@ public class Engine {
     //Server speed in milliseconds
     private static final int SERVER_SPEED = 20;
 
+    public Engine() {
+
+    }
+
     public Engine(ServerMulticast udpServer, int serverId) {
         engineId = serverId;
         multicastServer = udpServer;
