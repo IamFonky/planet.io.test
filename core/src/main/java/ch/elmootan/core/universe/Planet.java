@@ -69,7 +69,7 @@ public class Planet extends Body {
     ActionListener setBonusTime = new ActionListener() {
         public void actionPerformed(ActionEvent evt) {
             if (++bonusDuration == MAX_BONUS_DURATION)
-                setActiveBonus(Bonus.NONE);
+                activeBonus = Bonus.NONE;
         }
     };
 }
