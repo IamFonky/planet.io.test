@@ -40,7 +40,7 @@ public class Engine {
 
     private static final int MIN_TIME_MOON_APPEARS = 5000;
     private static final int MAX_TIME_MOON_APPEARS = 15000;
-    private static final int MAX_BODIES = 100;
+    private static final int MAX_BODIES = 25;
 
     //Server speed in milliseconds
     private static final int SERVER_SPEED = 20;
@@ -102,12 +102,14 @@ public class Engine {
                             } else {
                                 BodyState eatState;
                                 synchronized (allThings) {
-                                    if (isProtected(body) || isProtected(surrounding))
-                                        continue;
                                     if (body.getMass() > surrounding.getMass()) {
+                                        if (isProtected(surrounding))
+                                            continue;
                                         eatState = body.eat(surrounding);
                                         allThings.remove(surrounding);
                                     } else {
+                                        if (isProtected(body))
+                                            continue;
                                         eatState = surrounding.eat(body);
                                         allThings.remove(body);
                                     }
@@ -370,7 +372,7 @@ public class Engine {
                     randomGenerator.nextDouble() * 1E+21 + 1E+20,
                     randomGenerator.nextDouble() * 4000 + 500,
                 7,
-                    allThings.size()
+                    randomGenerator.nextInt()
             );
         allThings.add(moon);
     }
