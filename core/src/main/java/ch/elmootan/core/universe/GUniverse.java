@@ -41,7 +41,7 @@ public class GUniverse extends JFrame {
 
     private TheEndFrame theEndFrame = new TheEndFrame();
     private JPanel rootPane;
-    private final double controlPlanetMass = 1E+24;
+    private final double controlPlanetMass = 2E+24;
     private InvisiblePlanet clickedPlanet;
     private Planet myPlanet;
     private boolean mousePressed = false;
