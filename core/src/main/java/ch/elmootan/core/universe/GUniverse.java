@@ -30,6 +30,7 @@ import static java.lang.Math.*;
 public class GUniverse extends JFrame {
 
     private final ArrayList<Body> allThings = new ArrayList<>();
+    private ArrayList<Body> statBodies = new ArrayList<>();
 
     private double zoom = 500.0;
     private int dx = 0;
@@ -212,7 +213,7 @@ public class GUniverse extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
+                final Graphics2D g2d = (Graphics2D) g;
 
                 backgroundTexture = new TexturePaint(
                         backgroundImage,
@@ -225,31 +226,32 @@ public class GUniverse extends JFrame {
                 g.setColor(Color.WHITE);
 
                 synchronized (allThings) {
-
-
                     if (GUniverse.this.asAdmin) {
                         g2d.drawString("Player List:", 0, 10);
                         for (int i = 0; i < allThings.size(); i++) {
-                            if (allThings.get(i).getClass() == Planet.class) {
-                                g2d.drawString(allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (i + 2));
+                            Body bodyScore = allThings.get(i);
+                            if (bodyScore.getClass() == Planet.class) {
+                                g2d.drawString(bodyScore.getName() + " : " + (int) bodyScore.getRadius(), 0, 15 * (i + 2));
                             }
                         }
 
                     } else {
-                        allThings.sort(Comparator.comparingDouble(Body::getRadius));
-                        Collections.reverse(allThings);
-                        int nbScores = allThings.size() > 5 ? 5 : allThings.size();
-                        g2d.drawString("Top 5:", 0, 10);
-                        int i = 0, j = 1;
-                        while (i != nbScores) {
-                            if (allThings.get(i) instanceof Planet && !(allThings.get(i) instanceof InvisiblePlanet)) {
-                                g2d.drawString(j + ". " + allThings.get(i).getName() + " : " + (int) allThings.get(i).getRadius(), 0, 15 * (++j) + 10);
-                            } else if (allThings.size() > 5) {
-                                nbScores++;
-                            }
-                            if (++i >= allThings.size())
-                                break;
-                        }
+//                        allThings.sort(Comparator.comparingDouble(Body::getRadius));
+//                        Collections.reverse(allThings);
+//                        int nbScores = allThings.size() > 5 ? 5 : allThings.size();
+//                        g2d.drawString("Top 5:", 0, 10);
+//                        int i = 0, j = 1;
+//                        while (i != nbScores) {
+//                            Body bodyScore = allThings.get(i);
+//                            if (bodyScore instanceof Planet && !(bodyScore instanceof InvisiblePlanet)) {
+//                                if(bodyScore.getName().indexOf("MOON") != 0)
+//                                    g2d.drawString(j + ". " + bodyScore.getName() + " : " + (int) bodyScore.getRadius(), 0, 15 * (++j) + 10);
+//                            } else if (allThings.size() > 5) {
+//                                nbScores++;
+//                            }
+//                            if (++i >= allThings.size())
+//                                break;
+//                        }
 
 
                         for (Body body : allThings) {
@@ -265,6 +267,7 @@ public class GUniverse extends JFrame {
                             } else if (body.getClass() == Bonus.class) {
                                 g2d.drawImage(bonus.getScaledInstance(radius + radius, radius + radius, 0), x - radius / 2, y - radius / 2, this);
                             } else if (body.getClass() == Planet.class) {
+                                if(body.getName().indexOf("MOON") != 0)
                                 g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
                                 g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
 
@@ -302,6 +305,54 @@ public class GUniverse extends JFrame {
                         }
                     }
                 }
+
+                        if(statBodies != null) {
+                            synchronized (allThings)
+                            {
+                                statBodies = (ArrayList<Body>)allThings.clone();
+                            }
+                            statBodies.sort(Comparator.comparingDouble(Body::getRadius));
+                            Collections.reverse(statBodies);
+                            int nbScores = statBodies.size() > 5 ? 5 : statBodies.size();
+                            g2d.drawString("Top 5:", 0, 10);
+                            int i = 0, j = 1;
+                            while (i != nbScores) {
+                                Body bodyScore = statBodies.get(i);
+                                if (bodyScore instanceof Planet && !(bodyScore instanceof InvisiblePlanet)) {
+                                    if (bodyScore.getName().indexOf("MOON") != 0)
+                                        g2d.drawString(j + ". " + bodyScore.getName() + " : " + (int) bodyScore.getRadius(), 0, 15 * (++j) + 10);
+                                } else if (statBodies.size() > 5) {
+                                    nbScores++;
+                                }
+                                if (++i >= statBodies.size())
+                                    break;
+                            }
+                        }
+
+
+//                (new Thread()
+//                {
+//                    @Override
+//                    public void run() {
+//                        ArrayList<Body> statBodies = (ArrayList<Body>)allThings.clone();
+//                        statBodies.sort(Comparator.comparingDouble(Body::getRadius));
+//                        Collections.reverse(statBodies);
+//                        int nbScores = statBodies.size() > 5 ? 5 : statBodies.size();
+//                        g2d.drawString("Top 5:", 0, 10);
+//                        int i = 0, j = 1;
+//                        while (i != nbScores) {
+//                            Body bodyScore = statBodies.get(i);
+//                            if (bodyScore instanceof Planet && !(bodyScore instanceof InvisiblePlanet)) {
+//                                if(bodyScore.getName().indexOf("MOON") != 0)
+//                                    g2d.drawString(j + ". " + bodyScore.getName() + " : " + (int) bodyScore.getRadius(), 0, 15 * (++j) + 10);
+//                            } else if (statBodies.size() > 5) {
+//                                nbScores++;
+//                            }
+//                            if (++i >= statBodies.size())
+//                                break;
+//                        }
+//                    }
+//                }).start();
 
             }
 
