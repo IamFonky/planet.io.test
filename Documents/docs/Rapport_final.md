@@ -166,7 +166,7 @@ Nous sommes partis du principe que les calculs devaient se faire du côté serve
 
 \begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Schemas/activity.png}
+    \includegraphics[width=0.9\linewidth]{Schemas/activity.png}
     \captionof{figure}{Diagramme d'activité}
 \end{minipage}
 
@@ -214,13 +214,13 @@ L'admin peut, depuis le lobby, paramétrer le nombre de parties maximum que ce d
 
 \begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Schemas/domaine/domaine_serveur_final.png}
+    \includegraphics[width=0.9\linewidth]{Schemas/domaine/domaine_serveur_final.png}
     \captionof{figure}{Modèle de domaine serveur}
 \end{minipage}
 
 \begin{minipage}{\linewidth}
     \centering
-    \includegraphics[width=\linewidth]{Schemas/domaine/domaine_client.png}
+    \includegraphics[width=0.9\linewidth]{Schemas/domaine/domaine_client.png}
     \captionof{figure}{Modèle de domaine client}
 \end{minipage}
 
@@ -229,7 +229,7 @@ Notre base de données est assez simpliste car nous sommes partis dans l'optique
 
 \begin{minipage}{\linewidth}
     \centering
-    \includegraphics{images/db.png}
+    \includegraphics[scale=0.8]{images/db.png}
     \captionof{figure}{Schéma de la base de données}
 \end{minipage}
 
@@ -265,7 +265,7 @@ Les échanges multicast se font à l'adresse `239.192.0.2`, sur le port `9898`. 
 Voici une version très simplifiée du diagramme de classe de notre application.
 \begin{minipage}{\linewidth}
     \centering
-    \includegraphics{Schemas/diagramme_classes.jpg}
+    \includegraphics[width=\linewidth]{Schemas/diagramme_classes.jpg}
     \captionof{figure}{Diagramme de classes client-serveur}
 \end{minipage}
 
