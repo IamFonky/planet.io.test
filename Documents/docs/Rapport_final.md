@@ -79,6 +79,7 @@ header-includes:
 \let\footnote\thanks
 \begin{center}
 {\Huge\@title}\vskip1.5em
+\includegraphics[width=0.7\linewidth]{images/logo.jpg}\vskip1.5em
 {\LARGE Rapport final}\vskip1.5em
 {
 
@@ -98,7 +99,7 @@ header-includes:
 }
 \makeatother
 
-\title{Planet.io}
+\title{}
 
 \date{HEIG-VD - Semestre d'été 2017}
 
@@ -171,6 +172,44 @@ Nous sommes partis du principe que les calculs devaient se faire du côté serve
 
 ### Cas d'utilisation
 
+#### Administrateur et joueur normal
+##### Se connecter
+- Le joueur rentre ses données (pseudonyme + mot-de-passe).
+    a. Les identifiants sont corrects et le joueur accède au lobby.
+    b. Les identifiants sont incorrects et un message d'erreur est affiché. Retour à l'étape 1.
+
+##### S'enregistrer
+- Le joueur clique sur un bouton S'enregistrer et accède au menu pour s'enregistrer.
+- Il rentre un pseudonyme.
+    a. Le pseudonyme est libre et le compte est créé.
+    b. Le pseudonyme est déjà pris et le joueur est informé par un message d'erreur. Retour à l'étape 2.
+- Le joueur peut se connecter avec son compte.
+
+##### Jouer
+- Le joueur choisi la partie à laquelle il veut participer dans le lobby.
+    a. La partie est pleine ou terminée (pas mise à jour) donc impossible de se connecter. Retour à l'étape 1.
+    b. Le joueur peut se connecter.
+- Le joueur rentre dans la partie.
+- Il commande sa planète en générant de la gravité à l'aide de clicks plus ou moins rapide de la souris.
+- Il absorbe les fragments contenu par l'univers de la partie et les planètes plus petites que lui.
+- Il peut absorber des bonus/malus qui lui donnent des pouvoir ou font des actions spécifique à leur type (accélération, augmentation de la force de gravité momentanée, etc...).
+- Sa partie se termine lorsque sa planète se fait absorber par une autre entité (planète adverse, trou noir, pluie de météorite).
+
+##### Créer une partie dans le lobby
+- Dans le lobby le joueur appuie sur le bouton Créer une partie. 2. a. Il reste de la place pour une partie dans le lobby, le joueur peut passer à l'étape 3.
+    b. Plus de place pour une partie donc impossible de créer la partie. Un message d'erreur est affiché.
+- Choisir un nom pour sa partie et un nombre de joueur max.
+- Choisir les bonus disponibles lors de la partie et si elle a des propriétés spéciales (garvité extra, nombre de fragments, etc...).
+
+#### Administrateur seulement
+#### Paramétrer le lobby
+L'admin peut, depuis le lobby, paramétrer le nombre de parties maximum que ce dernier peut contenir.
+
+#### Action sur une partie
+- Ajout de bonus en live.
+- Accès à la liste de tous les joueurs avec leurs informations: pseudo, masse actuelle.
+- Spectateur d'une partie.
+
 ### Modèles de domaine
 
 \begin{minipage}{\linewidth}
@@ -186,7 +225,7 @@ Nous sommes partis du principe que les calculs devaient se faire du côté serve
 \end{minipage}
 
 ### Base de données
-Notre base de données est assez simpliste care nous somme parti dans l'optique de faire un jeu arcade ou les utilisateurs ne s'enregistrent pas mais si connectent juste avec un pseudo avec comme seule contrainte le fait que le pseudo soit déjà pris actuellement sur le serveur. Nous pensons que certaines améliorations sont possible sur la base de données (scores, nettoyage de la DB mieux géré).
+Notre base de données est assez simpliste car nous sommes partis dans l'optique de faire un jeu arcade ou les utilisateurs ne s'enregistrent pas mais s'y connectent juste avec un pseudo avec comme seule contrainte le fait que le pseudo soit déjà pris actuellement sur le serveur. Nous pensons que certaines améliorations sont possibles sur la base de données (scores, nettoyage de la DB mieux géré).
 
 \begin{minipage}{\linewidth}
     \centering
@@ -211,8 +250,8 @@ Le tableau ci-dessous liste les différentes commandes du protocole et leur rôl
 | `PLANET_IO_LOGIN`| Le client se connecte au lobby. |
 | `NB_GAME_MAX_UPDATE` | Le client demande le nombre max de parties. |
 | `PLANET_IO_CREATE_PLANET` | Le client crée sa planète. |
-| `PLANET_IO_SET_PLANET` | |
-| `PLANET_IO_KILL_PLANET` | |
+| `PLANET_IO_SET_PLANET` | Utilisé pour créer une planète invisible. |
+| `PLANET_IO_KILL_PLANET` | Utilisé pour détruire une planète. |
 | `CMD_CREATE_GAME` | Le client crée une partie. |
 | `CMD_JOIN_GAME` | Le client rejoint une partie. |
 | `CMD_DISCONNECT` | Le client se déconnecte. |
@@ -223,6 +262,14 @@ Le tableau ci-dessous liste les différentes commandes du protocole et leur rôl
 Les échanges multicast se font à l'adresse `239.192.0.2`, sur le port `9898`. Les échanges unicast se font sur le port `8585`.
 
 ## Diagrammes de classes
+Voici une version très simplifiée du diagramme de classe de notre application.
+\begin{minipage}{\linewidth}
+    \centering
+    \includegraphics{Schemas/diagramme_classes.jpg}
+    \captionof{figure}{Diagramme de classes client-serveur}
+\end{minipage}
+
+On y voit bien notre implémentation. Le serveur effectue les calculs sur l'engine physique et envoie au client l'état de l'univers. De son côté, le client ne s'occupe que d'afficher l'univers dans son interface graphique (que le serveur n'a pas).
 
 
 # Implémentation du projet
@@ -239,7 +286,7 @@ Pour la sérialisation/désarialisation des données, nous avons utilisé Jackso
 
 Un dépôt Git a été ouvert sur Bitbucket afin que tout le monde puisse travailler de son côté. L'outil Travis a été ajouté au dépôt afin que chaque push ne casse pas la compilation du projet.
 
-Toute la partie engine physique a été développée par nos soins. Nous avons utiliser **Swing** pour l'UI mais cela n'était peut-être pas le plus adapté.
+Toute la partie engine physique a été développée par notre chef de projet. Nous avons utilisé **Swing** pour l'UI mais cela n'était peut-être pas le plus adapté.
 
 # Gestion du projet
 
@@ -252,10 +299,12 @@ Toute la partie engine physique a été développée par nos soins. Nous avons u
     Architecte, concepteur en chef, développeur.
 
 - David Truan  
-    Représentant des utilisateur, développeur.
+    Représentant des utilisateurs, développeur.
 
 - Gaëtan Othenin-Girard  
     Responsable de la configuration, développeur.
+
+Au final, les rôles ont bien été respectés. Sur la fin du projet, tout le monde s'est mis à 100% sur le code.
 
 ## Plan d'itération initial
 
@@ -537,7 +586,7 @@ Nous avons encore du édulcorer cette itération comme la 6. La gestion des bonu
 
 #### Problèmes rencontrés
 
-Le fait que nous ayons été mis au courant au dernier moment qu'un rapport était à rédiger, une charge de travail conséquente est venue s'ajouter à celle déjà existante mais la replanification est cette fois-ci impossible.
+Le fait que nous n'avions pas prévu le rapport dans les itérations, une charge de travail conséquente est venue s'ajouter à celle déjà existante mais la replanification est cette fois-ci impossible.
 
 #### Replanification
 
@@ -545,7 +594,8 @@ Malheureusement non.
 
 ### Bilan sur Trello
 
-Nous avons trouvé que **Trello** n'était pas l'outil le plus adapté à ce genre de projet. Bien que le projet n'était que sur 8 semaines, le fait d'avoir utiliser une interface web pour un suivi de projet n'était pas ergonomique. Peu pratique pour avoir une vue d'ensemble des itérations, interface graphique de genre jeu-vidéo (peu épurée, commentaires perdus dans un flow d'informations). 
+Nous avons trouvé que **Trello** n'était pas l'outil le plus adapté à ce genre de projet. Bien que le projet n'était que sur 8 semaines, le fait d'avoir utiliser une interface web pour un suivi de projet n'était pas ergonomique. Peu pratique pour avoir une vue d'ensemble des itérations, interface graphique de genre jeu-vidéo (peu épurée, commentaires perdus dans un flot d'informations).
+Nous aurions du avoir un apprentissage de cet outil un peu plus profond par rapport  ce qui a été fait.
 
 ## Stratégie de tests
 
@@ -614,7 +664,7 @@ Du point de vue technique, nous aurions sûrement dû réfléchir un peu plus lo
 
 ## Gestion du projet
 
-La gestion du projet s'est très bien déroulée. Les deadlines ont été respectées dans la quasi-totalité des cas. Le chef de projet avait plus le rôle de leader que de chef ce qui fait qu'aucun sentiment de hiérarchie n'a été ressenti. Chacun a effectué son travail correctement.
+La gestion du projet s'est très bien déroulée. Les deadlines ont été respectées dans la quasi-totalité des cas. Le chef de projet avait plus le rôle de leader que de chef ce qui fait qu'aucun sentiment de hiérarchie n'a été ressenti. Chacun a effectué son travail correctement. Nous avons bien su gérer les replanifications sur la fin du projet.
 
 ## Plan d'itérations
 
@@ -632,4 +682,6 @@ Si ce projet était à refaire nous changerions certains points:
 
 # Conclusion
 
-Nous
+Ce projet, bien que partant d'une bonne idée du fait que l'on doive développer un jeu  que l'on puisse choisir avec qui nous travaillons, a été plombé par le fait que le suivit était plus une contrainte qu'autre chose. De plus, la charge de travail qu'une application client-serveur représente et le nombre de laboratoires conséquent dans les autres branches nous a pénalisé pour l'avancement du projet.
+Comme dit précédemment, nous n'avons pas réussi à appréhender correctement **Trello** et l'avons plus vécu comme un boulet attaché au pied plutôt qu'un moyen de bien suivre notre projet.
+Au final nous avons réussi à rendre une application fonctionnelle en remplissant presque tous les points du cahier des charges que nous avions fixé au départ.
