@@ -45,6 +45,10 @@ public class Engine {
     //Server speed in milliseconds
     private static final int SERVER_SPEED = 20;
 
+    public Engine() {
+
+    }
+
     public Engine(ServerMulticast udpServer, int serverId) {
         engineId = serverId;
         multicastServer = udpServer;
@@ -203,7 +207,7 @@ public class Engine {
         }
     }
 
-    private boolean isProtected(Body body) {
+    public boolean isProtected(Body body) {
         if (!(body instanceof Planet))
             return false;
 
@@ -346,7 +350,7 @@ public class Engine {
         userPlanets.remove(idPlanet);
     }
 
-    private void generateBonus() {
+    public Bonus generateBonus() {
         Random rand = new Random();
         Bonus bonus = new Bonus(
                 "CENA" + rand.nextDouble() * 10000,
@@ -361,6 +365,8 @@ public class Engine {
         allThings.add(bonus);
 
         sendPlayMusic();
+
+        return bonus;
     }
 
     private void generateMoon() {

@@ -41,7 +41,7 @@ public class GUniverse extends JFrame {
 
     private TheEndFrame theEndFrame = new TheEndFrame();
     private JPanel rootPane;
-    private final double controlPlanetMass = 1E+24;
+    private final double controlPlanetMass = 2E+24;
     private InvisiblePlanet clickedPlanet;
     private Planet myPlanet;
     private boolean mousePressed = false;
@@ -69,6 +69,13 @@ public class GUniverse extends JFrame {
     private BufferedImage backgroundImage;
     private TexturePaint backgroundTexture;
 
+    private void setDx(int dx) {
+        this.dx = (dx > 0) ? min(dx, (int)10e5 / (int)zoom) : max(dx, (int)-10e5 / (int)zoom);
+    }
+
+    private void setDy(int dy) {
+        this.dy = (dy > 0) ? min(dy, (int)10e5 / (int)zoom) : max(dy, (int)-10e5 / (int)zoom);
+    }
 
     public GUniverse(PrintWriter wr, BufferedReader rd, MulticastSocket udpSocket, int gameId, Planet myPlanet, boolean asAdmin) {
 
@@ -160,22 +167,22 @@ public class GUniverse extends JFrame {
                     case KeyEvent.VK_LEFT:
                     case KeyEvent.VK_A:
                         followMode = false;
-                        dx += Math.sqrt(zoom);
+                        setDx(dx + (int)Math.sqrt(zoom));
                         break;
                     case KeyEvent.VK_RIGHT:
                     case KeyEvent.VK_D:
                         followMode = false;
-                        dx -= Math.sqrt(zoom);
+                        setDx(dx - (int)Math.sqrt(zoom));
                         break;
                     case KeyEvent.VK_UP:
                     case KeyEvent.VK_W:
                         followMode = false;
-                        dy += Math.sqrt(zoom);
+                        setDy(dy + (int)Math.sqrt(zoom));
                         break;
                     case KeyEvent.VK_DOWN:
                     case KeyEvent.VK_S:
                         followMode = false;
-                        dy -= Math.sqrt(zoom);
+                        setDy(dy - (int)Math.sqrt(zoom));
                         break;
 
                     case KeyEvent.VK_SPACE:
@@ -184,8 +191,8 @@ public class GUniverse extends JFrame {
 
                     case KeyEvent.VK_ENTER:
                         followMode = false;
-                        dx = 0;
-                        dy = 0;
+                        setDx(0);
+                        setDy(0);
                         break;
 
                     default:
@@ -296,8 +303,8 @@ public class GUniverse extends JFrame {
                             if (body.equals(myPlanet)) {
                                 myPlanet.setPosition(body.getPosition());
                                 if (followMode) {
-                                    dx = (int) -((myPlanet.getPosition().getX() - (body.getRadius() / 2)) / zoom);
-                                    dy = (int) -((myPlanet.getPosition().getY() - (body.getRadius() / 2)) / zoom);
+                                    setDx((int) -((myPlanet.getPosition().getX() - (body.getRadius() / 2)) / zoom));
+                                    setDy((int) -((myPlanet.getPosition().getY() - (body.getRadius() / 2)) / zoom));
 
                                 }
                             }
