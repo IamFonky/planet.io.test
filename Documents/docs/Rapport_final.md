@@ -186,6 +186,7 @@ Nous sommes partis du principe que les calculs devaient se faire du côté serve
 \end{minipage}
 
 ### Base de données
+Notre base de données est assez simpliste care nous somme parti dans l'optique de faire un jeu arcade ou les utilisateurs ne s'enregistrent pas mais si connectent juste avec un pseudo avec comme seule contrainte le fait que le pseudo soit déjà pris actuellement sur le serveur. Nous pensons que certaines améliorations sont possible sur la base de données (scores, nettoyage de la DB mieux géré).
 
 \begin{minipage}{\linewidth}
     \centering
@@ -223,6 +224,7 @@ Les échanges multicast se font à l'adresse `239.192.0.2`, sur le port `9898`. 
 
 ## Diagrammes de classes
 
+
 # Implémentation du projet
 
 ## Technologies utilisées
@@ -236,6 +238,8 @@ Notre base de données s'appuie sur SQLite3.
 Pour la sérialisation/désarialisation des données, nous avons utilisé Jackson.
 
 Un dépôt Git a été ouvert sur Bitbucket afin que tout le monde puisse travailler de son côté. L'outil Travis a été ajouté au dépôt afin que chaque push ne casse pas la compilation du projet.
+
+Toute la partie engine physique a été développée par nos soins. Nous avons utiliser **Swing** pour l'UI mais cela n'était peut-être pas le plus adapté.
 
 # Gestion du projet
 
@@ -486,7 +490,7 @@ Non.
 
 #### Problèmes rencontrés
 
-Aucun.
+Manque de temps pour cette itération.
 
 #### Replanification
 
@@ -504,7 +508,7 @@ Aucun.
 
 #### Replanification
 
-Non.
+Nous avons déplacer toutes l'implémentation des fonctionnalités admin dans l'itération 7 suite à notre retard pris lors de l'itération 5.
 
 ### Itération 7
 
@@ -521,12 +525,13 @@ Problème de communication multicast.
 
 #### Replanification
 
-Non.
+Nous avons encore du édulcorer cette itération comme la 6. La gestion des bonus sera donc finie lors de l'itération 8.
 
 ### Itération 8
 
 #### Bilan
 
+- Finalisation du projet.
 - Correction de bugs majeurs.
 - Rédaction du rapport.
 
@@ -537,6 +542,10 @@ Le fait que nous ayons été mis au courant au dernier moment qu'un rapport éta
 #### Replanification
 
 Malheureusement non.
+
+### Bilan sur Trello
+
+Nous avons trouvé que **Trello** n'était pas l'outil le plus adapté à ce genre de projet. Bien que le projet n'était que sur 8 semaines, le fait d'avoir utiliser une interface web pour un suivi de projet n'était pas ergonomique. Peu pratique pour avoir une vue d'ensemble des itérations, interface graphique de genre jeu-vidéo (peu épurée, commentaires perdus dans un flow d'informations). 
 
 ## Stratégie de tests
 
@@ -550,27 +559,52 @@ Comme expliqué précédemment, Git a été utilisé pour intégrer le travail d
 
 ## Ce qui fonctionne
 
+- Lobby fonctionnel avec un nombre de parties maximum.
+
+- Nombre de joueurs maximum dans une partie.
+
+- Création de parties.
+
 - Déplacement de la planète grâce à la souris: lorsque le joueur fait un geste de frottement à l'aide de sa souris, cela génère une forte gravité par rapport à la planète du joueur.
+
 - Score se basant sur la masse de la planète du joueur. Mise à jour en temps réel du score des 5 meilleurs joueurs, visible par chaque joueur.
-- **Sauvegarde des scores des joueurs dans une base de données**.
+
 - Bonus offrant des pouvoirs:
-    - Lune amassant des fragments pour nous.
-    - Atmosphère protectrice.
-- Zoom/De-zoom avec les touches **A** et **D** .
-- **Déplacement de la caméra avec les flèches directionnelles.**
+    - Lune amassant des fragments pour nous (non fonctionnel mais offre une expérience visuelle sympathique car la lune est quand même là).
+    - Atmosphère protectrice (fonctionnel).
+
+- Zoom/De-zoom avec les touches **Q** et **E** et la molette de scroll.
+
+- Déplacement de la caméra avec les flèches directionnelles et WASD.
+
+- Modification de la masse de la planète de contrôle.
+
 - Administration. Au niveau du serveur, un administrateur doit pouvoir effectuer certaines tâches :
-    - **Vider la base de données (reset des scores par utilisateur ou pour tout le monde)**
     - Gérer le nombre de parties max du lobby.
     - Être spectateur d'une partie en ayant la visibilité sur tous les joueurs.
+
 - Choix d'une texture visuelle de la planète contrôlée.
+
 - Gestion concurrente du maximum de joueurs possibles (si possible, pas de limite).
-- Sons.
+
+- Sons des bonus.
 
 ## Développement futur
 
-- Correction des bugs
-- Ajout de bonus/malus
-- Amélioration de l'interface graphique
+Pour le développement futur de l'application, nous pensons que les points suivants sont primordiaux:
+
+- Revue de l'architecture du code. Notre code est un peu chaotique dans certaines classes, typiquement au niveau du client. Cela prendrait un temps assez conséquent car nous avons du développer tout le projet sur une base assez fragile. Nous planifions cela à 2 à 3 semaines de travail.
+
+- Amélioration de la communication réseau. Nous utilisons actuellement du multicast pour envoyer à tous nous client l'état de l'univers mais cela pose des problèmes de latence lorsque nous jouons en wi-fi. Nous pensions redévelopper le serveur en *JavaScript* à l'aide de **NodeJS**. Cela prendrait bien entendu un temps conséquent et nous planifierions ça à hauteur de 2 voir 3 semaines pour rendre le réseau totalement stable en devant repartir de zéro avec le serveur. Cela pourrait être fait en parallèle de la restructure de l'architecture du code.
+
+- Ajout de bonus. Dans notre programme nous n'avons pas eu le temps d'implémenter tous les bonus que nous voulions. L'ajout de nouveau bonus/malus (masse x10, zone de ralentissement, ...) ne prendrait pas beaucoup de temps et serait donc réalisable en 1 semaine si cela était à planifier.
+
+- Ajout de fonctionnalités admin. Notre programme ne propose que très peu de fonctionnalités aux admin:
+    - Modification du nombre de parties maximum dans le lobby.
+    - Devenir spectateur d'une partie et voir la liste de tous les joueurs de cette partie.
+
+    Nous avions prévu de permettre aux admins de bannir des joueurs, d'ajouter des bonus manuellement et d'autres fonctions spécifiques à l'administration du jeu. Il faudrait aussi pouvoir s'enregistrer en temps qu'admin d'une façon plus sécurisée (mot de passe). Comme la connexion admin est déjà gérée, l'ajout de ces fonctionnalités ne devrait pas être trop long. 1 à 2 semaines devraient être suffisantes pour la planification.
+
 
 # Auto-critique
 
@@ -584,8 +618,18 @@ La gestion du projet s'est très bien déroulée. Les deadlines ont été respec
 
 ## Plan d'itérations
 
-Notre plan d'itérations initial a dans l'ensemble été respecté malgré quelques réajustements qui ont été nécessaires en cours de route.
+Notre plan d'itérations initial a dans l'ensemble été respecté malgré quelques réajustements qui ont été nécessaires en cours de route. Le fait d'avoir eu un semestre aussi chargé nous a mis en retard à certains moment mais nous avons su replanifier nos itérations lorsque cela était le cas.
 
 ## Améliorations
 
+Si ce projet était à refaire nous changerions certains points:
+
+- Ne pas utiliser **Trello**. Nous avons vraiment trouvé cet outil peut pratique à utiliser, peu ergonomique et pensons que si nous avions un suivi de projet à refaire nous utiliserions une application plus spécifique (pas d'interface web en tout cas).
+
+- S'y prendre plus à l'avance pour certaines itérations ou nous avons coder très vite par manque de temps. Cela à fait que le code est fonctionnel mais largement améliorable.
+
+- Plus vite réfléchir en mode client-serveur que ce que nous avons fait. Nous avions un engine graphique fonctionnel assez tôt mais de l'adapter à une version client-serveur à pris bien plus de temps que prévu.
+
 # Conclusion
+
+Nous
