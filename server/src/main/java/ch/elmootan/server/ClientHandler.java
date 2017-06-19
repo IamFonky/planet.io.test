@@ -54,6 +54,7 @@ public class ClientHandler {
                         // Client wants to click.
                         case Protocol.PLANET_IO_LOGIN: {
                             User newUser = mapper.readValue(reader.readLine(), User.class);
+                            newUser.setName(newUser.getName().replace("'",""));
                             db.checkUser(newUser);
                             if (newUser.getId() == 0) {
                                 db.insertUser(newUser);
