@@ -87,18 +87,26 @@ public class Server implements Observer {
 
         Lobby.getSharedInstance().showUI();
 
-        String ksName = "server/src/main/java/ch/elmootan/server/server.jks";
-        char ksPass[] = "LeRoiDesCoches".toCharArray();
-        char ctPass[] = "LeRoiDesCoches".toCharArray();
+        String ksName = "certif.jks";
+        char ksPass[] = "ELSIsMaBoi".toCharArray();
+        char ctPass[] = "ELSIsMaBoi".toCharArray();
 
         try {
             KeyStore ks = KeyStore.getInstance("JKS");
             ks.load(new FileInputStream(ksName), ksPass);
+
+            //////////////
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            tmf.init(ks);
+
+            /////////////
+
             KeyManagerFactory kmf =
                     KeyManagerFactory.getInstance("SunX509");
             kmf.init(ks, ctPass);
             SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(kmf.getKeyManagers(), null, null);
+            sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
             SSLServerSocketFactory ssf = sc.getServerSocketFactory();
             serverSocket
                     = (SSLServerSocket) ssf.createServerSocket(Protocol.PORT);

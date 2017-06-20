@@ -106,15 +106,20 @@ public class Client implements Runnable {
         try {
             char[] passphrase = "ELSIsMaBoi".toCharArray();
             KeyStore keystore = KeyStore.getInstance("JKS");
-            keystore.load(new FileInputStream("client/src/main/java/ch/elmootan/client/client.jks"), passphrase);
+            keystore.load(new FileInputStream("certif.jks"), passphrase);
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
             tmf.init(keystore);
 
+            KeyManagerFactory kmf =
+                    KeyManagerFactory.getInstance("SunX509");
+            kmf.init(keystore, passphrase);
+
+
             SSLContext context = SSLContext.getInstance("TLS");
             TrustManager[] trustManagers = tmf.getTrustManagers();
 
-            context.init(null, trustManagers, null);
+            context.init(kmf.getKeyManagers(), trustManagers, null);
 
             sslFactory = context.getSocketFactory();
             tcpSocket = (SSLSocket)sslFactory.createSocket(server, port);
