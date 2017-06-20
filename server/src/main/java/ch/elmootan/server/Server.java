@@ -8,8 +8,11 @@ import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.net.ssl.*;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.*;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -41,7 +44,10 @@ public class Server implements Observer {
     private static final int LISTENING_PORT = Protocol.PORT;
 
     //! Server socket.
-    private ServerSocket serverSocket;
+//    private ServerSocket serverSocket;
+    private SSLServerSocketFactory sslFactory;
+    private SSLServerSocket serverSocket;
+
 
     private ServerMulticast serverMulticast;
 
@@ -81,9 +87,28 @@ public class Server implements Observer {
 
         Lobby.getSharedInstance().showUI();
 
-        serverSocket = new ServerSocket();
-        serverSocket.setReuseAddress(true);
-        serverSocket.bind(new InetSocketAddress(LISTENING_PORT));
+        String ksName = "server/src/main/java/ch/elmootan/server/server.jks";
+        char ksPass[] = "LeRoiDesCoches".toCharArray();
+        char ctPass[] = "LeRoiDesCoches".toCharArray();
+
+        try {
+            KeyStore ks = KeyStore.getInstance("JKS");
+            ks.load(new FileInputStream(ksName), ksPass);
+            KeyManagerFactory kmf =
+                    KeyManagerFactory.getInstance("SunX509");
+            kmf.init(ks, ctPass);
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(kmf.getKeyManagers(), null, null);
+            SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+            serverSocket
+                    = (SSLServerSocket) ssf.createServerSocket(Protocol.PORT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//        serverSocket = new ServerSocket();
+//        serverSocket.setReuseAddress(true);
+//        serverSocket.bind(new InetSocketAddress(LISTENING_PORT));
 
         // Delegate work to a ClientWorker.
         Thread serverThread = new Thread(() -> {
@@ -92,10 +117,12 @@ public class Server implements Observer {
                 try {
                     LOG.info("Listening for connections on port " + LISTENING_PORT);
 
-                    Socket clientSocket = serverSocket.accept();
+                    SSLSocket clientSocket = (SSLSocket)serverSocket.accept();
+//                    Socket clientSocket = serverSocket.accept();
                     LOG.info("New client has arrived. Delegating work...");
 
                     ClientWorker worker = new ClientWorker(clientSocket, Server.this);
+//                    ClientWorker worker = new ClientWorker(clientSocket, Server.this);
                     clientWorkers.add(worker);
 
                     Thread clientThread = new Thread(worker);

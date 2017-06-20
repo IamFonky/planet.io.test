@@ -8,19 +8,18 @@ import ch.elmootan.core.universe.Planet;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import javax.net.ssl.*;
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyStore;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -31,7 +30,9 @@ public class Client implements Runnable {
 
     protected final CustomObjectMapper mapper = new CustomObjectMapper();
 
-    protected Socket tcpSocket;
+//    protected Socket tcpSocket;
+    protected SSLSocketFactory sslFactory;
+    protected SSLSocket tcpSocket;
 
     protected static GUniverse gui;
 
@@ -71,7 +72,7 @@ public class Client implements Runnable {
 
     private void createClient(Player player, String serverIP, String interfaceIP) {
 
-        tcpSocket = new Socket();
+//        tcpSocket = new Socket();
 
         cPrompt = new CredentialsPrompt();
 
@@ -100,7 +101,28 @@ public class Client implements Runnable {
         if (tcpSocket != null)
             tcpSocket.close();
 
-        tcpSocket = new Socket(server, port);
+//        tcpSocket = new Socket(server, port);
+
+        try {
+            char[] passphrase = "ELSIsMaBoi".toCharArray();
+            KeyStore keystore = KeyStore.getInstance("JKS");
+            keystore.load(new FileInputStream("client/src/main/java/ch/elmootan/client/client.jks"), passphrase);
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            tmf.init(keystore);
+
+            SSLContext context = SSLContext.getInstance("TLS");
+            TrustManager[] trustManagers = tmf.getTrustManagers();
+
+            context.init(null, trustManagers, null);
+
+            sslFactory = context.getSocketFactory();
+            tcpSocket = (SSLSocket)sslFactory.createSocket(server, port);
+
+            tcpSocket.startHandshake();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         try {
             out = new PrintWriter(tcpSocket.getOutputStream());

@@ -1,5 +1,6 @@
 package ch.elmootan.server;
 
+import javax.net.ssl.SSLSocket;
 import java.io.*;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -10,13 +11,15 @@ public class ClientWorker implements Runnable {
     private static final Logger LOG = Logger.getLogger(ClientWorker.class.getSimpleName());
 
     private ClientHandler handler = null;
-    private Socket clientSocket = null;
+//    private Socket clientSocket = null;
+    private SSLSocket clientSocket = null;
     private InputStream is = null;
     private OutputStream os = null;
     private boolean done = false;
     private Server server = null;
 
-    public ClientWorker(Socket clientSocket, Server server) throws IOException {
+    //public ClientWorker(Socket clientSocket, Server server) throws IOException {
+    public ClientWorker(SSLSocket clientSocket, Server server) throws IOException {
         this.clientSocket = clientSocket;
         this.handler = new ClientHandler();
         this.server = server;
