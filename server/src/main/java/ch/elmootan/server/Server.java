@@ -87,36 +87,35 @@ public class Server implements Observer {
 
         Lobby.getSharedInstance().showUI();
 
-        String ksName = "certif.jks";
+        String ksName = "/wasa/certif.jks";
         char ksPass[] = "ELSIsMaBoi".toCharArray();
         char ctPass[] = "ELSIsMaBoi".toCharArray();
 
         try {
+            //Getting keystore instance and loading certificate
             KeyStore ks = KeyStore.getInstance("JKS");
-            ks.load(new FileInputStream(ksName), ksPass);
+            ks.load(getClass().getResourceAsStream(ksName), ksPass);
 
-            //////////////
-
+            //Getting instance of TrustManager
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
             tmf.init(ks);
 
-            /////////////
-
+            //Getting instance of KeyManager
             KeyManagerFactory kmf =
                     KeyManagerFactory.getInstance("SunX509");
             kmf.init(ks, ctPass);
+
+            //Getting instance of SSLContext and initialisating the link with certificate
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+            //Getting instance of SSLServerSocket and connecting
             SSLServerSocketFactory ssf = sc.getServerSocketFactory();
             serverSocket
                     = (SSLServerSocket) ssf.createServerSocket(Protocol.PORT);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-//        serverSocket = new ServerSocket();
-//        serverSocket.setReuseAddress(true);
-//        serverSocket.bind(new InetSocketAddress(LISTENING_PORT));
 
         // Delegate work to a ClientWorker.
         Thread serverThread = new Thread(() -> {

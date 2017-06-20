@@ -105,25 +105,29 @@ public class Client implements Runnable {
 
         try {
             char[] passphrase = "ELSIsMaBoi".toCharArray();
-            KeyStore keystore = KeyStore.getInstance("JKS");
-            keystore.load(new FileInputStream("certif.jks"), passphrase);
 
+            //Getting keystore instance and loading certificate
+            KeyStore keystore = KeyStore.getInstance("JKS");
+            keystore.load(getClass().getResourceAsStream("/wasa/certif.jks"), passphrase);
+
+            //Getting instance of TrustManager
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
             tmf.init(keystore);
 
+            //Getting instance of KeyManager
             KeyManagerFactory kmf =
                     KeyManagerFactory.getInstance("SunX509");
             kmf.init(keystore, passphrase);
 
-
+            //Getting instance of SSLContext and initialisating the link with certificate
             SSLContext context = SSLContext.getInstance("TLS");
-            TrustManager[] trustManagers = tmf.getTrustManagers();
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
-            context.init(kmf.getKeyManagers(), trustManagers, null);
-
+            //Getting instance of SSLSocket and connecting
             sslFactory = context.getSocketFactory();
             tcpSocket = (SSLSocket)sslFactory.createSocket(server, port);
 
+            //Handshake initialisation
             tcpSocket.startHandshake();
         } catch (Exception e) {
             e.printStackTrace();
