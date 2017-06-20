@@ -102,7 +102,7 @@ public class GUniverse extends JFrame {
                         }
                     }
                 });
-        cheatFrame.setSize(200,50);
+        cheatFrame.setSize(200,75);
         cheatFrame.add(idField);
         cheatFrame.setVisible(true);
 
