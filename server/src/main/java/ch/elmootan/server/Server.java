@@ -8,8 +8,11 @@ import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.net.ssl.*;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.*;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -41,7 +44,10 @@ public class Server implements Observer {
     private static final int LISTENING_PORT = Protocol.PORT;
 
     //! Server socket.
-    private ServerSocket serverSocket;
+//    private ServerSocket serverSocket;
+    private SSLServerSocketFactory sslFactory;
+    private SSLServerSocket serverSocket;
+
 
     private ServerMulticast serverMulticast;
 
@@ -81,9 +87,35 @@ public class Server implements Observer {
 
         Lobby.getSharedInstance().showUI();
 
-        serverSocket = new ServerSocket();
-        serverSocket.setReuseAddress(true);
-        serverSocket.bind(new InetSocketAddress(LISTENING_PORT));
+        String ksName = "/wasa/certif.jks";
+        char ksPass[] = "ELSIsMaBoi".toCharArray();
+        char ctPass[] = "ELSIsMaBoi".toCharArray();
+
+        try {
+            //Getting keystore instance and loading certificate
+            KeyStore ks = KeyStore.getInstance("JKS");
+            ks.load(getClass().getResourceAsStream(ksName), ksPass);
+
+            //Getting instance of TrustManager
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            tmf.init(ks);
+
+            //Getting instance of KeyManager
+            KeyManagerFactory kmf =
+                    KeyManagerFactory.getInstance("SunX509");
+            kmf.init(ks, ctPass);
+
+            //Getting instance of SSLContext and initialisating the link with certificate
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+            //Getting instance of SSLServerSocket and connecting
+            SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+            serverSocket
+                    = (SSLServerSocket) ssf.createServerSocket(Protocol.PORT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Delegate work to a ClientWorker.
         Thread serverThread = new Thread(() -> {
@@ -92,10 +124,12 @@ public class Server implements Observer {
                 try {
                     LOG.info("Listening for connections on port " + LISTENING_PORT);
 
-                    Socket clientSocket = serverSocket.accept();
+                    SSLSocket clientSocket = (SSLSocket)serverSocket.accept();
+//                    Socket clientSocket = serverSocket.accept();
                     LOG.info("New client has arrived. Delegating work...");
 
                     ClientWorker worker = new ClientWorker(clientSocket, Server.this);
+//                    ClientWorker worker = new ClientWorker(clientSocket, Server.this);
                     clientWorkers.add(worker);
 
                     Thread clientThread = new Thread(worker);

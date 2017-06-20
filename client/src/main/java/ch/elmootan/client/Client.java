@@ -8,19 +8,18 @@ import ch.elmootan.core.universe.Planet;
 import ch.elmootan.protocol.Protocol;
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import javax.net.ssl.*;
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyStore;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -31,7 +30,9 @@ public class Client implements Runnable {
 
     protected final CustomObjectMapper mapper = new CustomObjectMapper();
 
-    protected Socket tcpSocket;
+//    protected Socket tcpSocket;
+    protected SSLSocketFactory sslFactory;
+    protected SSLSocket tcpSocket;
 
     protected static GUniverse gui;
 
@@ -71,7 +72,7 @@ public class Client implements Runnable {
 
     private void createClient(Player player, String serverIP, String interfaceIP) {
 
-        tcpSocket = new Socket();
+//        tcpSocket = new Socket();
 
         cPrompt = new CredentialsPrompt();
 
@@ -100,7 +101,37 @@ public class Client implements Runnable {
         if (tcpSocket != null)
             tcpSocket.close();
 
-        tcpSocket = new Socket(server, port);
+//        tcpSocket = new Socket(server, port);
+
+        try {
+            char[] passphrase = "ELSIsMaBoi".toCharArray();
+
+            //Getting keystore instance and loading certificate
+            KeyStore keystore = KeyStore.getInstance("JKS");
+            keystore.load(getClass().getResourceAsStream("/wasa/certif.jks"), passphrase);
+
+            //Getting instance of TrustManager
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            tmf.init(keystore);
+
+            //Getting instance of KeyManager
+            KeyManagerFactory kmf =
+                    KeyManagerFactory.getInstance("SunX509");
+            kmf.init(keystore, passphrase);
+
+            //Getting instance of SSLContext and initialisating the link with certificate
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+            //Getting instance of SSLSocket and connecting
+            sslFactory = context.getSocketFactory();
+            tcpSocket = (SSLSocket)sslFactory.createSocket(server, port);
+
+            //Handshake initialisation
+            tcpSocket.startHandshake();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         try {
             out = new PrintWriter(tcpSocket.getOutputStream());

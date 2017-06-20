@@ -86,25 +86,26 @@ public class GUniverse extends JFrame {
         this.myPlanet = myPlanet;
         this.asAdmin = asAdmin;
 
-        final Planet cheatPlanet = this.myPlanet;
-        JFrame cheatFrame = new JFrame("Cheat window");
-        JTextField idField = new JTextField();
-        idField.addKeyListener(new KeyAdapter() {
-                    @Override
-                    public void keyReleased(KeyEvent e) {
-                        try
-                        {
-                            cheatPlanet.setId(Integer.parseInt(idField.getText()));
-                        }
-                        catch (NumberFormatException nfe)
-                        {
-                            nfe.printStackTrace();
-                        }
-                    }
-                });
-        cheatFrame.setSize(200,75);
-        cheatFrame.add(idField);
-        cheatFrame.setVisible(true);
+//        //Cheats
+//        final Planet cheatPlanet = this.myPlanet;
+//        JFrame cheatFrame = new JFrame("Cheat window");
+//        JTextField idField = new JTextField();
+//        idField.addKeyListener(new KeyAdapter() {
+//                    @Override
+//                    public void keyReleased(KeyEvent e) {
+//                        try
+//                        {
+//                            cheatPlanet.setId(Integer.parseInt(idField.getText()));
+//                        }
+//                        catch (NumberFormatException nfe)
+//                        {
+//                            nfe.printStackTrace();
+//                        }
+//                    }
+//                });
+//        cheatFrame.setSize(200,75);
+//        cheatFrame.add(idField);
+//        cheatFrame.setVisible(true);
 
         try {
             backgroundImage = ImageIO.read(getClass().getResourceAsStream("/skins/universe.jpg"));
@@ -280,7 +281,7 @@ public class GUniverse extends JFrame {
                             } else if (body.getClass() == Planet.class) {
                                 if(body.getName().indexOf("MOON") != 0)
                                 {
-                                    String displayed = body.getName() + " : " + body.getId();
+                                    String displayed = body.getName() /*+ " : " + body.getId()*/;
                                     g2d.drawString(displayed, x - (displayed.length() / 2) * 5 + radius / 2, y - 10);
                                 }
                                 g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
