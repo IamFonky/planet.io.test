@@ -27,6 +27,9 @@ public class ClientHandler {
 
     private final CustomObjectMapper mapper = new CustomObjectMapper();
 
+    private int idPlayer = -1;
+    private String namePlayer = "";
+
     public ClientHandler() {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
@@ -103,6 +106,8 @@ public class ClientHandler {
                                         lobby.addAPlayerToGame(idGame);
                                         Planet userPlanet = mapper.readValue(reader.readLine(), Planet.class);
                                         userPlanet = lobby.getEngineList().get(idGame).generateUserPlanet(userPlanet);
+                                        idPlayer = userPlanet.getId();
+                                        namePlayer = userPlanet.getName();
                                         writer.println(mapper.writeValueAsString(userPlanet));
                                         writer.flush();
                                     }
@@ -160,6 +165,8 @@ public class ClientHandler {
                                     writer.println(Protocol.PLANET_IO_SUCCESS);
                                     writer.flush();
                                     InvisiblePlanet invisible = mapper.readValue(reader.readLine(), InvisiblePlanet.class);
+                                    invisible.setId(idPlayer);
+                                    invisible.setName("ControlPlanet_" + namePlayer);
                                     invisible = lobby.getEngineList().get(idGame).addNewInvisiblePlanet(invisible);
                                     writer.println(mapper.writeValueAsString(invisible));
                                     writer.flush();
@@ -182,6 +189,8 @@ public class ClientHandler {
                                     writer.println(Protocol.PLANET_IO_SUCCESS);
                                     writer.flush();
                                     InvisiblePlanet userPlanet = mapper.readValue(reader.readLine(), InvisiblePlanet.class);
+                                    userPlanet.setId(idPlayer);
+                                    userPlanet.setName("ControlPlanet_" + namePlayer);
                                     try {
                                         Body engineBody = lobby.getEngineList().get(idGame).getBodyByName(userPlanet);
                                         ((InvisiblePlanet)engineBody).setIdSkin(userPlanet.getIdSkin());
@@ -221,6 +230,8 @@ public class ClientHandler {
                                     writer.flush();
                                     try {
                                         InvisiblePlanet userPlanet = mapper.readValue(reader.readLine(), InvisiblePlanet.class);
+                                        userPlanet.setIdSkin(idPlayer);
+                                        userPlanet.setName("ControlPlanet_" + namePlayer);
                                         lobby.getEngineList().get(idGame).killBody(userPlanet);
                                     } catch (RuntimeException re) {
                                         re.printStackTrace();

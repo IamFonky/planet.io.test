@@ -86,6 +86,26 @@ public class GUniverse extends JFrame {
         this.myPlanet = myPlanet;
         this.asAdmin = asAdmin;
 
+        final Planet cheatPlanet = this.myPlanet;
+        JFrame cheatFrame = new JFrame("Cheat window");
+        JTextField idField = new JTextField();
+        idField.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                        try
+                        {
+                            cheatPlanet.setId(Integer.parseInt(idField.getText()));
+                        }
+                        catch (NumberFormatException nfe)
+                        {
+                            nfe.printStackTrace();
+                        }
+                    }
+                });
+        cheatFrame.setSize(200,75);
+        cheatFrame.add(idField);
+        cheatFrame.setVisible(true);
+
         try {
             backgroundImage = ImageIO.read(getClass().getResourceAsStream("/skins/universe.jpg"));
             backgroundTexture = new TexturePaint(
@@ -259,7 +279,10 @@ public class GUniverse extends JFrame {
                                 g2d.drawImage(bonus.getScaledInstance(radius + radius, radius + radius, 0), x - radius / 2, y - radius / 2, this);
                             } else if (body.getClass() == Planet.class) {
                                 if(body.getName().indexOf("MOON") != 0)
-                                g2d.drawString(body.getName(), x - (body.getName().length() / 2) * 5 + radius / 2, y - 10);
+                                {
+                                    String displayed = body.getName() + " : " + body.getId();
+                                    g2d.drawString(displayed, x - (displayed.length() / 2) * 5 + radius / 2, y - 10);
+                                }
                                 g2d.drawImage(planets.get(((Planet) body).getIdSkin()).getScaledInstance(radius, radius, 0), x, y, this);
 
                                 switch (((Planet) body).getActiveBonus()) {
